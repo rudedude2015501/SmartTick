@@ -1,10 +1,10 @@
-import React from 'react'
-import Header from './Header'
+import React from 'react';
+import Chart from './Chart';
 
 function App() {
   return (
     <>
-      <Header />
+      <Chart />
     </>
   )
 }
