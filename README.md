@@ -10,13 +10,10 @@ Ensure you have the correct version of Node.js and npm installed:
 To install the LTS version of Node.js, go to the official website:  
 [Download Node.js LTS](https://nodejs.org/en/)
 
-To verify your installation, run the following commands:
-
-node -v
-npm -v
+To verify your installation, run the following commands:  
+node -v  
+npm -v  
 
 # Frontend
-
-Install Project Dependencies: npm install
-
+Install Project Dependencies (Inside frontend folder): npm install  
 Run the Development Server: npm run dev
