@@ -1,0 +1,17 @@
+# flask 
+Flask==2.3.2
+Flask-CORS==4.0.0  # For frontend-backend communication
+
+# database 
+Flask-SQLAlchemy==3.0.3  # ORM for PostgreSQL
+psycopg2-binary==2.9.6   # PostgreSQL adapter
+Flask-Migrate==4.0.4     # Database migrations
+
+# api development 
+python-dotenv==1.0.0     # Environment variables
+requests==2.31.0         # For fetching external API data (if scraping Congress data)
+
+# optional packages 
+pandas==2.0.3           # If analyzing trade data
+python-dateutil==2.8.2  # For date handling
+

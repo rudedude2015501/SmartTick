@@ -1,0 +1,73 @@
+### General OS and Editor Files ###
+.DS_Store
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+*.code-workspace
+
+### Python ###
+# Byte-compiled files
+__pycache__/
+*.py[cod]
+*.pyc
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# Flask secret files
+instance/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+### Node.js/React ###
+# Dependencies
+node_modules/
+frontend/node_modules/
+
+# Build files
+dist/
+frontend/dist/
+build/
+frontend/build/
+
+# Cache
+.npm
+.yarn
+.yarn-integrity
+.pnp.*
+.cache/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+### Database ###
+# PostgreSQL data (managed by Docker volume)
+postgres_data/
+
+# SQLite files (if any)
+*.sqlite
+*.sqlite3
+
+### Docker ###
+# Docker compose override files
+docker-compose.override.yml
+
+# Docker build files
+**/Dockerfile.dev
+**/docker-compose.dev.yml
+
+### Vite/React ###
+# Vite cache
+frontend/.vite/
+frontend/.env
+frontend/.env.*
+
