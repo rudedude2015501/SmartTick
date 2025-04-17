@@ -10,11 +10,6 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
 
   # flask backend
   backend:
@@ -29,13 +24,7 @@ services:
       - FLASK_ENV=development
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
     depends_on:
-      db:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:5000 || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
+      - db
 
   # react/vite frontend
   frontend:
@@ -46,8 +35,7 @@ services:
       - ./frontend:/app
       - frontend_node_modules:/app/node_modules
     depends_on:
-      backend:
-        condition: service_healthy
+      - backend
     environment:
       - CHOKIDAR_USEPOLLING=true
       - VITE_API_URL=http://backend:5000
