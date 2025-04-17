@@ -1,28 +1,21 @@
-# python image with version 3.11 
-# ensures consitent python version between us 
-FROM python:3.11 
+# Use the official Python 3.11 image
+FROM python:3.11
 
-# set a working directory inside our container 
-# all following commands run from /app 
-WORKDIR /app 
+# Set the working directory inside the container
+WORKDIR /app
 
-# copy requirements first to leverage Docker cache 
-# allows docker to cache `pip install` 
+# Copy requirements first to leverage Docker cache
 COPY requirements.txt .
 
-# install dependencies 
-# runs in the container /app directory
-RUN pip install -r requirements.txt
+# Install dependencies
+RUN pip install --no-cache-dir -r requirements.txt
 
-# copy rest of the application 
-# includes flask code, templates, etc 
-COPY . . 
+# Copy the rest of the application into the container
+COPY . .
 
-# expose port for FLask (default port: 5000) 
-# does not publish the port, just documents it 
-EXPOSE 5000 
+# Expose port for Flask (default: 5000)
+EXPOSE 5000
 
-# command to run the flask dev server 
-# the host makes the server accessible outside our container 
-CMD ["flask", "run", "--host=0.0.0.0"]
+# Command to run the Flask dev server
+CMD ["flask", "run", "--host=0.0.0.0", "--port=5000"]
 

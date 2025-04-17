@@ -1,27 +1,20 @@
-# official node image 
-# ensures we all use the same node version 
-FROM node:18 
+# Use the official Node.js 18 image
+FROM node:lts
 
-# set working directories 
-# all following commands will run in /app 
+# Set the working directory inside the container
 WORKDIR /app
 
-# copy package files first to leverage docker cache 
-COPY package.json yarn.lock* package-lock.json* ./ 
+# Copy package.json and package-lock.json to leverage Docker cache
+COPY package.json package-lock.json ./
 
-# install dependencies 
-# runs in the container /app directory 
-RUN npm install 
+# Install dependencies
+RUN npm install
 
-# copy the rest of the application onto the container
+# Copy the rest of the application into the container
 COPY . .
 
-# build the react app 
-# vite wil bundle and optimize our code 
-RUN npm run build 
+# Expose the port the app runs on (Vite default: 5173)
+EXPOSE 5173
 
-# port the app runs on (current port: Vite default)
-EXPOSE 5173 
-
-# command to run the dev server when the container starts  
+# Command to run the development server when the container starts
 CMD ["npm", "run", "dev"]
