@@ -1,8 +1,11 @@
+import os
 import finnhub
 import websocket
 
-# put your finnhub API key here when testing
-API_KEY = ""
+# put your finnhub API key into .env file
+API_KEY = os.getenv("FINNHUB_API_KEY")
+if not API_KEY:
+    raise ValueError("FINNHUB_API_KEY is not set in the environment variables.")
 
 # Setup client
 finnhub_client = finnhub.Client(api_key=API_KEY)

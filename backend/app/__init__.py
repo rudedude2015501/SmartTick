@@ -1,6 +1,8 @@
-from flask import Flask
+import os
+from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from .finnhub_client import get_profile
 
 # ── 1.  shared extension objects ────────────────────────────
 db = SQLAlchemy()          # models will import this
@@ -11,9 +13,7 @@ def create_app() -> Flask:
     app = Flask(__name__)
 
     # ---- configuration ----
-    app.config["SQLALCHEMY_DATABASE_URI"] = (
-        "postgresql://smarttick:cse115a@db:5432/tickdb"
-    )
+    app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     # ---- initialise extensions ----
@@ -26,6 +26,11 @@ def create_app() -> Flask:
 
     @app.route("/")
     def home():
-        return "SmartTick backend is running"
+        try:
+            # Fetch the Apple (AAPL) company profile
+            profile = get_profile("AAPL")
+            return jsonify(profile)  # Return the profile as JSON
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500  # Return error if something goes wrong
 
     return app
