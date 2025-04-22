@@ -1,5 +1,6 @@
 import os
 from flask import Flask, jsonify
+from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from .finnhub_client import get_profile
@@ -11,6 +12,7 @@ migrate = Migrate()        # flask db … commands come from this
 # ── 2.  app factory ─────────────────────────────────────────
 def create_app() -> Flask:
     app = Flask(__name__)
+    CORS(app)
 
     # ---- configuration ----
     app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
@@ -26,11 +28,15 @@ def create_app() -> Flask:
 
     @app.route("/")
     def home():
+        return "SmartTick backend is running"
+    
+    @app.route("/api/profile/<symbol>", methods=["GET"])
+    def profile(symbol):
         try:
-            # Fetch the Apple (AAPL) company profile
-            profile = get_profile("AAPL")
-            return jsonify(profile)  # Return the profile as JSON
+            # Call the get_profile function to fetch company profile
+            profile_data = get_profile(symbol)
+            return jsonify(profile_data)  # Return the profile as JSON
         except Exception as e:
-            return jsonify({"error": str(e)}), 500  # Return error if something goes wrong
-
+            # Handle errors and return a 500 status code
+            return jsonify({"error": str(e)}), 500
     return app
