@@ -80,84 +80,84 @@ function App() {
 
   return (
     <>
-    <AppBar position="static" sx={{ backgroundColor: '#1976d2' }}>
-  <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
-    <Typography variant="h6" noWrap component="div">
-      SmartTick
-    </Typography>
-    <Search>
-      <SearchIconWrapper>
-        <SearchIcon />
-      </SearchIconWrapper>
-      <StyledInputBase
-        placeholder="Search…"
-        inputProps={{ 'aria-label': 'search' }}
-        value={symbol}
-        onChange={(e) => setSymbol(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') handleSearch(e);
-        }}
-      />
-    </Search>
-  </Toolbar>
-</AppBar>
-    <Box sx={{ backgroundColor: '#f5f5f5', minHeight: '100vh', py: 4 }}>
-      <Container maxWidth="sm" sx={{ backgroundColor: '#ffffff', borderRadius: 2, p: 3, boxShadow: 3 }}>
-        <Typography variant="h4" component="h1" gutterBottom>
-          Stock Profile Search
-        </Typography>
-        <Box component="form" onSubmit={handleSearch} sx={{ display: 'flex', gap: 2, mb: 3 }}>
-          <TextField
-            label="Stock Symbol"
-            variant="outlined"
-            fullWidth
-            value={symbol}
-            onChange={(e) => setSymbol(e.target.value)}
-          />
-          <Button type="submit" variant="contained" color="primary">
-            Search
-          </Button>
-        </Box>
+      <AppBar position="static" sx={{ backgroundColor: '#1976d2' }}>
+        <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
+          <Typography variant="h6" noWrap component="div">
+            SmartTick
+          </Typography>
+          <Search>
+            <SearchIconWrapper>
+              <SearchIcon />
+            </SearchIconWrapper>
+            <StyledInputBase
+              placeholder="Search…"
+              inputProps={{ 'aria-label': 'search' }}
+              value={symbol}
+              onChange={(e) => setSymbol(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleSearch(e);
+              }}
+            />
+          </Search>
+        </Toolbar>
+      </AppBar>
+      <Box sx={{ backgroundColor: '#f5f5f5', minHeight: '100vh', py: 4 }}>
+        <Container maxWidth="sm" sx={{ backgroundColor: '#ffffff', borderRadius: 2, p: 3, boxShadow: 3 }}>
+          <Typography variant="h4" component="h1" gutterBottom>
+            Stock Profile Search
+          </Typography>
+          <Box component="form" onSubmit={handleSearch} sx={{ display: 'flex', gap: 2, mb: 3 }}>
+            <TextField
+              label="Stock Symbol"
+              variant="outlined"
+              fullWidth
+              value={symbol}
+              onChange={(e) => setSymbol(e.target.value)}
+            />
+            <Button type="submit" variant="contained" color="primary">
+              Search
+            </Button>
+          </Box>
 
-        {error && <Alert severity="error">{error}</Alert>}
+          {error && <Alert severity="error">{error}</Alert>}
 
-        {profileData && (
-          <Card sx={{ mt: 3 }}>
-            <CardContent>
-              <Typography variant="h5" component="div">
-                {profileData.name} ({profileData.ticker})
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                <strong>Industry:</strong> {profileData.finnhubIndustry}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                <strong>Market Capitalization:</strong> ${profileData.marketCapitalization} Billion
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                <strong>IPO Date:</strong> {profileData.ipo}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                <strong>Exchange:</strong> {profileData.exchange}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                <strong>Website:</strong>{' '}
-                <a href={profileData.weburl} target="_blank" rel="noopener noreferrer">
-                  {profileData.weburl}
-                </a>
-              </Typography>
-            </CardContent>
-            {profileData.logo && (
-              <CardMedia
-                component="img"
-                image={profileData.logo}
-                alt={`${profileData.name} logo`}
-                sx={{ maxWidth: 150, margin: '0 auto', padding: 2 }}
-              />
-            )}
-          </Card>
-        )}
-      </Container>
-    </Box>
+          {profileData && (
+            <Card sx={{ mt: 3 }}>
+              <CardContent>
+                <Typography variant="h5" component="div">
+                  {profileData.name} ({profileData.ticker})
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  <strong>Industry:</strong> {profileData.finnhubIndustry}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  <strong>Market Capitalization:</strong> ${profileData.marketCapitalization} Billion
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  <strong>IPO Date:</strong> {profileData.ipo}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  <strong>Exchange:</strong> {profileData.exchange}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  <strong>Website:</strong>{' '}
+                  <a href={profileData.weburl} target="_blank" rel="noopener noreferrer">
+                    {profileData.weburl}
+                  </a>
+                </Typography>
+              </CardContent>
+              {profileData.logo && (
+                <CardMedia
+                  component="img"
+                  image={profileData.logo}
+                  alt={`${profileData.name} logo`}
+                  sx={{ maxWidth: 150, margin: '0 auto', padding: 2 }}
+                />
+              )}
+            </Card>
+          )}
+        </Container>
+      </Box>
     </>
   );
 }
