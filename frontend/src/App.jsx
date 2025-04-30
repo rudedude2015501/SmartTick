@@ -1,157 +1,167 @@
-import React, { useState } from 'react';
-import Container from '@mui/material/Container';
-import Typography from '@mui/material/Typography';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import CardMedia from '@mui/material/CardMedia';
-import Alert from '@mui/material/Alert';
-import Box from '@mui/material/Box';
-import AppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
-import InputBase from '@mui/material/InputBase';
-import { alpha, styled } from '@mui/material/styles';
-import SearchIcon from '@mui/icons-material/Search';
+// SmartTick/frontend/src/App.jsx
+import React, { useState, useEffect, useCallback } from 'react';
+import TradeChart from './Chart'; // Import the chart component
+import './App.css'; // Ensure basic CSS is imported
 
-// Styled components
-const Search = styled('div')(({ theme }) => ({
-  position: 'relative',
-  borderRadius: theme.shape.borderRadius,
-  backgroundColor: alpha(theme.palette.common.white, 0.15),
-  '&:hover': {
-    backgroundColor: alpha(theme.palette.common.white, 0.25),
-  },
-  marginLeft: 0,
-  width: '100%',
-  [theme.breakpoints.up('sm')]: {
-    marginLeft: theme.spacing(1),
-    width: 'auto',
-  },
-}));
-
-const SearchIconWrapper = styled('div')(({ theme }) => ({
-  padding: theme.spacing(0, 2),
-  height: '100%',
-  position: 'absolute',
-  pointerEvents: 'none',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-}));
-
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-  color: 'inherit',
-  '& .MuiInputBase-input': {
-    padding: theme.spacing(1, 1, 1, 0),
-    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-    transition: theme.transitions.create('width'),
-    width: '100%',
-    [theme.breakpoints.up('sm')]: {
-      width: '20ch',
-      '&:focus': {
-        width: '30ch',
-      },
-    },
-  },
-}));
+// Get API URL from environment variable (set by Docker/Vite)
+// Provides a fallback for local development outside Docker
+const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 function App() {
-  const [symbol, setSymbol] = useState(''); // User input for stock symbol
-  const [profileData, setProfileData] = useState(null); // Fetched stock profile data
-  const [error, setError] = useState(null); // Error message
+  // State variables
+  const [symbol, setSymbol] = useState(''); // Current value in the input field
+  const [searchSymbol, setSearchSymbol] = useState(''); // The symbol that was last searched for
+  const [chartData, setChartData] = useState([]); // Data for the chart, fetched from API
+  const [isLoading, setIsLoading] = useState(false); // Tracks if an API call is in progress
+  const [error, setError] = useState(null); // Stores any error message from the API call
 
-  // Handle search submission
-  const handleSearch = async (e) => {
-    e.preventDefault();
-    setError(null);
-    setProfileData(null);
+  // Function to fetch trade summary data from the backend API
+  // useCallback ensures the function reference is stable unless dependencies change
+  const fetchTradeSummary = useCallback(async (symbolToFetch) => {
+    // Don't fetch if the symbol is empty
+    if (!symbolToFetch) {
+      setChartData([]); // Clear chart
+      setError(null); // Clear errors
+      setSearchSymbol(''); // Clear the last searched symbol
+      return;
+    }
+
+    console.log(`Fetching data for symbol: ${symbolToFetch} from ${apiUrl}/api/trades/summary/${symbolToFetch}`);
+    setIsLoading(true); // Set loading state to true
+    setError(null); // Clear previous errors
+    setChartData([]); // Clear previous chart data
 
     try {
-      const response = await fetch(`http://localhost:5000/api/profile/${symbol}`);
+      // Make the API call
+      const response = await fetch(`${apiUrl}/api/trades/summary/${symbolToFetch}`);
+
+      // Check if the response status indicates an error
       if (!response.ok) {
-        throw new Error(`Error: ${response.statusText}`);
+        let errorMsg = `Error: ${response.status} ${response.statusText}`;
+        // Try to parse a JSON error message from the backend response body
+        try {
+            const errData = await response.json();
+            // Use the backend's error message if available
+            errorMsg = errData.error || errorMsg;
+        } catch (jsonError) {
+            // If the response body isn't JSON or is empty, stick with the status text
+            console.warn("Could not parse error response as JSON:", jsonError);
+        }
+        throw new Error(errorMsg); // Throw an error to be caught below
       }
+
+      // Parse the successful JSON response
       const data = await response.json();
-      setProfileData(data);
+      console.log("Received data:", data);
+      setChartData(data); // Update chart data state
+
     } catch (err) {
-      setError(err.message);
+      // Handle any errors during fetch or processing
+      console.error("Failed to fetch trade summary:", err);
+      setError(err.message || 'Failed to fetch data. Check network or backend server.'); // Set the error message state
+      setChartData([]); // Ensure chart is cleared on error
+    } finally {
+      // This block always runs, regardless of success or error
+      setIsLoading(false); // Set loading state back to false
+    }
+  }, []); // Empty dependency array means this function is created once
+
+  // Handler for the search form submission
+  const handleSearch = (event) => {
+    event.preventDefault(); // Prevent default form submission (which causes page reload)
+    const trimmedSymbol = symbol.trim().toUpperCase(); // Trim whitespace and convert to uppercase
+    if (trimmedSymbol) {
+        setSearchSymbol(trimmedSymbol); // Store the symbol being searched
+        fetchTradeSummary(trimmedSymbol); // Call the fetch function
     }
   };
 
+  // Handler for changes in the input field
+  const handleInputChange = (event) => {
+    setSymbol(event.target.value); // Update the symbol state as the user types
+  };
+
+  // --- Render Logic ---
+  // Helper function to determine what content to show in the chart area
+  const renderChartAreaContent = () => {
+    if (isLoading) {
+      return <div className="text-center text-blue-600 p-4">Loading chart data...</div>;
+    }
+    if (error) {
+      return (
+        <div className="text-center text-red-600 mb-4 p-3 bg-red-100 border border-red-400 rounded">
+          <p>Error: {error}</p>
+        </div>
+      );
+    }
+    if (chartData.length > 0) {
+      return (
+        <>
+          <h2 className="text-xl font-semibold text-center mb-4 text-gray-700">
+            Monthly Trade Summary for: {searchSymbol}
+          </h2>
+          {/* Render the chart component with the fetched data */}
+          <TradeChart data={chartData} />
+        </>
+      );
+    }
+    if (searchSymbol) {
+      // If a search was performed but resulted in no data and no error
+      return (
+        <div className="text-center text-gray-500 p-4">
+          No trade data found for symbol "{searchSymbol}". It might be an invalid symbol or have no recorded trades.
+        </div>
+      );
+    }
+    // Default state before any search or if search was cleared
+    return (
+      <div className="text-center text-gray-500 p-4">
+        Enter a stock symbol (e.g., AAPL, MSFT) above and click Search to view the trade summary.
+      </div>
+    );
+  };
+
+
   return (
-    <>
-      {/* AppBar with Search */}
-      <AppBar sx={{ backgroundColor: '#1976d2' }}>
-        <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Typography variant="h6" noWrap>
-            SmartTick
-          </Typography>
-          <Search>
-            <SearchIconWrapper>
-              <SearchIcon />
-            </SearchIconWrapper>
-            <StyledInputBase
-              placeholder="Search…"
-              inputProps={{ 'aria-label': 'search' }}
-              value={symbol}
-              onChange={(e) => setSymbol(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') handleSearch(e);
-              }}
-            />
-          </Search>
-        </Toolbar>
-      </AppBar>
-      <Toolbar />
-      <Box sx={{ backgroundColor: '#f5f5f5', minHeight: '100vh', py: 4 }}>
-        {profileData || error ? (
-          <Container maxWidth="sm" sx={{ backgroundColor: '#ffffff', borderRadius: 2, p: 3, boxShadow: 3 }}>
-            <Typography variant="h4" component="h1" gutterBottom>
-              Stock Profile
-            </Typography>
+    <div className="min-h-screen bg-gray-100 p-4 md:p-8 font-sans"> {/* Added font-sans */}
+      <header className="text-center mb-8">
+        <h1 className="text-3xl md:text-4xl font-bold text-gray-800">SmartTick</h1>
+        <p className="text-gray-600 mt-1">Politician Trade Visualizer</p>
+      </header>
 
-            {/* Error Message */}
-            {error && <Alert severity="error">{error}</Alert>}
+      {/* Search Form */}
+      <div className="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md mb-8">
+        <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-4">
+          <label htmlFor="symbolInput" className="sr-only">Stock Symbol</label> {/* Added label for accessibility */}
+          <input
+            id="symbolInput" // Added id to link label
+            type="text"
+            value={symbol}
+            onChange={handleInputChange}
+            placeholder="Enter Stock Symbol (e.g., AAPL)"
+            className="flex-grow p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out"
+            aria-label="Stock Symbol" // Aria-label still useful
+            required // Basic HTML5 validation
+          />
+          <button
+            type="submit"
+            disabled={isLoading || !symbol.trim()} // Disable button when loading or input is empty/whitespace
+            className="px-6 py-3 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition duration-150 ease-in-out"
+          >
+            {isLoading ? 'Loading...' : 'Search'}
+          </button>
+        </form>
+      </div>
 
-            {/* Stock Profile Data */}
-            {profileData && (
-              <Card sx={{ mt: 3 }}>
-                <CardContent>
-                  <Typography variant="h5">
-                    {profileData.name} ({profileData.ticker})
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    <strong>Industry:</strong> {profileData.finnhubIndustry}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    <strong>Market Capitalization:</strong> ${profileData.marketCapitalization} Billion
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    <strong>IPO Date:</strong> {profileData.ipo}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    <strong>Exchange:</strong> {profileData.exchange}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    <strong>Website:</strong>{' '}
-                    <a href={profileData.weburl} target="_blank" rel="noopener noreferrer">
-                      {profileData.weburl}
-                    </a>
-                  </Typography>
-                </CardContent>
-                {profileData.logo && (
-                  <CardMedia
-                    component="img"
-                    image={profileData.logo}
-                    alt={`${profileData.name} logo`}
-                    sx={{ maxWidth: 150, margin: '0 auto', padding: 2 }}
-                  />
-                )}
-              </Card>
-            )}
-          </Container>
-        ) : null}
-      </Box>
-    </>
+      {/* Chart Display Area */}
+      <div className="max-w-4xl mx-auto bg-white p-4 md:p-6 rounded-lg shadow-md min-h-[200px] flex flex-col justify-center"> {/* Added min-height and flex centering for messages */}
+        {renderChartAreaContent()} {/* Render loading/error/chart/message */}
+      </div>
+
+      <footer className="text-center mt-8 text-gray-500 text-sm">
+        Data aggregated from public politician trade filings. Amounts are approximate based on reported value ranges.
+      </footer>
+    </div>
   );
 }
 

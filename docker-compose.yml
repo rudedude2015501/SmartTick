@@ -39,7 +39,7 @@ services:
       - backend
     environment:
       - CHOKIDAR_USEPOLLING=true
-      - VITE_API_URL=http://backend:5000
+      - VITE_API_URL=http://localhost:5000
 
 volumes:
   postgres_data:
