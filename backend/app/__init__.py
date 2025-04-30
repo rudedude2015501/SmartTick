@@ -7,7 +7,10 @@ from flask_cors import CORS
 from sqlalchemy import func, extract, case, cast, Integer
 import re
 # Import date type for checking
-from datetime import date # <-- Import date
+from datetime import date
+# --- Import Finnhub client ---
+# *** Corrected function name ***
+from .finnhub_client import get_profile # Import the correct function name
 
 # --- Initialize extensions outside the factory ---
 db = SQLAlchemy()
@@ -103,6 +106,13 @@ def create_app(config_class=None):
     app = Flask(__name__)
     CORS(app) # Enable CORS for frontend requests
 
+    # --- Environment Variable Check ---
+    # Check if FINNHUB_API_KEY is set, log warning if not
+    if not os.environ.get('FINNHUB_API_KEY'):
+        app.logger.warning("FINNHUB_API_KEY environment variable not set. Stock profile endpoint will likely fail.")
+    # --- End Check ---
+
+
     # Configuration (ensure DATABASE_URL is set in environment)
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///default.db')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -118,6 +128,41 @@ def create_app(config_class=None):
     @app.route('/')
     def hello():
         return "Hello from SmartTick Backend!"
+
+    # --- NEW: API Endpoint for Stock Profile ---
+    @app.route('/api/profile/<symbol>')
+    def stock_profile(symbol):
+        """
+        Fetches stock profile information using the Finnhub client.
+        """
+        if not symbol:
+            return jsonify({"error": "Stock symbol is required"}), 400
+
+        # Normalize symbol (optional, Finnhub might handle various cases)
+        normalized_symbol = symbol.upper()
+
+        try:
+            # Call the function from finnhub_client.py
+            # *** Corrected function call ***
+            profile_data = get_profile(normalized_symbol) # Use the correct function name
+
+            if profile_data:
+                # Check if the response indicates an error (e.g., empty dict for unknown symbol)
+                if not profile_data.get('name'): # Check for a key expected in a valid profile
+                     app.logger.warning(f"Finnhub returned empty profile for symbol: {normalized_symbol}")
+                     return jsonify({"error": f"No profile data found for symbol {normalized_symbol}"}), 404
+                return jsonify(profile_data)
+            else:
+                # Handle cases where finnhub_client might return None or an empty dict
+                app.logger.error(f"Failed to get profile data from Finnhub for symbol: {normalized_symbol}")
+                return jsonify({"error": f"Could not retrieve profile data for symbol {normalized_symbol}"}), 404
+
+        except Exception as e:
+            # Log the exception from the Finnhub client or other issues
+            app.logger.error(f"Error fetching profile for {normalized_symbol}: {e}", exc_info=True)
+            return jsonify({"error": "An internal server error occurred while fetching profile data"}), 500
+    # --- END Stock Profile Endpoint ---
+
 
     # API Endpoint for Trade Summary
     @app.route('/api/trades/summary/<symbol>')
@@ -200,9 +245,9 @@ def create_app(config_class=None):
             # Log the error for debugging
             # Use app.logger for proper logging within Flask
             app.logger.error(f"Error fetching trade summary for {symbol}: {e}", exc_info=True) # exc_info=True logs traceback
-            # import traceback # Not needed if using exc_info=True
-            # app.logger.error(traceback.format_exc())
-            return jsonify({"error": "An internal server error occurred"}), 500
+            return jsonify({"error": "An internal server error occurred while fetching trade summary"}), 500
 
     # --- Return the configured app instance ---
     return app
+
+    
