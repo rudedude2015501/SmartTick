@@ -31,8 +31,6 @@ def load_trade_data():
     with app.app_context():
         try:
             # Ensure the file path is correct relative to where the script runs
-            # Inside the container, it should be '/app/1yeartrade.json'
-            # The volume mount maps ./backend on host to /app in container
             with open('1yeartrade.json', 'r', encoding='utf-8') as f:
                 trade_data = json.load(f)
         except FileNotFoundError:
@@ -40,6 +38,17 @@ def load_trade_data():
             return
         except json.JSONDecodeError:
             print("Error: Could not decode JSON from 1yeartrade.json.")
+            return
+
+        # --- Clear the Trade table before inserting new data ---
+        print("Clearing existing trade data from the database...")
+        try:
+            db.session.query(Trade).delete()  # Deletes all rows in the Trade table
+            db.session.commit()
+            print("Existing trade data cleared successfully.")
+        except Exception as e:
+            db.session.rollback()
+            print(f"Error clearing trade data: {e}")
             return
 
         trades_to_add = []
@@ -55,7 +64,7 @@ def load_trade_data():
             if trade_date_str and not trade_date:
                 failed_parses += 1
             elif trade_date:
-                successful_parses +=1
+                successful_parses += 1
 
             trade = Trade(
                 politician_name=record.get('politician_name'),
@@ -65,7 +74,7 @@ def load_trade_data():
                 traded_issuer_ticker=record.get('traded_issuer_ticker'),
                 traded_issuer_link=record.get('traded_issuer_link'),
                 published=record.get('published'),
-                traded=trade_date, # Use the parsed date object (can be None)
+                traded=trade_date,  # Use the parsed date object (can be None)
                 filed_after=record.get('filed_after'),
                 owner=record.get('owner'),
                 type=record.get('type'),
@@ -75,33 +84,32 @@ def load_trade_data():
             trades_to_add.append(trade)
 
             # Optional: Print progress periodically
-            if (i + 1) % 5000 == 0: # Print less often for large files
+            if (i + 1) % 5000 == 0:  # Print less often for large files
                 print(f"Processed {i + 1} records...")
 
         print(f"\nFinished processing JSON.")
         print(f"Successfully parsed {successful_parses} dates.")
         if failed_parses > 0:
-             print(f"Failed to parse {failed_parses} dates (see warnings above).")
+            print(f"Failed to parse {failed_parses} dates (see warnings above).")
 
         if trades_to_add:
             print(f"\nAdding {len(trades_to_add)} trades to the database session...")
             # Add in chunks to potentially manage memory better (optional)
             chunk_size = 5000
             for i in range(0, len(trades_to_add), chunk_size):
-                 chunk = trades_to_add[i:i + chunk_size]
-                 db.session.add_all(chunk)
-                 print(f"Added chunk {i // chunk_size + 1} to session...")
+                chunk = trades_to_add[i:i + chunk_size]
+                db.session.add_all(chunk)
+                print(f"Added chunk {i // chunk_size + 1} to session...")
 
             try:
                 print("\nCommitting changes to the database...")
                 db.session.commit()
                 print("Trade data loaded successfully.")
             except Exception as e:
-                db.session.rollback() # Rollback on error
+                db.session.rollback()  # Rollback on error
                 print(f"\n--- Database Commit Error ---")
                 print(f"An error occurred: {e}")
                 print("Database changes have been rolled back.")
-                # Log the full traceback for detailed debugging
                 import traceback
                 traceback.print_exc()
                 print("-----------------------------\n")
