@@ -11,6 +11,13 @@ import Toolbar from '@mui/material/Toolbar';
 import InputBase from '@mui/material/InputBase';
 import { alpha, styled } from '@mui/material/styles';
 import SearchIcon from '@mui/icons-material/Search';
+import CircularProgress from '@mui/material/CircularProgress';
+
+import TradeChart from './Chart';
+
+
+// Get API URL from environment variable
+const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 // Styled components
 const Search = styled('div')(({ theme }) => ({
@@ -54,33 +61,71 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
+// Main App component
 function App() {
-  const [symbol, setSymbol] = useState(''); // User input for stock symbol
-  const [profileData, setProfileData] = useState(null); // Fetched stock profile data
-  const [error, setError] = useState(null); // Error message
+  const [symbol, setSymbol] = useState('');
+  const [searchSymbol, setSearchSymbol] = useState('');
+  const [profileData, setProfileData] = useState(null);
+  const [chartData, setChartData] = useState([]);
+  const [isLoadingProfile, setIsLoadingProfile] = useState(false);
+  const [profileError, setProfileError] = useState(null);
+  const [isLoadingChart, setIsLoadingChart] = useState(false);
+  const [chartError, setChartError] = useState(null);
 
-  // Handle search submission
-  const handleSearch = async (e) => {
-    e.preventDefault();
-    setError(null);
-    setProfileData(null);
+  // Handle search function
+  const handleSearch = async (event) => {
+    event.preventDefault();
+
+    const trimmedSymbol = symbol.trim();
+    if (!trimmedSymbol) return; // Don't search if input is empty
+
+    setSearchSymbol(trimmedSymbol); // Store the searched symbol
+
+    // Reset states before fetching
+    resetStates();
 
     try {
-      const response = await fetch(`http://localhost:5000/api/profile/${symbol}`);
-      if (!response.ok) {
+      // Fetch Profile Data
+      const profileResponse = await fetch(`${apiUrl}/api/profile/${trimmedSymbol}`);
+      if (!profileResponse.ok) {
         throw new Error(`Error: ${response.statusText}`);
       }
-      const data = await response.json();
-      setProfileData(data);
+      const profileData = await profileResponse.json();
+      setProfileData(profileData);
     } catch (err) {
-      setError(err.message);
+      setProfileError(err.message);
+    } finally {
+      setIsLoadingProfile(false);
     }
+
+    try {
+      // Fetch Trade Summary Data
+      const chartResponse = await fetch(`${apiUrl}/api/trades/summary/${trimmedSymbol}`);
+      if (!chartResponse.ok) {
+        throw new Error(`Error: ${response.statusText}`);
+      }
+      const chartData = await chartResponse.json();
+      setChartData(chartData);
+    } catch (err) {
+      setChartError(err.message);
+    } finally {
+      setIsLoadingChart(false);
+    }
+  };
+
+  // Reset states before fetching
+  const resetStates = () => {
+    setProfileData(null);
+    setChartData([]);
+    setProfileError(null);
+    setChartError(null);
+    setIsLoadingProfile(true);
+    setIsLoadingChart(true);
   };
 
   return (
     <>
-      {/* AppBar with Search */}
-      <AppBar sx={{ backgroundColor: '#1976d2' }}>
+      <AppBar position="fixed">
         <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
           <Typography variant="h6" noWrap>
             SmartTick
@@ -101,55 +146,99 @@ function App() {
           </Search>
         </Toolbar>
       </AppBar>
+
+      {/* Offset content below fixed AppBar */}
       <Toolbar />
-      <Box sx={{ backgroundColor: '#f5f5f5', minHeight: '100vh', py: 4 }}>
-        {profileData || error ? (
-          <Container maxWidth="sm" sx={{ backgroundColor: '#ffffff', borderRadius: 2, p: 3, boxShadow: 3 }}>
-            <Typography variant="h4" component="h1" gutterBottom>
-              Stock Profile
+
+      <Box sx={{ backgroundColor: '#f5f5f5', minHeight: 'calc(100vh - 64px)', py: 4, px: 2 }}>
+        <Container maxWidth="md">
+          {searchSymbol ? (
+            <Box>
+              {/* Profile Section */}
+              <Box mb={4}>
+                <Card sx={{ boxShadow: 3, borderRadius: 2 }}>
+                  <CardContent>
+                    {isLoadingProfile && (
+                      <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+                        <CircularProgress />
+                      </Box>
+                    )}
+                    {profileError && <Alert severity="warning" sx={{ mt: 1, mb: 1 }}>{profileError}</Alert>}
+                    {!isLoadingProfile && !profileError && !profileData && (
+                      <Typography sx={{ p: 2, color: 'text.secondary' }}>No profile data found.</Typography>
+                    )}
+                    {profileData && (
+                      <>
+                        <Typography variant="h6" component="div">
+                          {profileData.name} ({profileData.ticker})
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                          <strong>Industry:</strong> {profileData.finnhubIndustry || 'N/A'}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          <strong>Market Cap:</strong> $
+                          {profileData.marketCapitalization?.toLocaleString() || 'N/A'} Billion
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          <strong>IPO Date:</strong> {profileData.ipo || 'N/A'}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          <strong>Exchange:</strong> {profileData.exchange || 'N/A'}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          <strong>Website:</strong>{' '}
+                          {profileData.weburl ? (
+                            <a href={profileData.weburl} target="_blank" rel="noopener noreferrer">
+                              {profileData.weburl}
+                            </a>
+                          ) : (
+                            'N/A'
+                          )}
+                        </Typography>
+                        {profileData.logo && (
+                          <CardMedia
+                            component="img"
+                            image={profileData.logo}
+                            alt={`${profileData.name} logo`}
+                            sx={{
+                              maxWidth: 100,
+                              margin: '16px auto 0',
+                              padding: 1,
+                              border: '1px solid #eee',
+                              borderRadius: 1,
+                            }}
+                          />
+                        )}
+                      </>
+                    )}
+                  </CardContent>
+                </Card>
+              </Box>
+
+              {/* Trade Chart Section */}
+              <Box>
+                <Card sx={{ boxShadow: 3, borderRadius: 2, p: 2, minHeight: 450 }}>
+                  {isLoadingChart && (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', minHeight: 300 }}>
+                      <CircularProgress />
+                    </Box>
+                  )}
+                  {chartError && <Alert severity="warning" sx={{ mt: 1, mb: 1 }}>{chartError}</Alert>}
+                  {!isLoadingChart && !chartError && chartData.length === 0 && (
+                    <Typography sx={{ p: 2, color: 'text.secondary', textAlign: 'center', mt: 4 }}>
+                      No trade summary data found for this period.
+                    </Typography>
+                  )}
+                  {!isLoadingChart && chartData.length > 0 && <TradeChart data={chartData} />}
+                </Card>
+              </Box>
+            </Box>
+          ) : (
+            <Typography sx={{ textAlign: 'center', color: 'text.secondary', mt: 10 }}>
+              Enter a stock symbol in the search bar above to view its profile and trade summary.
             </Typography>
-
-            {/* Error Message */}
-            {error && <Alert severity="error">{error}</Alert>}
-
-            {/* Stock Profile Data */}
-            {profileData && (
-              <Card sx={{ mt: 3 }}>
-                <CardContent>
-                  <Typography variant="h5">
-                    {profileData.name} ({profileData.ticker})
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    <strong>Industry:</strong> {profileData.finnhubIndustry}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    <strong>Market Capitalization:</strong> ${profileData.marketCapitalization} Billion
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    <strong>IPO Date:</strong> {profileData.ipo}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    <strong>Exchange:</strong> {profileData.exchange}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    <strong>Website:</strong>{' '}
-                    <a href={profileData.weburl} target="_blank" rel="noopener noreferrer">
-                      {profileData.weburl}
-                    </a>
-                  </Typography>
-                </CardContent>
-                {profileData.logo && (
-                  <CardMedia
-                    component="img"
-                    image={profileData.logo}
-                    alt={`${profileData.name} logo`}
-                    sx={{ maxWidth: 150, margin: '0 auto', padding: 2 }}
-                  />
-                )}
-              </Card>
-            )}
-          </Container>
-        ) : null}
+          )}
+        </Container>
       </Box>
     </>
   );
