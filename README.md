@@ -14,9 +14,9 @@
 
 1. Build containers and run services: docker-compose up --build
 
-2. Run database migrations: docker-compose exec backend flask db upgrade
+2. Run database migrations: docker-compose exec backend flask db upgrade (Not needed on subsequent reruns)
 
-3. Load trade data: docker-compose exec backend python loadtrades.py
+3. Load trade data: docker-compose exec backend python loadtrades.py (Not needed on subsequent reruns)
 
 ## ⚠️ Errors
 
