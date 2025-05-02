@@ -1,23 +1,24 @@
-# SmartTick/backend/app/__init__.py
+# Standard library imports
 import os
+import re
+from datetime import date
+
+# Third-party imports
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_cors import CORS
-from sqlalchemy import func, extract, case, cast, Integer
-import re
-# Import date type for checking
-from datetime import date
-# --- Import Finnhub client ---
-# *** Corrected function name ***
-from .finnhub_client import get_profile # Import the correct function name
+from sqlalchemy import func
 
-# --- Initialize extensions outside the factory ---
+# Local application imports
+from .finnhub_client import get_profile
+
+# Shared extension objects
 db = SQLAlchemy()
 migrate = Migrate()
 
-# --- Helper function to convert size string to numeric midpoint ---
-# (Keep the size_to_numeric function as defined previously)
+
+# Helper Function
 def size_to_numeric(size_str):
     """
     Converts trade size string (e.g., '1K–15K', '< 1K', '1M–5M')
@@ -27,110 +28,65 @@ def size_to_numeric(size_str):
     if not size_str or size_str.lower() == 'n/a':
         return 0
 
-    size_str = size_str.replace(',', '').strip() # Clean up string
+    size_str = size_str.replace(',', '').strip()
 
-    # Handle greater/less than cases first
-    if size_str.startswith('<'):
-        match = re.search(r'< (\d+)([KkMm])?', size_str)
-        if match:
-            val = int(match.group(1))
-            mult = match.group(2)
-            if mult and mult.lower() == 'k': val *= 1000
-            elif mult and mult.lower() == 'm': val *= 1000000
-            return val / 2 # Estimate as half the upper bound
-        # Try parsing just '< 1k' etc.
-        match_simple = re.search(r'< (\d+)', size_str)
-        if match_simple:
-             val = int(match_simple.group(1))
-             # Assume K if value is small, M if large? Or require K/M?
-             # Let's assume K if < 1000, otherwise treat as base unit
-             return (val * 1000) / 2 if val < 1000 else val / 2
-        return 500 # Default for '< 1K' if specific value not found
+    def parse_multiplier(value, multiplier):
+        """Helper to apply K/M multiplier."""
+        if multiplier and multiplier.lower() == 'k':
+            return value * 1000
+        elif multiplier and multiplier.lower() == 'm':
+            return value * 1000000
+        return value
 
-    if size_str.startswith('>'):
-        match = re.search(r'> (\d+)([KkMm])?', size_str)
+    # Handle '<' and '>' cases
+    if size_str.startswith('<') or size_str.startswith('>'):
+        match = re.search(r'([<>])\s*(\d+)([KkMm]?)', size_str)
         if match:
-            val = int(match.group(1))
-            mult = match.group(2)
-            if mult and mult.lower() == 'k': val *= 1000
-            elif mult and mult.lower() == 'm': val *= 1000000
-            return val # Use the lower bound as estimate
-        # Try parsing just '> 50M' etc.
-        match_simple = re.search(r'> (\d+)', size_str)
-        if match_simple:
-             val = int(match_simple.group(1))
-             # Assume M if value is large?
-             return (val * 1000000) if val > 1000 else val
-        return 50000000 # Default for '> 50M'
+            operator, value, multiplier = match.groups()
+            value = parse_multiplier(int(value), multiplier)
+            return value / 2 if operator == '<' else value
 
     # Handle ranges (e.g., '1K–15K', '5M-25M')
-    # Use non-capturing group for K/M optionality
-    match = re.search(r'(\d+(?:[.,]\d+)?)\s?([KkMm])?\s?[-–]\s?(\d+(?:[.,]\d+)?)\s?([KkMm])?', size_str)
+    match = re.search(r'(\d+(?:[.,]\d+)?)\s?([KkMm]?)\s?[-–]\s?(\d+(?:[.,]\d+)?)\s?([KkMm]?)', size_str)
     if match:
-        val1_str, mult1, val2_str, mult2 = match.groups()
-        val1 = float(val1_str.replace(',', '.')) # Handle potential decimal commas
-        val2 = float(val2_str.replace(',', '.'))
-
-        if mult1 and mult1.lower() == 'k': val1 *= 1000
-        elif mult1 and mult1.lower() == 'm': val1 *= 1000000
-        if mult2 and mult2.lower() == 'k': val2 *= 1000
-        elif mult2 and mult2.lower() == 'm': val2 *= 1000000
-
-        # If only one multiplier is given, assume the other is the same or base unit
-        if mult1 and not mult2:
-             if val2 > val1: # e.g., 500K - 1M -> assume 500K - 1000K
-                 val2 *= 1000 if 'k' in mult1.lower() else 1000000
-        elif mult2 and not mult1:
-             if val1 < val2: # e.g., 1 - 5K -> assume 1K - 5K? This is ambiguous.
-                 # Let's assume base unit if multiplier missing on lower bound
-                 pass # val1 remains as parsed
-
-        return (val1 + val2) / 2 # Midpoint
+        val1, mult1, val2, mult2 = match.groups()
+        val1 = parse_multiplier(float(val1.replace(',', '.')), mult1)
+        val2 = parse_multiplier(float(val2.replace(',', '.')), mult2)
+        return (val1 + val2) / 2  # Return midpoint
 
     # Handle single values (e.g., '100K')
-    match = re.search(r'^(\d+(?:[.,]\d+)?)\s?([KkMm])?$', size_str)
+    match = re.search(r'^(\d+(?:[.,]\d+)?)\s?([KkMm]?)$', size_str)
     if match:
-        val_str, mult = match.groups()
-        val = float(val_str.replace(',', '.'))
-        if mult and mult.lower() == 'k': val *= 1000
-        elif mult and mult.lower() == 'm': val *= 1000000
-        return val
+        value, multiplier = match.groups()
+        return parse_multiplier(float(value.replace(',', '.')), multiplier)
 
-    print(f"Warning: Could not parse size string: {size_str}")
+    print(f"Could not parse size string: {size_str}")
     return 0
-# --- End Helper function ---
 
 
-def create_app(config_class=None):
+# Application Factory
+def create_app():
     """Application Factory Function"""
     app = Flask(__name__)
-    CORS(app) # Enable CORS for frontend requests
+    CORS(app)
 
-    # --- Environment Variable Check ---
-    # Check if FINNHUB_API_KEY is set, log warning if not
-    if not os.environ.get('FINNHUB_API_KEY'):
-        app.logger.warning("FINNHUB_API_KEY environment variable not set. Stock profile endpoint will likely fail.")
-    # --- End Check ---
+    # Configuration
+    app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-
-    # Configuration (ensure DATABASE_URL is set in environment)
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///default.db')
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-    # --- Initialize extensions with the app instance ---
+    # Initialize extensions
     db.init_app(app)
     migrate.init_app(app, db)
 
-    # --- Import models and register blueprints/routes ---
-    # Import models here *after* db is initialized and within the app context
-    from . import models # noqa - prevent unused import warning if models only used via db
+    # Import models
+    from . import models  # noqa: F401
 
+    # Routes
     @app.route('/')
-    def hello():
+    def home():
         return "Hello from SmartTick Backend!"
 
-    # --- NEW: API Endpoint for Stock Profile ---
-    @app.route('/api/profile/<symbol>')
+    @app.route('/api/profile/<symbol>', methods=["GET"])
     def stock_profile(symbol):
         """
         Fetches stock profile information using the Finnhub client.
@@ -138,34 +94,16 @@ def create_app(config_class=None):
         if not symbol:
             return jsonify({"error": "Stock symbol is required"}), 400
 
-        # Normalize symbol (optional, Finnhub might handle various cases)
-        normalized_symbol = symbol.upper()
-
         try:
-            # Call the function from finnhub_client.py
-            # *** Corrected function call ***
-            profile_data = get_profile(normalized_symbol) # Use the correct function name
-
-            if profile_data:
-                # Check if the response indicates an error (e.g., empty dict for unknown symbol)
-                if not profile_data.get('name'): # Check for a key expected in a valid profile
-                     app.logger.warning(f"Finnhub returned empty profile for symbol: {normalized_symbol}")
-                     return jsonify({"error": f"No profile data found for symbol {normalized_symbol}"}), 404
-                return jsonify(profile_data)
-            else:
-                # Handle cases where finnhub_client might return None or an empty dict
-                app.logger.error(f"Failed to get profile data from Finnhub for symbol: {normalized_symbol}")
-                return jsonify({"error": f"Could not retrieve profile data for symbol {normalized_symbol}"}), 404
-
+            profile_data = get_profile(symbol.upper())
+            if not profile_data or not profile_data.get('name'):
+                return jsonify({"error": f"No profile data found for symbol {symbol}"}), 404
+            return jsonify(profile_data)
         except Exception as e:
-            # Log the exception from the Finnhub client or other issues
-            app.logger.error(f"Error fetching profile for {normalized_symbol}: {e}", exc_info=True)
-            return jsonify({"error": "An internal server error occurred while fetching profile data"}), 500
-    # --- END Stock Profile Endpoint ---
+            app.logger.error(f"Failed to fetch profile for {symbol}: {e}", exc_info=True)
+            return jsonify({"error": "An internal server error occurred"}), 500
 
-
-    # API Endpoint for Trade Summary
-    @app.route('/api/trades/summary/<symbol>')
+    @app.route('/api/trades/summary/<symbol>', methods=["GET"])
     def trade_summary(symbol):
         """
         Provides aggregated monthly buy/sell data for a given stock symbol.
@@ -173,81 +111,76 @@ def create_app(config_class=None):
         if not symbol:
             return jsonify({"error": "Stock symbol is required"}), 400
 
-        # Normalize symbol (e.g., 'AAPL:US' -> 'AAPL')
-        base_symbol = symbol.split(':')[0].upper()
-
+        base_symbol = symbol.upper()
         try:
-            # Query raw data and process in Python for flexibility with size_to_numeric.
-            query = db.session.query(
-                models.Trade.traded, # Reference model via models.Trade
-                models.Trade.type,
-                models.Trade.size
-            ).filter(
-                # Match ticker, ignoring potential exchange suffixes like ':US'
-                func.split_part(models.Trade.traded_issuer_ticker, ':', 1).ilike(base_symbol)
-            ).filter(
-                models.Trade.traded.isnot(None) # Ensure trade date exists (already filters NULLs)
-            ).order_by(models.Trade.traded)
+            # Fetch trade data from the database
+            results = fetch_trade_data(base_symbol)
 
-            results = query.all()
+            # Process the results into a monthly summary
+            monthly_summary = process_trade_data(results)
 
-            # Process results in Python
-            monthly_summary = {} # Use dict: {(year, month): {'buy': total, 'sell': total}}
-            skipped_records = 0 # Counter for records skipped due to bad date type
-
-            for trade_date, trade_type, trade_size_str in results:
-
-                # *** Add type check for trade_date ***
-                if not isinstance(trade_date, date):
-                    app.logger.warning(f"Skipping record: Expected date object but got {type(trade_date)} for symbol {base_symbol}. Value: {trade_date}")
-                    skipped_records += 1
-                    continue # Skip this record
-
-                # Ensure trade_type is also valid before proceeding
-                if not trade_type:
-                    app.logger.warning(f"Skipping record: Missing trade type for symbol {base_symbol}, date {trade_date}")
-                    skipped_records += 1
-                    continue
-
-                # Now safe to access .year and .month
-                year = trade_date.year
-                month = trade_date.month
-                month_key = (year, month)
-
-                numeric_size = size_to_numeric(trade_size_str)
-
-                if month_key not in monthly_summary:
-                    monthly_summary[month_key] = {'buy': 0, 'sell': 0}
-
-                if trade_type.lower() == 'buy':
-                    monthly_summary[month_key]['buy'] += numeric_size
-                elif trade_type.lower() == 'sell':
-                    monthly_summary[month_key]['sell'] += numeric_size
-
-            if skipped_records > 0:
-                app.logger.warning(f"Total skipped records due to unexpected date type: {skipped_records} for symbol {base_symbol}")
-
-            # Convert aggregated data to list format for charting
-            summary_list = [
-                {
-                    "year": key[0],
-                    "month": key[1],
-                    "month_label": f"{key[0]}-{key[1]:02d}", # Format month nicely (e.g., '2024-03')
-                    "buy_total": data['buy'],
-                    "sell_total": data['sell']
-                }
-                for key, data in sorted(monthly_summary.items()) # Sort by year, month
-            ]
+            # Format the summary for the response
+            summary_list = format_monthly_summary(monthly_summary)
 
             return jsonify(summary_list)
-
         except Exception as e:
-            # Log the error for debugging
-            # Use app.logger for proper logging within Flask
-            app.logger.error(f"Error fetching trade summary for {symbol}: {e}", exc_info=True) # exc_info=True logs traceback
-            return jsonify({"error": "An internal server error occurred while fetching trade summary"}), 500
+            app.logger.error(f"Failed to fetch trade summary for {symbol}: {e}", exc_info=True)
+            return jsonify({"error": "An internal server error occurred"}), 500
 
-    # --- Return the configured app instance ---
+
+    def fetch_trade_data(base_symbol):
+        """
+        Fetches trade data for the given stock symbol from the database.
+        """
+        return db.session.query(
+            models.Trade.traded,
+            models.Trade.type,
+            models.Trade.size
+        ).filter(
+            models.Trade.traded_issuer_ticker.ilike(f"%{base_symbol}%"),  # Match the symbol
+            models.Trade.traded.isnot(None)
+        ).order_by(models.Trade.traded).all()
+
+
+    def process_trade_data(results):
+        """
+        Processes trade data into a monthly summary.
+        """
+        monthly_summary = {}
+
+        for trade_date, trade_type, trade_size_str in results:
+            if not isinstance(trade_date, date):
+                app.logger.warning(f"Skipping record with invalid date: {trade_date}")
+                continue
+
+            year, month = trade_date.year, trade_date.month
+            month_key = (year, month)
+            numeric_size = size_to_numeric(trade_size_str)
+
+            if month_key not in monthly_summary:
+                monthly_summary[month_key] = {'buy': 0, 'sell': 0}
+
+            if trade_type.lower() == 'buy':
+                monthly_summary[month_key]['buy'] += numeric_size
+            elif trade_type.lower() == 'sell':
+                monthly_summary[month_key]['sell'] += numeric_size
+
+        return monthly_summary
+
+
+    def format_monthly_summary(monthly_summary):
+        """
+        Formats the monthly summary into a list of dictionaries for the API response.
+        """
+        return [
+            {
+                "year": key[0],
+                "month": key[1],
+                "month_label": f"{key[0]}-{key[1]:02d}",
+                "buy_total": data['buy'],
+                "sell_total": data['sell']
+            }
+            for key, data in sorted(monthly_summary.items())
+        ]
+
     return app
-
-    
