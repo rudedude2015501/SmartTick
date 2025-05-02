@@ -2,8 +2,6 @@
 
 ## 🚀 Getting Started
 
-#### Prerequisites
-
 1. **Install Docker**  
    Make sure Docker Desktop (or Docker CLI) is installed and running on your machine.
 
