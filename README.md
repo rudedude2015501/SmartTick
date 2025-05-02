@@ -26,5 +26,4 @@
 
 1. Reinstall dependencies inside the frontend container: docker-compose exec frontend npm install
    
-2. Delete the node_modules volume manually in Docker for a clean install
-  (You can do this via Docker Desktop or Docker CLI).
+2. Delete the node_modules volume manually in Docker for a clean install and then build again
