@@ -11,7 +11,7 @@ from flask_cors import CORS
 from sqlalchemy import func
 
 # Local application imports
-from .finnhub_client import get_profile
+from .finnhub_client import get_profile, get_quote_data
 
 # Shared extension objects
 db = SQLAlchemy()
@@ -100,6 +100,23 @@ def create_app():
             return jsonify(profile_data)
         except Exception as e:
             app.logger.error(f"Failed to fetch profile for {symbol}: {e}", exc_info=True)
+            return jsonify({"error": "An internal server error occurred"}), 500
+    
+    @app.route('/api/price/<symbol>', methods=["GET"])
+    def realtime_price(symbol):
+        """
+        Fetches real-time stock price using the Finnhub client.
+        """
+        if not symbol:
+            return jsonify({"error": "Stock symbol is required"}), 400
+
+        try:
+            price_data = get_quote_data(symbol.upper())
+            if not price_data:
+                return jsonify({"error": f"No price data found for symbol {symbol}"}), 404
+            return jsonify(price_data)
+        except Exception as e:
+            app.logger.error(f"Failed to fetch real-time price for {symbol}: {e}", exc_info=True)
             return jsonify({"error": "An internal server error occurred"}), 500
 
     @app.route('/api/trades/summary/<symbol>', methods=["GET"])

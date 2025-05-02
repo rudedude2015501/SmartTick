@@ -67,6 +67,7 @@ function App() {
   const [searchSymbol, setSearchSymbol] = useState('');
   const [profileData, setProfileData] = useState(null);
   const [chartData, setChartData] = useState([]);
+  const [realtimePrice, setRealtimePrice] = useState(null); // State for real-time price
   const [isLoadingProfile, setIsLoadingProfile] = useState(false);
   const [profileError, setProfileError] = useState(null);
   const [isLoadingChart, setIsLoadingChart] = useState(false);
@@ -88,10 +89,18 @@ function App() {
       // Fetch Profile Data
       const profileResponse = await fetch(`${apiUrl}/api/profile/${trimmedSymbol}`);
       if (!profileResponse.ok) {
-        throw new Error(`Error: ${response.statusText}`);
+        throw new Error(`Error: ${profileResponse.statusText}`);
       }
       const profileData = await profileResponse.json();
       setProfileData(profileData);
+
+      // Fetch Real-Time Price
+      const priceResponse = await fetch(`${apiUrl}/api/price/${trimmedSymbol}`);
+      if (!priceResponse.ok) {
+        throw new Error(`Error: ${priceResponse.statusText}`);
+      }
+      const priceData = await priceResponse.json();
+      setRealtimePrice(priceData); // Store real-time price data
     } catch (err) {
       setProfileError(err.message);
     } finally {
@@ -102,7 +111,7 @@ function App() {
       // Fetch Trade Summary Data
       const chartResponse = await fetch(`${apiUrl}/api/trades/summary/${trimmedSymbol}`);
       if (!chartResponse.ok) {
-        throw new Error(`Error: ${response.statusText}`);
+        throw new Error(`Error: ${chartResponse.statusText}`);
       }
       const chartData = await chartResponse.json();
       setChartData(chartData);
@@ -117,6 +126,7 @@ function App() {
   const resetStates = () => {
     setProfileData(null);
     setChartData([]);
+    setRealtimePrice(null);
     setProfileError(null);
     setChartError(null);
     setIsLoadingProfile(true);
@@ -208,6 +218,16 @@ function App() {
                               borderRadius: 1,
                             }}
                           />
+                        )}
+                        {realtimePrice && (
+                          <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+                            <strong>Real-Time Price:</strong> ${realtimePrice.c.toFixed(2)}{' '}
+                            <span style={{ color: realtimePrice.d >= 0 ? 'green' : 'red' }}>
+                              ({realtimePrice.d >= 0 ? '+' : ''}
+                              {realtimePrice.d.toFixed(2)} / {realtimePrice.dp.toFixed(2)}%)
+                              {realtimePrice.d >= 0 ? ' ↑' : ' ↓'} Today
+                            </span>
+                          </Typography>
                         )}
                       </>
                     )}
