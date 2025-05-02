@@ -1,4 +1,3 @@
-// SmartTick/frontend/src/Chart.jsx
 import React from 'react';
 import {
   BarChart,
@@ -8,84 +7,110 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
-  ResponsiveContainer, // To make the chart responsive
+  ResponsiveContainer,
+  Text,
 } from 'recharts';
 
-// Helper function to format large numbers (optional but nice)
+// Helper function to format large numbers for the Y-axis
 const formatYAxisTick = (value) => {
-  if (value >= 1000000) {
-    return `${(value / 1000000).toFixed(1)}M`; // Format as Millions
-  }
-  if (value >= 1000) {
-    return `${(value / 1000).toFixed(0)}K`; // Format as Thousands
-  }
+  if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`; // Format as Millions
+  if (value >= 1_000) return `${(value / 1_000).toFixed(0)}K`; // Format as Thousands
   return value;
 };
 
-// Custom Tooltip formatter
-const formatTooltipValue = (value) => {
-    return `$${value.toLocaleString()}`; // Add $ sign and commas
-}
+// Helper function to format tooltip values
+const formatTooltipValue = (value) => `$${value.toLocaleString()}`; // Add $ sign and commas
 
+// TradeChart Component
 function TradeChart({ data }) {
   if (!data || data.length === 0) {
-    // Don't render the chart container if there's no data
-    // App.jsx handles the "no data" message
-    return null;
+    // Don't render the chart if there's no data
+    return (
+      <div style={{ textAlign: 'center', padding: '20px', color: '#666', fontFamily: 'Roboto, sans-serif' }}>
+        No data available to display.
+      </div>
+    );
   }
 
   return (
-    // Use ResponsiveContainer to make the chart adapt to its parent size
-    <div style={{ width: '100%', height: 400 }}> {/* Set a height */}
+    <div style={{ width: '100%', height: 450 }}> {/* Responsive container with fixed height */}
       <ResponsiveContainer>
         <BarChart
           data={data}
-          margin={{
-            top: 20,
-            right: 30,
-            left: 30, // Increased left margin for Y-axis labels
-            bottom: 5,
-          }}
+          margin={{ top: 40, right: 30, left: 30, bottom: 20 }} // Adjust margins for better spacing
         >
+          {/* Title for the bar chart */}
+          <text
+            x="50%"
+            y="20"
+            textAnchor="middle"
+            dominantBaseline="middle"
+            style={{
+              fontSize: '18px',
+              fontWeight: 'bold',
+              fontFamily: 'Roboto, sans-serif',
+              fill: '#333',
+            }}
+          >
+            Monthly Trade Summary
+          </text>
+
           {/* Grid lines */}
           <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
 
-          {/* X-axis displaying the month label (e.g., '2024-03') */}
+          {/* X-axis for month labels */}
           <XAxis
-             dataKey="month_label"
-             tick={{ fontSize: 12 }} // Smaller font size for ticks
-             angle={-30} // Angle ticks slightly if they overlap
-             textAnchor="end" // Anchor angled text at the end
-             height={50} // Increase height to accommodate angled labels
-             interval={0} // Show all labels (can adjust if too crowded)
+            dataKey="month_label"
+            tick={{ fontSize: 12, fontFamily: 'Roboto, sans-serif' }}
+            angle={-30} // Rotate labels for better readability
+            textAnchor="end"
+            height={50} // Increase height for angled labels
+            interval={0} // Show all labels
           />
 
-          {/* Y-axis displaying the aggregated dollar amount */}
+          {/* Y-axis for dollar amounts */}
           <YAxis
-            tickFormatter={formatYAxisTick} // Use the helper to format ticks
-            tick={{ fontSize: 12 }}
-            width={80} // Ensure enough width for formatted labels like "1.5M"
+            tickFormatter={formatYAxisTick} // Format Y-axis ticks
+            tick={{ fontSize: 12, fontFamily: 'Roboto, sans-serif' }}
+            width={80} // Adjust width for formatted labels
           />
 
-          {/* Tooltip shown on hover */}
+          {/* Tooltip for hover details */}
           <Tooltip
-            formatter={formatTooltipValue} // Format values in tooltip
-            labelStyle={{ fontSize: 14, fontWeight: 'bold', color: '#333' }}
-            itemStyle={{ fontSize: 12 }}
-            contentStyle={{ borderRadius: '8px', boxShadow: '0 2px 5px rgba(0,0,0,0.1)', padding: '8px 12px' }}
+            formatter={formatTooltipValue}
+            labelStyle={{ fontSize: 14, fontWeight: 'bold', color: '#333', fontFamily: 'Roboto, sans-serif' }}
+            itemStyle={{ fontSize: 12, fontFamily: 'Roboto, sans-serif' }}
+            contentStyle={{
+              borderRadius: '8px',
+              boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
+              padding: '8px 12px',
+            }}
           />
 
-          {/* Legend to identify bars */}
-          <Legend wrapperStyle={{ paddingTop: '20px' }} />
+          {/* Legend for bar identification */}
+          <Legend
+            wrapperStyle={{
+              paddingTop: '20px',
+              fontSize: '12px',
+              fontFamily: 'Roboto, sans-serif',
+            }}
+          />
 
-          {/* Bar for total 'buy' amount per month */}
-          <Bar dataKey="buy_total" name="Total Buys ($)" fill="#4ade80" radius={[4, 4, 0, 0]} />
+          {/* Bar for total 'buy' amounts */}
+          <Bar
+            dataKey="buy_total"
+            name="Total Buys ($)"
+            fill="#4ade80"
+            radius={[4, 4, 0, 0]} // Rounded top corners
+          />
 
-          {/* Bar for total 'sell' amount per month */}
-          {/* Use negative values for sells to show below axis, OR stack them */}
-          {/* Let's show them side-by-side for clarity */}
-          <Bar dataKey="sell_total" name="Total Sells ($)" fill="#f87171" radius={[4, 4, 0, 0]} />
-
+          {/* Bar for total 'sell' amounts */}
+          <Bar
+            dataKey="sell_total"
+            name="Total Sells ($)"
+            fill="#f87171"
+            radius={[4, 4, 0, 0]} // Rounded top corners
+          />
         </BarChart>
       </ResponsiveContainer>
     </div>

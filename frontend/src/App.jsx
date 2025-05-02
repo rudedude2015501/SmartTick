@@ -156,9 +156,6 @@ function App() {
             <Box>
               {/* Profile Section */}
               <Box mb={4}>
-                <Typography variant="h5" component="h2" gutterBottom sx={{ mb: 2 }}>
-                  Stock Profile: {searchSymbol}
-                </Typography>
                 <Card sx={{ boxShadow: 3, borderRadius: 2 }}>
                   <CardContent>
                     {isLoadingProfile && (
@@ -220,9 +217,6 @@ function App() {
 
               {/* Trade Chart Section */}
               <Box>
-                <Typography variant="h5" component="h2" gutterBottom sx={{ mb: 2 }}>
-                  Monthly Trade Summary: {searchSymbol}
-                </Typography>
                 <Card sx={{ boxShadow: 3, borderRadius: 2, p: 2, minHeight: 450 }}>
                   {isLoadingChart && (
                     <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', minHeight: 300 }}>
