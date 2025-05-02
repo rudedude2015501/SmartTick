@@ -39,30 +39,29 @@ def size_to_numeric(size_str):
         return value
 
     # Handle '<' and '>' cases
-    if size_str.startswith('<') or size_str.startswith('>'):
-        match = re.search(r'([<>])\s*(\d+)([KkMm]?)', size_str)
-        if match:
-            operator, value, multiplier = match.groups()
-            value = parse_multiplier(int(value), multiplier)
-            return value / 2 if operator == '<' else value
+    match = re.match(r'([<>])\s*(\d+)([KkMm]?)', size_str)
+    if match:
+        operator, value, multiplier = match.groups()
+        value = parse_multiplier(float(value), multiplier)
+        return value / 2 if operator == '<' else value
 
     # Handle ranges (e.g., '1K–15K', '5M-25M')
-    match = re.search(r'(\d+(?:[.,]\d+)?)\s?([KkMm]?)\s?[-–]\s?(\d+(?:[.,]\d+)?)\s?([KkMm]?)', size_str)
+    match = re.match(r'(\d+(?:[.,]\d+)?)\s?([KkMm]?)\s?[-–]\s?(\d+(?:[.,]\d+)?)\s?([KkMm]?)', size_str)
     if match:
         val1, mult1, val2, mult2 = match.groups()
-        val1 = parse_multiplier(float(val1.replace(',', '.')), mult1)
-        val2 = parse_multiplier(float(val2.replace(',', '.')), mult2)
-        return (val1 + val2) / 2  # Return midpoint
+        val1 = parse_multiplier(float(val1), mult1)
+        val2 = parse_multiplier(float(val2), mult2)
+        return (val1 + val2) / 2  # Return midpoint of the range
 
     # Handle single values (e.g., '100K')
-    match = re.search(r'^(\d+(?:[.,]\d+)?)\s?([KkMm]?)$', size_str)
+    match = re.match(r'^(\d+(?:[.,]\d+)?)\s?([KkMm]?)$', size_str)
     if match:
         value, multiplier = match.groups()
-        return parse_multiplier(float(value.replace(',', '.')), multiplier)
+        return parse_multiplier(float(value), multiplier)
 
+    # If parsing fails, log a warning and return 0
     print(f"Could not parse size string: {size_str}")
     return 0
-
 
 # Application Factory
 def create_app():
