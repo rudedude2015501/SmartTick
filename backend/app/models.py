@@ -31,15 +31,19 @@ class Stock(db.Model):
 class Trade(db.Model):
     # __tablename__ = 'trade' # Optional: explicitly name table
     id = db.Column(db.Integer, primary_key=True)
+
     politician_name = db.Column(db.String(128), nullable=False)
     politician_family = db.Column(db.String(128))
     politician_link = db.Column(db.String(256))
+
     traded_issuer_name = db.Column(db.String(256), nullable=False)
     traded_issuer_ticker = db.Column(db.String(32)) # Ticker symbol (e.g., AAPL, MSFT:US)
     traded_issuer_link = db.Column(db.String(256))
+
     published = db.Column(db.String(64)) # Publication date string
     traded = db.Column(db.Date, nullable=True) # Use Date type for the trade date
     filed_after = db.Column(db.String(32))
+
     owner = db.Column(db.String(64))
     type = db.Column(db.String(16)) # 'buy' or 'sell'
     size = db.Column(db.String(64)) # Trade size range (e.g., '1K–15K')
@@ -64,3 +68,50 @@ class Trade(db.Model):
             'price': self.price,
             'created_at': self.created_at.isoformat() if self.created_at else None
         }
+
+class StockPrice(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    stock_id = db.Column(db.Integer, db.ForeignKey('stock.id'), nullable=False)
+    date = db.Column(db.Date, nullable=False)
+
+    open = db.Column(db.Float)
+    high = db.Column(db.Float)
+    low = db.Column(db.Float)
+    close = db.Column(db.Float)
+    volume = db.Column(db.BigInteger)
+
+    adj_close = db.Column(db.Float)
+    adj_high = db.Column(db.Float)
+    adj_low = db.Column(db.Float)
+    adj_open = db.Column(db.Float)
+    adj_volume = db.Column(db.Float)
+
+    created_at = db.Column(db.DateTime, server_default=func.now())
+
+    # Relationship back to Stock
+    stock = db.relationship('Stock', backref=db.backref('prices', lazy=True))
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'stock_id': self.stock_id,
+            'date': self.date.isoformat() if self.date else None,
+
+            'open': self.open,
+            'high': self.high,
+            'low': self.low,
+            'close': self.close,
+            'volume': self.volume,
+
+            'adj_close': self.adj_close,
+            'adj_high': self.adj_high,
+            'adj_low': self.adj_low,
+            'adj_open': self.adj_open,
+            'adj_volume': self.adj_volume,
+
+            'created_at': self.created_at.isoformat() if self.created_at else None
+        }
+
+    def __repr__(self):
+        return f"<StockPrice {self.date} Close={self.close}>"
+
