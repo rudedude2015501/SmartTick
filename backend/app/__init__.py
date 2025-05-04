@@ -4,7 +4,7 @@ from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from .finnhub_client import get_profile, get_quote_data
-from .scraper import getPolData  # Import the scraper function
+from scripts.scraper import getPolData  # Import the scraper function
 
 # Shared extension objects
 db = SQLAlchemy()

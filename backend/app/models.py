@@ -3,28 +3,48 @@ from sqlalchemy import Date, func # Added Date, func
 # --- Import db from the package level (app) where it's initialized ---
 from app import db
 
-# Keep the Stock model as is
+from sqlalchemy.sql import func
+
 class Stock(db.Model):
-    # __tablename__ = 'stock' # Optional: explicitly name table
-    id = db.Column(db.Integer, primary_key=True)
-    symbol = db.Column(db.String(10), unique=True, nullable=False)
-    name = db.Column(db.String(128), nullable=False)
-    exchange = db.Column(db.String(32))
-    sector = db.Column(db.String(64))
-    industry = db.Column(db.String(128))
-    currency = db.Column(db.String(8))
-    created_at = db.Column(db.DateTime, server_default=func.now())
+    id                    = db.Column(db.Integer, primary_key=True)
+    symbol                = db.Column(db.String(10),   unique=True, nullable=False)  # ticker
+    name                  = db.Column(db.String(128),  nullable=False)
+    exchange              = db.Column(db.String(64))
+    sector                = db.Column(db.String(64))    # you can leave or drop if unused
+    industry              = db.Column(db.String(128))   # maps from finnhubIndustry
+    currency              = db.Column(db.String(8))
+    
+    # ─── NEW FIELDS ──────────────────────────────────────────────
+    country               = db.Column(db.String(64))
+    estimate_currency     = db.Column(db.String(8))
+    ipo                   = db.Column(db.Date)
+    logo                  = db.Column(db.String(256))
+    market_capitalization = db.Column(db.Float)
+    phone                 = db.Column(db.String(32))
+    shares_outstanding    = db.Column(db.Float)
+    weburl                = db.Column(db.String(256))
+    # ──────────────────────────────────────────────────────────────
+
+    created_at            = db.Column(db.DateTime, server_default=func.now())
 
     def to_dict(self):
         return {
-            'id': self.id,
-            'symbol': self.symbol,
-            'name': self.name,
-            'exchange': self.exchange,
-            'sector': self.sector,
-            'industry': self.industry,
-            'currency': self.currency,
-            'created_at': self.created_at.isoformat() if self.created_at else None
+            'id':                    self.id,
+            'symbol':                self.symbol,
+            'name':                  self.name,
+            'exchange':              self.exchange,
+            'sector':                self.sector,
+            'industry':              self.industry,
+            'currency':              self.currency,
+            'country':               self.country,
+            'estimate_currency':     self.estimate_currency,
+            'ipo':                   self.ipo.isoformat() if self.ipo else None,
+            'logo':                  self.logo,
+            'market_capitalization': self.market_capitalization,
+            'phone':                 self.phone,
+            'shares_outstanding':    self.shares_outstanding,
+            'weburl':                self.weburl,
+            'created_at':            self.created_at.isoformat() if self.created_at else None
         }
 
 # Define the Trade model
