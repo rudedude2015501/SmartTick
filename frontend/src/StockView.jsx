@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useTheme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import Card from '@mui/material/Card';
@@ -8,6 +8,13 @@ import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
 import Link from '@mui/material/Link';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
 
 import TradeChart from './Chart';
 
@@ -23,9 +30,12 @@ function StockView({ searchSymbol }) {
   const [profileError, setProfileError] = useState(null);
   const [isLoadingChart, setIsLoadingChart] = useState(false);
   const [chartError, setChartError] = useState(null);
+  const [trades, setTrades] = useState([]);
+  const [isLoadingTrades, setIsLoadingTrades] = useState(false);
+  const [tradesError, setTradesError] = useState(null);
 
   // Effect to fetch data when searchSymbol changes
-  React.useEffect(() => {
+  useEffect(() => {
     const fetchData = async () => {
       if (!searchSymbol) return;
       
@@ -67,6 +77,20 @@ function StockView({ searchSymbol }) {
       } finally {
         setIsLoadingChart(false);
       }
+
+      try {
+        // Fetch Recent Trades Data
+        const tradesResponse = await fetch(`${apiUrl}/api/trades/${searchSymbol}`);
+        if (!tradesResponse.ok) {
+          throw new Error(`Error: ${tradesResponse.statusText}`);
+        }
+        const tradesData = await tradesResponse.json();
+        setTrades(tradesData);
+      } catch (err) {
+        setTradesError(err.message);
+      } finally {
+        setIsLoadingTrades(false);
+      }
     };
 
     fetchData();
@@ -81,6 +105,9 @@ function StockView({ searchSymbol }) {
     setChartError(null);
     setIsLoadingProfile(true);
     setIsLoadingChart(true);
+    setTrades([]);
+    setIsLoadingTrades(true);
+    setTradesError(null);
   };
 
   // Get appropriate link colors based on theme mode
@@ -230,6 +257,56 @@ function StockView({ searchSymbol }) {
             />
           )}
         </Card>
+      </Box>
+
+      {/* Recent Trades Section */}
+      <Box mt={4}>
+        <Typography variant="h6" gutterBottom>
+          Recent Trades for {searchSymbol}
+        </Typography>
+        {isLoadingTrades && (
+          <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+            <CircularProgress />
+          </Box>
+        )}
+        {tradesError && <Alert severity="error">{tradesError}</Alert>}
+        {!isLoadingTrades && trades.length === 0 && (
+          <Typography sx={{ color: 'text.secondary', mt: 2 }}>
+            No recent trades found for this stock.
+          </Typography>
+        )}
+        {!isLoadingTrades && trades.length > 0 && (
+          <TableContainer component={Paper} sx={{ mt: 2, maxHeight: 400 }}>
+            <Table stickyHeader>
+              <TableHead>
+                <TableRow>
+                  <TableCell><strong>Politician</strong></TableCell>
+                  <TableCell><strong>Trade Type</strong></TableCell>
+                  <TableCell><strong>Trade Date</strong></TableCell>
+                  <TableCell><strong>Size</strong></TableCell>
+                  <TableCell><strong>Price</strong></TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {trades.map((trade) => (
+                  <TableRow key={trade.id}>
+                    <TableCell>{trade.politician_name || 'N/A'}</TableCell>
+                    <TableCell>
+                      {trade.type ? trade.type.charAt(0).toUpperCase() + trade.type.slice(1) : 'N/A'}
+                    </TableCell>
+                    <TableCell>
+                      {trade.traded
+                        ? new Intl.DateTimeFormat('en-US').format(new Date(trade.traded))
+                        : 'N/A'}
+                    </TableCell>
+                    <TableCell>{trade.size || 'N/A'}</TableCell>
+                    <TableCell>{trade.price || 'N/A'}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
       </Box>
     </Box>
   );

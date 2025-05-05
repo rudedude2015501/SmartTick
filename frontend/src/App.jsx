@@ -15,10 +15,12 @@ import Fab from '@mui/material/Fab';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import CssBaseline from '@mui/material/CssBaseline';
+import HomeIcon from '@mui/icons-material/Home';
 
 // Import the new modularized components
 import StockView from './StockView';
 import CongressView from './CongressView';
+import HomeView from './HomeView';
 
 // Get API URL from environment variable
 const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
@@ -76,7 +78,7 @@ const ThemeToggleFab = styled(Fab)(({ theme }) => ({
 function App() {
   const [searchTerm, setSearchTerm] = useState('');
   const [searchedTerm, setSearchedTerm] = useState('');
-  const [viewMode, setViewMode] = useState('stock'); // 'stock' or 'congress'
+  const [viewMode, setViewMode] = useState('home'); // Default view mode
   const [darkMode, setDarkMode] = useState(false); // Track dark/light mode
 
   // Create theme based on darkMode state
@@ -144,23 +146,27 @@ function App() {
               onChange={handleViewModeChange}
               aria-label="view mode"
               size="small"
-              sx={{ 
-                bgcolor: 'primary.dark',
+              sx={{
+                bgcolor: darkMode ? 'background.paper' : 'primary.dark', // Background color based on darkMode
                 '& .MuiToggleButton-root': {
-                  color: 'white',
+                  color: darkMode ? 'white' : 'white', // Text color
                   '&.Mui-selected': {
-                    bgcolor: 'primary.light',
-                    color: 'white',
+                    bgcolor: darkMode ? 'grey.700' : 'primary.light', // Selected background color
+                    color: darkMode ? 'white' : 'white', // Selected text color
                     '&:hover': {
-                      bgcolor: 'primary.light',
+                      bgcolor: darkMode ? 'grey.600' : 'primary.light', // Hover effect for selected button
                     },
                   },
                   '&:hover': {
-                    bgcolor: 'primary.main',
+                    bgcolor: darkMode ? 'grey.800' : 'primary.main', // Hover effect for unselected button
                   },
-                }
+                },
               }}
             >
+              <ToggleButton value="home" aria-label="home view">
+                <HomeIcon sx={{ mr: 1 }} />
+                Home
+              </ToggleButton>
               <ToggleButton value="stock" aria-label="stock view">
                 <ShowChartIcon sx={{ mr: 1 }} />
                 Stocks
@@ -170,20 +176,24 @@ function App() {
                 Congress
               </ToggleButton>
             </ToggleButtonGroup>
-            <Search>
-              <SearchIconWrapper>
-                <SearchIcon />
-              </SearchIconWrapper>
-              <StyledInputBase
-                placeholder={getPlaceholderText()}
-                inputProps={{ 'aria-label': 'search' }}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') handleSearch(e);
-                }}
-              />
-            </Search>
+
+            {/* Conditionally render the search bar */}
+            {viewMode !== 'home' && (
+              <Search>
+                <SearchIconWrapper>
+                  <SearchIcon />
+                </SearchIconWrapper>
+                <StyledInputBase
+                  placeholder={getPlaceholderText()}
+                  inputProps={{ 'aria-label': 'search' }}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleSearch(e);
+                  }}
+                />
+              </Search>
+            )}
           </Box>
         </Toolbar>
       </AppBar>
@@ -193,7 +203,9 @@ function App() {
 
       <Box sx={{ minHeight: 'calc(100vh - 64px)', py: 4, px: 2 }}>
         <Container maxWidth="md">
-          {viewMode === 'stock' ? (
+          {viewMode === 'home' ? (
+            <HomeView />
+          ) : viewMode === 'stock' ? (
             <StockView searchSymbol={searchedTerm} />
           ) : (
             <CongressView searchTerm={searchedTerm} />
