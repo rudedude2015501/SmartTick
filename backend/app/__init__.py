@@ -143,6 +143,55 @@ def create_app():
             app.logger.error(f"Failed to fetch trade summary for {symbol}: {e}", exc_info=True)
             return jsonify({"error": "An internal server error occurred"}), 500
 
+    @app.route('/api/trades/<symbol>', methods=["GET"])
+    def get_trades_by_symbol(symbol):
+        """
+        Fetches all trade data for the given stock symbol from the Trade table.
+        """
+        if not symbol:
+            return jsonify({"error": "Stock symbol is required"}), 400
+
+        try:
+            # Query the database for trades matching the symbol and sort by date (descending)
+            trades = db.session.query(models.Trade).filter(
+                models.Trade.traded_issuer_ticker.ilike(f"%{symbol.upper()}%")
+            ).order_by(models.Trade.traded.desc()).all()
+
+            if not trades:
+                return jsonify({"error": f"No trade data found for symbol {symbol}"}), 404
+
+            # Convert the trade data to a list of dictionaries
+            trades_data = [trade.to_dict() for trade in trades]
+
+            return jsonify(trades_data)
+        except Exception as e:
+            app.logger.error(f"Failed to fetch trades for {symbol}: {e}", exc_info=True)
+            return jsonify({"error": "An internal server error occurred"}), 500
+
+    @app.route('/api/trades', methods=["GET"])
+    def get_recent_trades():
+        """
+        Fetches trade data from the Trade table, sorted by trade date in descending order.
+        Allows specifying a limit for the number of trades returned via a query parameter.
+        """
+        try:
+            # Get the limit from the query parameters, default to 50 if not provided
+            limit = request.args.get('limit', default=50, type=int)
+
+            # Query the database for trades and sort by date (descending), applying the limit
+            trades = db.session.query(models.Trade).order_by(models.Trade.traded.desc()).limit(limit).all()
+
+            if not trades:
+                return jsonify({"error": "No trade data found"}), 404
+
+            # Convert the trade data to a list of dictionaries
+            trades_data = [trade.to_dict() for trade in trades]
+
+            return jsonify(trades_data)
+        except Exception as e:
+            app.logger.error(f"Failed to fetch trades: {e}", exc_info=True)
+            return jsonify({"error": "An internal server error occurred"}), 500
+
 
     def fetch_trade_data(base_symbol):
         """
