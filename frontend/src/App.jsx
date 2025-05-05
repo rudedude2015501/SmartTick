@@ -1,20 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import Container from '@mui/material/Container';
-import Typography from '@mui/material/Typography';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import CardMedia from '@mui/material/CardMedia';
-import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import InputBase from '@mui/material/InputBase';
-import { alpha, styled } from '@mui/material/styles';
+import { alpha, styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import SearchIcon from '@mui/icons-material/Search';
-import CircularProgress from '@mui/material/CircularProgress';
+import Typography from '@mui/material/Typography';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import ToggleButton from '@mui/material/ToggleButton';
+import ShowChartIcon from '@mui/icons-material/ShowChart';
+import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
+import Fab from '@mui/material/Fab';
+import Brightness4Icon from '@mui/icons-material/Brightness4';
+import Brightness7Icon from '@mui/icons-material/Brightness7';
+import CssBaseline from '@mui/material/CssBaseline';
 
-import TradeChart from './Chart';
-
+// Import the new modularized components
+import StockView from './StockView';
+import CongressView from './CongressView';
 
 // Get API URL from environment variable
 const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
@@ -61,206 +65,151 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
+// Fixed position FAB for theme toggle
+const ThemeToggleFab = styled(Fab)(({ theme }) => ({
+  position: 'fixed',
+  bottom: theme.spacing(4),
+  right: theme.spacing(4),
+}));
+
 // Main App component
 function App() {
-  const [symbol, setSymbol] = useState('');
-  const [searchSymbol, setSearchSymbol] = useState('');
-  const [profileData, setProfileData] = useState(null);
-  const [chartData, setChartData] = useState([]);
-  const [realtimePrice, setRealtimePrice] = useState(null); // State for real-time price
-  const [isLoadingProfile, setIsLoadingProfile] = useState(false);
-  const [profileError, setProfileError] = useState(null);
-  const [isLoadingChart, setIsLoadingChart] = useState(false);
-  const [chartError, setChartError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchedTerm, setSearchedTerm] = useState('');
+  const [viewMode, setViewMode] = useState('stock'); // 'stock' or 'congress'
+  const [darkMode, setDarkMode] = useState(false); // Track dark/light mode
+
+  // Create theme based on darkMode state
+  const theme = useMemo(
+    () =>
+      createTheme({
+        palette: {
+          mode: darkMode ? 'dark' : 'light',
+          primary: {
+            main: darkMode ? '#1976d2' : '#1976d2', // You can customize colors for dark/light modes
+          },
+          background: {
+            default: darkMode ? '#121212' : '#f5f5f5',
+            paper: darkMode ? '#1e1e1e' : '#ffffff',
+          },
+        },
+      }),
+    [darkMode]
+  );
+
+  // Toggle dark mode function
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
+  };
 
   // Handle search function
-  const handleSearch = async (event) => {
+  const handleSearch = (event) => {
     event.preventDefault();
+    
+    const trimmedTerm = searchTerm.trim();
+    if (!trimmedTerm) return; // Don't search if input is empty
+    
+    setSearchedTerm(trimmedTerm); // Store the searched term
+  };
 
-    const trimmedSymbol = symbol.trim();
-    if (!trimmedSymbol) return; // Don't search if input is empty
-
-    setSearchSymbol(trimmedSymbol); // Store the searched symbol
-
-    // Reset states before fetching
-    resetStates();
-
-    try {
-      // Fetch Profile Data
-      const profileResponse = await fetch(`${apiUrl}/api/profile/${trimmedSymbol}`);
-      if (!profileResponse.ok) {
-        throw new Error(`Error: ${profileResponse.statusText}`);
-      }
-      const profileData = await profileResponse.json();
-      setProfileData(profileData);
-
-      // Fetch Real-Time Price
-      const priceResponse = await fetch(`${apiUrl}/api/price/${trimmedSymbol}`);
-      if (!priceResponse.ok) {
-        throw new Error(`Error: ${priceResponse.statusText}`);
-      }
-      const priceData = await priceResponse.json();
-      setRealtimePrice(priceData); // Store real-time price data
-    } catch (err) {
-      setProfileError(err.message);
-    } finally {
-      setIsLoadingProfile(false);
-    }
-
-    try {
-      // Fetch Trade Summary Data
-      const chartResponse = await fetch(`${apiUrl}/api/trades/summary/${trimmedSymbol}`);
-      if (!chartResponse.ok) {
-        throw new Error(`Error: ${chartResponse.statusText}`);
-      }
-      const chartData = await chartResponse.json();
-      setChartData(chartData);
-    } catch (err) {
-      setChartError(err.message);
-    } finally {
-      setIsLoadingChart(false);
+  // Handle view mode change
+  const handleViewModeChange = (event, newMode) => {
+    if (newMode !== null) {
+      setViewMode(newMode);
+      setSearchTerm(''); // Clear search term when switching views
+      setSearchedTerm(''); // Clear searched term when switching views
     }
   };
 
-  // Reset states before fetching
-  const resetStates = () => {
-    setProfileData(null);
-    setChartData([]);
-    setRealtimePrice(null);
-    setProfileError(null);
-    setChartError(null);
-    setIsLoadingProfile(true);
-    setIsLoadingChart(true);
+  // Get placeholder text based on view mode
+  const getPlaceholderText = () => {
+    return viewMode === 'stock' 
+      ? 'Enter Ticker Symbol...' 
+      : 'Enter Politician Name...';
   };
 
   return (
-    <>
+    <ThemeProvider theme={theme}>
+      <CssBaseline /> {/* Apply baseline CSS for the theme */}
+      
       <AppBar position="fixed">
         <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
           <Typography variant="h6" noWrap>
             SmartTick
           </Typography>
-          <Search>
-            <SearchIconWrapper>
-              <SearchIcon />
-            </SearchIconWrapper>
-            <StyledInputBase
-              placeholder="Search…"
-              inputProps={{ 'aria-label': 'search' }}
-              value={symbol}
-              onChange={(e) => setSymbol(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') handleSearch(e);
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <ToggleButtonGroup
+              value={viewMode}
+              exclusive
+              onChange={handleViewModeChange}
+              aria-label="view mode"
+              size="small"
+              sx={{ 
+                bgcolor: 'primary.dark',
+                '& .MuiToggleButton-root': {
+                  color: 'white',
+                  '&.Mui-selected': {
+                    bgcolor: 'primary.light',
+                    color: 'white',
+                    '&:hover': {
+                      bgcolor: 'primary.light',
+                    },
+                  },
+                  '&:hover': {
+                    bgcolor: 'primary.main',
+                  },
+                }
               }}
-            />
-          </Search>
+            >
+              <ToggleButton value="stock" aria-label="stock view">
+                <ShowChartIcon sx={{ mr: 1 }} />
+                Stocks
+              </ToggleButton>
+              <ToggleButton value="congress" aria-label="congress view">
+                <AccountBalanceIcon sx={{ mr: 1 }} />
+                Congress
+              </ToggleButton>
+            </ToggleButtonGroup>
+            <Search>
+              <SearchIconWrapper>
+                <SearchIcon />
+              </SearchIconWrapper>
+              <StyledInputBase
+                placeholder={getPlaceholderText()}
+                inputProps={{ 'aria-label': 'search' }}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleSearch(e);
+                }}
+              />
+            </Search>
+          </Box>
         </Toolbar>
       </AppBar>
 
       {/* Offset content below fixed AppBar */}
       <Toolbar />
 
-      <Box sx={{ backgroundColor: '#f5f5f5', minHeight: 'calc(100vh - 64px)', py: 4, px: 2 }}>
+      <Box sx={{ minHeight: 'calc(100vh - 64px)', py: 4, px: 2 }}>
         <Container maxWidth="md">
-          {searchSymbol ? (
-            <Box>
-              {/* Profile Section */}
-              <Box mb={4}>
-                <Card sx={{ boxShadow: 3, borderRadius: 2 }}>
-                  <CardContent>
-                    {isLoadingProfile && (
-                      <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
-                        <CircularProgress />
-                      </Box>
-                    )}
-                    {profileError && <Alert severity="warning" sx={{ mt: 1, mb: 1 }}>{profileError}</Alert>}
-                    {!isLoadingProfile && !profileError && !profileData && (
-                      <Typography sx={{ p: 2, color: 'text.secondary' }}>No profile data found.</Typography>
-                    )}
-                    {profileData && (
-                      <>
-                        <Typography variant="h6" component="div">
-                          {profileData.name} ({profileData.ticker})
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                          <strong>Industry:</strong> {profileData.finnhubIndustry || 'N/A'}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          <strong>Market Cap:</strong> $
-                          {profileData.marketCapitalization?.toLocaleString() || 'N/A'} Billion
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          <strong>IPO Date:</strong> {profileData.ipo || 'N/A'}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          <strong>Exchange:</strong> {profileData.exchange || 'N/A'}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          <strong>Website:</strong>{' '}
-                          {profileData.weburl ? (
-                            <a href={profileData.weburl} target="_blank" rel="noopener noreferrer">
-                              {profileData.weburl}
-                            </a>
-                          ) : (
-                            'N/A'
-                          )}
-                        </Typography>
-                        {profileData.logo && (
-                          <CardMedia
-                            component="img"
-                            image={profileData.logo}
-                            alt={`${profileData.name} logo`}
-                            sx={{
-                              maxWidth: 100,
-                              margin: '16px auto 0',
-                              padding: 1,
-                              border: '1px solid #eee',
-                              borderRadius: 1,
-                            }}
-                          />
-                        )}
-                        {realtimePrice && (
-                          <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-                            <strong>Real-Time Price:</strong> ${realtimePrice.c.toFixed(2)}{' '}
-                            <span style={{ color: realtimePrice.d >= 0 ? 'green' : 'red' }}>
-                              ({realtimePrice.d >= 0 ? '+' : ''}
-                              {realtimePrice.d.toFixed(2)} / {realtimePrice.dp.toFixed(2)}%)
-                              {realtimePrice.d >= 0 ? ' ↑' : ' ↓'} Today
-                            </span>
-                          </Typography>
-                        )}
-                      </>
-                    )}
-                  </CardContent>
-                </Card>
-              </Box>
-
-              {/* Trade Chart Section */}
-              <Box>
-                <Card sx={{ boxShadow: 3, borderRadius: 2, p: 2, minHeight: 450 }}>
-                  {isLoadingChart && (
-                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', minHeight: 300 }}>
-                      <CircularProgress />
-                    </Box>
-                  )}
-                  {chartError && <Alert severity="warning" sx={{ mt: 1, mb: 1 }}>{chartError}</Alert>}
-                  {!isLoadingChart && !chartError && chartData.length === 0 && (
-                    <Typography sx={{ p: 2, color: 'text.secondary', textAlign: 'center', mt: 4 }}>
-                      No trade summary data found for this period.
-                    </Typography>
-                  )}
-                  {!isLoadingChart && chartData.length > 0 && <TradeChart data={chartData} />}
-                </Card>
-              </Box>
-            </Box>
+          {viewMode === 'stock' ? (
+            <StockView searchSymbol={searchedTerm} />
           ) : (
-            <Typography sx={{ textAlign: 'center', color: 'text.secondary', mt: 10 }}>
-              Enter a stock symbol in the search bar above to view its profile and trade summary.
-            </Typography>
+            <CongressView searchTerm={searchedTerm} />
           )}
         </Container>
       </Box>
-    </>
+
+      {/* Dark mode toggle button */}
+      <ThemeToggleFab 
+        color="primary" 
+        aria-label="toggle dark mode"
+        onClick={toggleDarkMode}
+      >
+        {darkMode ? <Brightness7Icon /> : <Brightness4Icon />}
+      </ThemeToggleFab>
+    </ThemeProvider>
   );
 }
 
