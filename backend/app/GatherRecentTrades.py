@@ -45,5 +45,5 @@ def getPolData():
         Trade["price"] =(tab.find("div","flex place-content-center px-2 lg:px-3 xl:px-6 justify-end pr-0")).text
 
         Trades.append(Trade)
-    with open ("prettify2.json", "w") as fs:
+    with open ("1yeartrade.json", "w") as fs:
         json.dump(Trades,fs,indent=2)
