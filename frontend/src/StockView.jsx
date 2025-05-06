@@ -139,11 +139,13 @@ function StockView({ searchSymbol }) {
     <Box>
       {/* Profile Section */}
       <Box mb={4}>
-        <Card sx={{ 
-          boxShadow: 3, 
-          borderRadius: 2,
-          backgroundColor: theme.palette.background.paper, // Use theme background
-        }}>
+        <Card
+          sx={{
+            boxShadow: 3,
+            borderRadius: 2,
+            backgroundColor: theme.palette.background.paper, // Use theme background
+          }}
+        >
           <CardContent>
             {isLoadingProfile && (
               <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
@@ -175,9 +177,9 @@ function StockView({ searchSymbol }) {
                 <Typography variant="body2" color="text.secondary">
                   <strong>Website:</strong>{' '}
                   {profileData.weburl ? (
-                    <Link 
-                      href={profileData.weburl} 
-                      target="_blank" 
+                    <Link
+                      href={profileData.weburl}
+                      target="_blank"
                       rel="noopener noreferrer"
                       sx={{
                         color: getLinkColor('link'),
@@ -213,11 +215,17 @@ function StockView({ searchSymbol }) {
                 {realtimePrice && (
                   <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
                     <strong>Real-Time Price:</strong> ${realtimePrice.c.toFixed(2)}{' '}
-                    <span style={{ 
-                      color: realtimePrice.d >= 0 
-                        ? theme.palette.mode === 'dark' ? '#4caf50' : 'green' 
-                        : theme.palette.mode === 'dark' ? '#f44336' : 'red' 
-                    }}>
+                    <span
+                      style={{
+                        color: realtimePrice.d >= 0
+                          ? theme.palette.mode === 'dark'
+                            ? '#4caf50'
+                            : 'green'
+                          : theme.palette.mode === 'dark'
+                          ? '#f44336'
+                          : 'red',
+                      }}
+                    >
                       ({realtimePrice.d >= 0 ? '+' : ''}
                       {realtimePrice.d.toFixed(2)} / {realtimePrice.dp.toFixed(2)}%)
                       {realtimePrice.d >= 0 ? ' ↑' : ' ↓'} Today
@@ -227,35 +235,6 @@ function StockView({ searchSymbol }) {
               </>
             )}
           </CardContent>
-        </Card>
-      </Box>
-
-      {/* Trade Chart Section */}
-      <Box>
-        <Card sx={{ 
-          boxShadow: 3, 
-          borderRadius: 2, 
-          p: 2, 
-          minHeight: 450,
-          backgroundColor: theme.palette.background.paper, // Use theme background
-        }}>
-          {isLoadingChart && (
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', minHeight: 300 }}>
-              <CircularProgress />
-            </Box>
-          )}
-          {chartError && <Alert severity="warning" sx={{ mt: 1, mb: 1 }}>{chartError}</Alert>}
-          {!isLoadingChart && !chartError && chartData.length === 0 && (
-            <Typography sx={{ p: 2, color: 'text.secondary', textAlign: 'center', mt: 4 }}>
-              No trade summary data found for this period.
-            </Typography>
-          )}
-          {!isLoadingChart && chartData.length > 0 && (
-            <TradeChart 
-              data={chartData} 
-              isDarkMode={theme.palette.mode === 'dark'} // Pass dark mode flag to chart
-            />
-          )}
         </Card>
       </Box>
 
@@ -307,6 +286,37 @@ function StockView({ searchSymbol }) {
             </Table>
           </TableContainer>
         )}
+      </Box>
+
+      {/* Trade Chart Section */}
+      <Box mt={4}>
+        <Card
+          sx={{
+            boxShadow: 3,
+            borderRadius: 2,
+            p: 2,
+            minHeight: 450,
+            backgroundColor: theme.palette.background.paper, // Use theme background
+          }}
+        >
+          {isLoadingChart && (
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', minHeight: 300 }}>
+              <CircularProgress />
+            </Box>
+          )}
+          {chartError && <Alert severity="warning" sx={{ mt: 1, mb: 1 }}>{chartError}</Alert>}
+          {!isLoadingChart && !chartError && chartData.length === 0 && (
+            <Typography sx={{ p: 2, color: 'text.secondary', textAlign: 'center', mt: 4 }}>
+              No trade summary data found for this period.
+            </Typography>
+          )}
+          {!isLoadingChart && chartData.length > 0 && (
+            <TradeChart
+              data={chartData}
+              isDarkMode={theme.palette.mode === 'dark'} // Pass dark mode flag to chart
+            />
+          )}
+        </Card>
       </Box>
     </Box>
   );

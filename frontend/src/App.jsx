@@ -150,6 +150,8 @@ function App() {
                 bgcolor: darkMode ? 'background.paper' : 'primary.dark', // Background color based on darkMode
                 '& .MuiToggleButton-root': {
                   color: darkMode ? 'white' : 'white', // Text color
+                  width: 150, // Set a consistent width for all buttons
+                  height: 40, // Set a consistent height for all buttons
                   '&.Mui-selected': {
                     bgcolor: darkMode ? 'grey.700' : 'primary.light', // Selected background color
                     color: darkMode ? 'white' : 'white', // Selected text color
