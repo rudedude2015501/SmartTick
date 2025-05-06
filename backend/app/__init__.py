@@ -4,6 +4,7 @@ from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from .finnhub_client import get_profile, get_quote_data
+from .tiingo_client import get_daily_prices
 from scripts.scraper import getPolData  # Import the scraper function
 
 # Shared extension objects
@@ -69,6 +70,31 @@ def create_app() -> Flask:
             # Fetch quote data
             quote_data = get_quote_data(symbol)
             return quote_data
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+
+    @app.route("/api/prices/<symbol>", methods=["GET"])
+    def daily_prices(symbol):
+        """
+        GET /api/prices/AAPL?start=2024-01-01&end=2024-02-01
+        returns Tiingo daily OHLC data between those dates
+        """
+        # grab and validate query params
+        start_date = request.args.get("start")
+        end_date   = request.args.get("end")
+        if not start_date or not end_date:
+            return jsonify({
+                "error": "Both 'start' and 'end' query parameters are required, in YYYY-MM-DD format."
+            }), 400
+
+        try:
+            data = get_daily_prices(symbol, start_date, end_date)
+            return jsonify({
+                "symbol": symbol.upper(),
+                "start":  start_date,
+                "end":    end_date,
+                "prices": data
+            })
         except Exception as e:
             return jsonify({"error": str(e)}), 500
 
