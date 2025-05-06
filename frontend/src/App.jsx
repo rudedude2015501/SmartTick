@@ -1,16 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import Container from '@mui/material/Container';
-import Typography from '@mui/material/Typography';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import CardMedia from '@mui/material/CardMedia';
-import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import InputBase from '@mui/material/InputBase';
-import { alpha, styled } from '@mui/material/styles';
+import { alpha, styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import SearchIcon from '@mui/icons-material/Search';
+import Typography from '@mui/material/Typography';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import ToggleButton from '@mui/material/ToggleButton';
+import ShowChartIcon from '@mui/icons-material/ShowChart';
+import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
+import Fab from '@mui/material/Fab';
+import Brightness4Icon from '@mui/icons-material/Brightness4';
+import Brightness7Icon from '@mui/icons-material/Brightness7';
+import CssBaseline from '@mui/material/CssBaseline';
+import HomeIcon from '@mui/icons-material/Home';
+
+// Import the new modularized components
+import StockView from './StockView';
+import CongressView from './CongressView';
+import HomeView from './HomeView';
+
+// Get API URL from environment variable
+const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 // Styled components
 const Search = styled('div')(({ theme }) => ({
@@ -54,104 +67,161 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
+// Fixed position FAB for theme toggle
+const ThemeToggleFab = styled(Fab)(({ theme }) => ({
+  position: 'fixed',
+  bottom: theme.spacing(4),
+  right: theme.spacing(4),
+}));
+
+// Main App component
 function App() {
-  const [symbol, setSymbol] = useState(''); // User input for stock symbol
-  const [profileData, setProfileData] = useState(null); // Fetched stock profile data
-  const [error, setError] = useState(null); // Error message
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchedTerm, setSearchedTerm] = useState('');
+  const [viewMode, setViewMode] = useState('home'); // Default view mode
+  const [darkMode, setDarkMode] = useState(false); // Track dark/light mode
 
-  // Handle search submission
-  const handleSearch = async (e) => {
-    e.preventDefault();
-    setError(null);
-    setProfileData(null);
+  // Create theme based on darkMode state
+  const theme = useMemo(
+    () =>
+      createTheme({
+        palette: {
+          mode: darkMode ? 'dark' : 'light',
+          primary: {
+            main: darkMode ? '#1976d2' : '#1976d2', // You can customize colors for dark/light modes
+          },
+          background: {
+            default: darkMode ? '#121212' : '#f5f5f5',
+            paper: darkMode ? '#1e1e1e' : '#ffffff',
+          },
+        },
+      }),
+    [darkMode]
+  );
 
-    try {
-      const response = await fetch(`http://localhost:5000/api/profile/${symbol}`);
-      if (!response.ok) {
-        throw new Error(`Error: ${response.statusText}`);
-      }
-      const data = await response.json();
-      setProfileData(data);
-    } catch (err) {
-      setError(err.message);
+  // Toggle dark mode function
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
+  };
+
+  // Handle search function
+  const handleSearch = (event) => {
+    event.preventDefault();
+    
+    const trimmedTerm = searchTerm.trim();
+    if (!trimmedTerm) return; // Don't search if input is empty
+    
+    setSearchedTerm(trimmedTerm); // Store the searched term
+  };
+
+  // Handle view mode change
+  const handleViewModeChange = (event, newMode) => {
+    if (newMode !== null) {
+      setViewMode(newMode);
+      setSearchTerm(''); // Clear search term when switching views
+      setSearchedTerm(''); // Clear searched term when switching views
     }
   };
 
+  // Get placeholder text based on view mode
+  const getPlaceholderText = () => {
+    return viewMode === 'stock' 
+      ? 'Enter Ticker Symbol...' 
+      : 'Enter Politician Name...';
+  };
+
   return (
-    <>
-      {/* AppBar with Search */}
-      <AppBar sx={{ backgroundColor: '#1976d2' }}>
+    <ThemeProvider theme={theme}>
+      <CssBaseline /> {/* Apply baseline CSS for the theme */}
+      
+      <AppBar position="fixed">
         <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
           <Typography variant="h6" noWrap>
             SmartTick
           </Typography>
-          <Search>
-            <SearchIconWrapper>
-              <SearchIcon />
-            </SearchIconWrapper>
-            <StyledInputBase
-              placeholder="Search…"
-              inputProps={{ 'aria-label': 'search' }}
-              value={symbol}
-              onChange={(e) => setSymbol(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') handleSearch(e);
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <ToggleButtonGroup
+              value={viewMode}
+              exclusive
+              onChange={handleViewModeChange}
+              aria-label="view mode"
+              size="small"
+              sx={{
+                bgcolor: darkMode ? 'background.paper' : 'primary.dark', // Background color based on darkMode
+                '& .MuiToggleButton-root': {
+                  color: darkMode ? 'white' : 'white', // Text color
+                  '&.Mui-selected': {
+                    bgcolor: darkMode ? 'grey.700' : 'primary.light', // Selected background color
+                    color: darkMode ? 'white' : 'white', // Selected text color
+                    '&:hover': {
+                      bgcolor: darkMode ? 'grey.600' : 'primary.light', // Hover effect for selected button
+                    },
+                  },
+                  '&:hover': {
+                    bgcolor: darkMode ? 'grey.800' : 'primary.main', // Hover effect for unselected button
+                  },
+                },
               }}
-            />
-          </Search>
+            >
+              <ToggleButton value="home" aria-label="home view">
+                <HomeIcon sx={{ mr: 1 }} />
+                Home
+              </ToggleButton>
+              <ToggleButton value="stock" aria-label="stock view">
+                <ShowChartIcon sx={{ mr: 1 }} />
+                Stocks
+              </ToggleButton>
+              <ToggleButton value="congress" aria-label="congress view">
+                <AccountBalanceIcon sx={{ mr: 1 }} />
+                Congress
+              </ToggleButton>
+            </ToggleButtonGroup>
+
+            {/* Conditionally render the search bar */}
+            {viewMode !== 'home' && (
+              <Search>
+                <SearchIconWrapper>
+                  <SearchIcon />
+                </SearchIconWrapper>
+                <StyledInputBase
+                  placeholder={getPlaceholderText()}
+                  inputProps={{ 'aria-label': 'search' }}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleSearch(e);
+                  }}
+                />
+              </Search>
+            )}
+          </Box>
         </Toolbar>
       </AppBar>
+
+      {/* Offset content below fixed AppBar */}
       <Toolbar />
-      <Box sx={{ backgroundColor: '#f5f5f5', minHeight: '100vh', py: 4 }}>
-        {profileData || error ? (
-          <Container maxWidth="sm" sx={{ backgroundColor: '#ffffff', borderRadius: 2, p: 3, boxShadow: 3 }}>
-            <Typography variant="h4" component="h1" gutterBottom>
-              Stock Profile
-            </Typography>
 
-            {/* Error Message */}
-            {error && <Alert severity="error">{error}</Alert>}
-
-            {/* Stock Profile Data */}
-            {profileData && (
-              <Card sx={{ mt: 3 }}>
-                <CardContent>
-                  <Typography variant="h5">
-                    {profileData.name} ({profileData.ticker})
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    <strong>Industry:</strong> {profileData.finnhubIndustry}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    <strong>Market Capitalization:</strong> ${profileData.marketCapitalization} Billion
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    <strong>IPO Date:</strong> {profileData.ipo}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    <strong>Exchange:</strong> {profileData.exchange}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    <strong>Website:</strong>{' '}
-                    <a href={profileData.weburl} target="_blank" rel="noopener noreferrer">
-                      {profileData.weburl}
-                    </a>
-                  </Typography>
-                </CardContent>
-                {profileData.logo && (
-                  <CardMedia
-                    component="img"
-                    image={profileData.logo}
-                    alt={`${profileData.name} logo`}
-                    sx={{ maxWidth: 150, margin: '0 auto', padding: 2 }}
-                  />
-                )}
-              </Card>
-            )}
-          </Container>
-        ) : null}
+      <Box sx={{ minHeight: 'calc(100vh - 64px)', py: 4, px: 2 }}>
+        <Container maxWidth="md">
+          {viewMode === 'home' ? (
+            <HomeView />
+          ) : viewMode === 'stock' ? (
+            <StockView searchSymbol={searchedTerm} />
+          ) : (
+            <CongressView searchTerm={searchedTerm} />
+          )}
+        </Container>
       </Box>
-    </>
+
+      {/* Dark mode toggle button */}
+      <ThemeToggleFab 
+        color="primary" 
+        aria-label="toggle dark mode"
+        onClick={toggleDarkMode}
+      >
+        {darkMode ? <Brightness7Icon /> : <Brightness4Icon />}
+      </ThemeToggleFab>
+    </ThemeProvider>
   );
 }
 
