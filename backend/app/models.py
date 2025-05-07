@@ -1,10 +1,12 @@
 # SmartTick/backend/app/models.py
 from sqlalchemy import Date, func # Added Date, func
+from sqlalchemy.sql import func
+
 # --- Import db from the package level (app) where it's initialized ---
 from app import db
 
-from sqlalchemy.sql import func
 
+# Stock Profile
 class Stock(db.Model):
     id                    = db.Column(db.Integer, primary_key=True)
     symbol                = db.Column(db.String(10),   unique=True, nullable=False)  # ticker
@@ -134,4 +136,3 @@ class StockPrice(db.Model):
 
     def __repr__(self):
         return f"<StockPrice {self.date} Close={self.close}>"
-
