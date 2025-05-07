@@ -7,11 +7,13 @@ from datetime import date
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+
 from flask_cors import CORS
 from sqlalchemy import func
 
-# Local application imports
 from .finnhub_client import get_profile, get_quote_data
+from .tiingo_client import get_daily_prices
+from scripts.scraper import getPolData  # Import the scraper function
 
 # Shared extension objects
 db = SQLAlchemy()
@@ -247,5 +249,30 @@ def create_app():
             }
             for key, data in sorted(monthly_summary.items())
         ]
+
+    @app.route("/api/prices/<symbol>", methods=["GET"])
+    def daily_prices(symbol):
+        """
+        GET /api/prices/AAPL?start=2024-01-01&end=2024-02-01
+        returns Tiingo daily OHLC data between those dates
+        """
+        # grab and validate query params
+        start_date = request.args.get("start")
+        end_date   = request.args.get("end")
+        if not start_date or not end_date:
+            return jsonify({
+                "error": "Both 'start' and 'end' query parameters are required, in YYYY-MM-DD format."
+            }), 400
+
+        try:
+            data = get_daily_prices(symbol, start_date, end_date)
+            return jsonify({
+                "symbol": symbol.upper(),
+                "start":  start_date,
+                "end":    end_date,
+                "prices": data
+            })
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
 
     return app

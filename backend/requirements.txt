@@ -10,10 +10,12 @@ psycopg2-binary==2.9.6    # PostgreSQL adapter
 # api development 
 python-dotenv==1.0.0      # Environment variables
 requests==2.31.0          # For fetching external API data
-finnhub-python==2.4.0     # Finnhub API client
+finnhub-python==2.4.0     # Finnhub API Client
+tiingo==0.16.1	  	  # Tiingo API Client
 
-# optional packages 
-pandas==2.0.3             # If analyzing trade data
+# python utility packages
+numpy==1.26.4
+pandas==2.2.2
 python-dateutil==2.8.2    # For date handling
 
 # WebSocket support
