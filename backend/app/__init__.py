@@ -13,7 +13,6 @@ from sqlalchemy import func
 
 from .finnhub_client import get_profile, get_quote_data
 from .tiingo_client import get_daily_prices
-from scripts.scraper import getPolData  # Import the scraper function
 
 # Shared extension objects
 db = SQLAlchemy()
