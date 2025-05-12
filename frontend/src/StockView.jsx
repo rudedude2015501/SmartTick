@@ -15,6 +15,8 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+// Adding StockAnalysis.jsx, with analysis functionality
+import StockAnalysis from './StockAnalysis';
 
 import TradeChart from './Chart';
 
@@ -317,6 +319,24 @@ function StockView({ searchSymbol }) {
             />
           )}
         </Card>
+      </Box>
+      {/* Stock Analysis Section */}
+      <Box mt={4}>
+        {!isLoadingTrades && trades.length > 0 ? (
+          <StockAnalysis symbol={searchSymbol} trades={trades} />
+        ) : (
+          isLoadingTrades ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+              <CircularProgress />
+            </Box>
+          ) : (
+            searchSymbol && (
+              <Alert severity="info">
+                No trade data available for analysis. Trading data is required to generate technical metrics.
+              </Alert>
+            )
+          )
+        )}
       </Box>
     </Box>
   );
