@@ -275,3 +275,36 @@ def create_app():
             return jsonify({"error": str(e)}), 500
 
     return app
+
+    @app.route('/api/autocomplete/stocks', methods=["GET"])
+    def autocomplete_stocks():
+        """
+        return a list of stock symbols based on the search 
+        """
+        query = request.args.get('query', '').upper()
+        if not query or len(query) < 1:
+            return jsonify([])
+
+        try:
+            # search for stocks where symbol starts with input
+            stocks = db.session.query(models.Stock).filter(
+                db.or_(
+                    models.Stock.symbol.ilike(f"{query}%"),
+                    models.Stock.name.ilike(f"{query}%")
+                )
+            ).limit(10).all()
+
+            # format results 
+            results = [
+                {
+                    'symbol': stock.symbol,
+                    'name': stock.name,
+                    'type': 'stock'
+                }
+                for stock in stocks
+            ]
+
+            return jsonify(results)
+        except Exception as e:
+            app.logger.error(f"error with autocomplete: {e}", exc_info=True)
+            return jsonify([]), 500
