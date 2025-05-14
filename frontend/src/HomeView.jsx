@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useTheme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
+import Button from '@mui/material/Button';
 import Alert from '@mui/material/Alert';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -17,13 +19,15 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 // Get API URL from environment variable
 const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
-function HomeView({ searchTerm }) {
+function HomeView({ searchTerm, onReset }) {
   const [allTrades, setAllTrades] = useState([]);
   const [trades, setTrades] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const tradesPerPage = 10;
+  const theme = useTheme();
+  const isDarkMode = theme.palette.mode === 'dark';
 
   // Fetch the trades on component mount
   useEffect(() => {
@@ -51,12 +55,19 @@ function HomeView({ searchTerm }) {
 
   // Filter trades based on search term
   useEffect(() => {
-    if (!searchTerm) return;
-    if (allTrades.length === 0) return;
-    const filtered = allTrades.filter(trade =>
-      trade.traded_issuer_ticker.split(':')[0].includes(searchTerm.toUpperCase())
-    );
-    setTrades(filtered);
+    if (!allTrades || allTrades.length === 0) return;
+
+    const term = searchTerm.trim().toUpperCase();
+
+    if (!term) {
+      setTrades(allTrades);
+    } else {
+      const filtered = allTrades.filter(trade =>
+        trade.traded_issuer_ticker.split(':')[0].includes(term)
+      );
+      setTrades(filtered);
+    }
+
     setCurrentPage(1);
   }, [searchTerm, allTrades]);
 
@@ -80,14 +91,30 @@ function HomeView({ searchTerm }) {
 
   return (
     <Box sx={{ p: 4, maxWidth: 1200, mx: 'auto' }}>
-      <Typography
-        variant="h4"
-        align="center"
-        gutterBottom
-        sx={{ fontWeight: 'bold', color: 'primary.main', mb: 4 }}
-      >
-        {searchTerm ? `Recent Trades for ${searchTerm}` : 'Recent Trades'}
-      </Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+        <Typography
+          variant="h4"
+          align="center"
+          gutterBottom
+          sx={{ fontWeight: 'bold', color: isDarkMode ? 'grey.100' : 'primary.main' }}
+        >
+          {searchTerm ? `Recent Trades for ${searchTerm}` : 'Recent Trades'}
+        </Typography>
+        <Button
+          variant="contained"
+          onClick={onReset}
+          sx={{
+            bgcolor: isDarkMode ? 'grey.800' : 'primary.main',
+            color: 'white',
+            transition: 'none', 
+            '&:hover': {
+              bgcolor: isDarkMode ? 'grey.700' : 'primary.dark',
+            }
+          }}
+        >
+          Reset
+        </Button>
+      </Box>
 
       {isLoading && (
         <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
@@ -96,7 +123,14 @@ function HomeView({ searchTerm }) {
       )}
 
       {error && (
-        <Alert severity="error" sx={{ mb: 3 }}>
+        <Alert
+          severity="error"
+          sx={{
+            mb: 3,
+            bgcolor: isDarkMode ? 'error.dark' : undefined,
+            color: isDarkMode ? 'grey.100' : undefined,
+          }}
+        >
           {error}
         </Alert>
       )}
@@ -117,13 +151,13 @@ function HomeView({ searchTerm }) {
             <TableContainer component={Paper} sx={{ borderRadius: 2 }}>
               <Table>
                 <TableHead>
-                  <TableRow sx={{ backgroundColor: 'primary.light' }}>
-                    <TableCell sx={{ fontWeight: 'bold', color: 'white', minWidth: 150, maxWidth: 150 }}>Politician</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold', color: 'white', minWidth: 100, maxWidth: 100 }}>Stock</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold', color: 'white', minWidth: 100, maxWidth: 100 }}>Trade Type</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold', color: 'white', minWidth: 120, maxWidth: 120 }}>Trade Date</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold', color: 'white', minWidth: 100, maxWidth: 100 }}>Size</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold', color: 'white', minWidth: 100, maxWidth: 100 }}>Price</TableCell>
+                  <TableRow sx={{ backgroundColor: isDarkMode ? 'grey.800' : 'primary.light' }}>
+                    <TableCell sx={{ fontWeight: 'bold', color: isDarkMode ? 'grey.100' : 'white', minWidth: 150 }}>Politician</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold', color: isDarkMode ? 'grey.100' : 'white', minWidth: 100 }}>Stock</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold', color: isDarkMode ? 'grey.100' : 'white', minWidth: 100 }}>Trade Type</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold', color: isDarkMode ? 'grey.100' : 'white', minWidth: 120 }}>Trade Date</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold', color: isDarkMode ? 'grey.100' : 'white', minWidth: 100 }}>Size</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold', color: isDarkMode ? 'grey.100' : 'white', minWidth: 100 }}>Price</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -132,28 +166,28 @@ function HomeView({ searchTerm }) {
                       key={trade.id}
                       hover
                       sx={{
-                        '&:hover': { backgroundColor: 'action.hover' },
+                        '&:hover': { backgroundColor: isDarkMode ? 'grey.900' : 'action.hover' },
                         transition: 'background-color 0.2s'
                       }}
                     >
-                      <TableCell sx={{ minWidth: 150, maxWidth: 150 }}>{trade.politician_name || 'N/A'}</TableCell>
-                      <TableCell sx={{ minWidth: 100, maxWidth: 100 }}>
+                      <TableCell sx={{ minWidth: 150 }}>{trade.politician_name || 'N/A'}</TableCell>
+                      <TableCell sx={{ minWidth: 100 }}>
                         {trade.traded_issuer_ticker
                           ? trade.traded_issuer_ticker.split(':')[0]
                           : 'N/A'}
                       </TableCell>
-                      <TableCell sx={{ minWidth: 100, maxWidth: 100 }}>
+                      <TableCell sx={{ minWidth: 100 }}>
                         {trade.type
                           ? trade.type.charAt(0).toUpperCase() + trade.type.slice(1)
                           : 'N/A'}
                       </TableCell>
-                      <TableCell sx={{ minWidth: 120, maxWidth: 120 }}>
+                      <TableCell sx={{ minWidth: 120 }}>
                         {trade.traded
                           ? new Intl.DateTimeFormat('en-US').format(new Date(trade.traded))
                           : 'N/A'}
                       </TableCell>
-                      <TableCell sx={{ minWidth: 100, maxWidth: 100 }}>{trade.size || 'N/A'}</TableCell>
-                      <TableCell sx={{ minWidth: 100, maxWidth: 100 }}>{trade.price || 'N/A'}</TableCell>
+                      <TableCell sx={{ minWidth: 100 }}>{trade.size || 'N/A'}</TableCell>
+                      <TableCell sx={{ minWidth: 100 }}>{trade.price || 'N/A'}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -164,7 +198,13 @@ function HomeView({ searchTerm }) {
             <IconButton
               onClick={handlePreviousPage}
               disabled={currentPage === 1}
-              sx={{ bgcolor: 'primary.main', color: 'white' }}
+              sx={{
+                bgcolor: isDarkMode ? 'grey.800' : 'primary.main',
+                color: 'white',
+                '&:hover': {
+                  bgcolor: isDarkMode ? 'grey.700' : 'primary.dark',
+                }
+              }}
             >
               <ArrowBackIcon />
             </IconButton>
@@ -174,7 +214,13 @@ function HomeView({ searchTerm }) {
             <IconButton
               onClick={handleNextPage}
               disabled={currentPage === totalPages}
-              sx={{ bgcolor: 'primary.main', color: 'white' }}
+              sx={{
+                bgcolor: isDarkMode ? 'grey.800' : 'primary.main',
+                color: 'white',
+                '&:hover': {
+                  bgcolor: isDarkMode ? 'grey.700' : 'primary.dark',
+                }
+              }}
             >
               <ArrowForwardIcon />
             </IconButton>

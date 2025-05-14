@@ -130,6 +130,11 @@ function App() {
       : 'Enter Politician Name...';
   };
 
+  const resetSearch = () => {
+    setSearchTerm('');
+    setSearchedTerm('');
+  };
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline /> {/* Apply baseline CSS for the theme */}
@@ -202,7 +207,7 @@ function App() {
       <Box sx={{ minHeight: 'calc(100vh - 64px)', py: 4, px: 2 }}>
         <Container maxWidth="md">
           {viewMode === 'home' ? (
-            <HomeView searchTerm={searchedTerm} />
+            <HomeView searchTerm={searchedTerm} onReset={resetSearch} />
           ) : viewMode === 'stock' ? (
             <StockView searchSymbol={searchedTerm} />
           ) : (
