@@ -29,21 +29,33 @@ def getPolData():
     for tab in table:
         Trade = {}
         Trade["politician_name"] = (tab.find('a',class_="text-txt-interactive")).text
-        Trade["politician_family"] = (tab.find('div',class_="politician-info mt-1 text-size-2 font-medium leading-none text-txt-dimmer").text)
+        
+        Trade["politician_family"] = (tab.find('div',class_="politician-info mt-1 text-size-2 font-medium leading-none text-txt-dimmer").get_text(" "))
+        
         Trade["politician_link"] = "N/A"
         Trade["traded_issuer_name"] =(tab.find('h3',class_="q-fieldset issuer-name")).text
         Trade["traded_issuer_ticker"] =(tab.find("span","q-field issuer-ticker")).text
         Trade["traded_issuer_link"] = "N/A"
         datesPublishedAndPosted = tab.find_all("div",class_="text-center")
-        Trade["published"] = datesPublishedAndPosted[0].text
-        Trade["traded"] = datesPublishedAndPosted[1].text
-        Trade["filed_after"] =(tab.find("div",class_="q-cell cell--reporting-gap flavour--lv")).text
-        Trade["owner"] =(tab.find("span",class_="q-label")).text
-        Trade["type"] =(tab.find("span", class_=["q-field tx-type tx-type--sell has-asterisk","q-field tx-type tx-type--buy has-asterisk",\
-                                               "q-field tx-type tx-type--buy","q-field tx-type tx-type--sell"])).text
+        Trade["published"] = datesPublishedAndPosted[0].get_text(" ")
+        Trade["traded"] = datesPublishedAndPosted[1].get_text(" ")
+        Trade["filed_after"] =(tab.find("div",class_="q-cell cell--reporting-gap flavour--lv")).get_text(" ")
+        Trade["owner"] =(tab.find("span",class_="q-label")).get_text(" ")
+
+        TradeType =tab.find("span", class_=["q-field tx-type tx-type--sell has-asterisk","q-field tx-type tx-type--buy has-asterisk","q-field tx-type tx-type--buy","q-field tx-type tx-type--sell"])
+        if TradeType == None:
+            Trade["type"] = "Tradetype is none"
+        else:
+            Trade["type"] = TradeType.text
         Trade["size"] =(tab.find("span","mt-1 text-size-2 text-txt-dimmer hover:text-foreground")).text
         Trade["price"] =(tab.find("div","flex place-content-center px-2 lg:px-3 xl:px-6 justify-end pr-0")).text
 
         Trades.append(Trade)
-    with open ("1yeartrade.json", "w") as fs:
+
+    print(Trades[0]) #for testing
+
+    with open ("1yeartrade.json", "w+") as fs:
         json.dump(Trades,fs,indent=2)
+        print("success")
+
+getPolData()
