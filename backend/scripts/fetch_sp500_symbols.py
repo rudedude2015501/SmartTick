@@ -1,19 +1,16 @@
-import requests
-import csv
-import io
+import os
+import pandas as pd
+from typing import List
 
-def fetch_sp500_symbols(url: str) -> list[str]:
+def fetch_sp500_symbols(
+    filename: str = "constituents.csv"
+) -> List[str]:
     """
-    Fetches the S&P 500 company list CSV from `url` and returns
-    a list of ticker symbols.
+    Reads `data/constituents.csv` and returns a list of symbols.
     """
-    resp = requests.get(url)
-    resp.raise_for_status()
-    reader = csv.DictReader(io.StringIO(resp.text))
-    symbols = [row["Symbol"].strip() for row in reader if row.get("Symbol")]
-    return symbols
+    here = os.path.dirname(__file__)
+    project_root = os.path.abspath(os.path.join(here, os.pardir))
+    csv_path = os.path.join(project_root, "data", filename)
 
-# if __name__ == "__main__":
-#     symbols = fetch_sp500_symbols(CSV_URL)
-#     for symbol in symbols:
-#         print(symbol)
+    df = pd.read_csv(csv_path)
+    return df["Symbol"].str.strip().tolist()
