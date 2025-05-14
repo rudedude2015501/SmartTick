@@ -201,6 +201,7 @@ function HomeView({ searchTerm, onReset }) {
               sx={{
                 bgcolor: isDarkMode ? 'grey.800' : 'primary.main',
                 color: 'white',
+                transition: 'none', 
                 '&:hover': {
                   bgcolor: isDarkMode ? 'grey.700' : 'primary.dark',
                 }
@@ -217,6 +218,7 @@ function HomeView({ searchTerm, onReset }) {
               sx={{
                 bgcolor: isDarkMode ? 'grey.800' : 'primary.main',
                 color: 'white',
+                transition: 'none', 
                 '&:hover': {
                   bgcolor: isDarkMode ? 'grey.700' : 'primary.dark',
                 }
