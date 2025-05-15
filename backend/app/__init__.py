@@ -297,7 +297,6 @@ def create_app():
                 {
                     'symbol': stock.symbol,
                     'name': stock.name,
-                    'type': 'stock'
                 }
                 for stock in stocks
             ]
@@ -306,5 +305,5 @@ def create_app():
         except Exception as e:
             app.logger.error(f"error with autocomplete: {e}", exc_info=True)
             return jsonify([]), 500
-    
+        
     return app
