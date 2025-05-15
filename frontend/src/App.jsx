@@ -1,4 +1,5 @@
-import React, { useState, useMemo } from 'react';
+// App.jsx with StockAutocomplete and original styling
+import React, { useState, useMemo, useEffect } from 'react';
 import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
 import AppBar from '@mui/material/AppBar';
@@ -16,8 +17,14 @@ import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import CssBaseline from '@mui/material/CssBaseline';
 import HomeIcon from '@mui/icons-material/Home';
+import Popper from '@mui/material/Popper';
+import Paper from '@mui/material/Paper';
+import MenuItem from '@mui/material/MenuItem';
+import ClickAwayListener from '@mui/material/ClickAwayListener';
+import MenuList from '@mui/material/MenuList';
+import CircularProgress from '@mui/material/CircularProgress';
 
-// Import the new modularized components
+// Import the view components
 import StockView from './StockView';
 import CongressView from './CongressView';
 import HomeView from './HomeView';
@@ -25,7 +32,7 @@ import HomeView from './HomeView';
 // Get API URL from environment variable
 const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
-// Styled components
+// Styled components - keeping original styling
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
   borderRadius: theme.shape.borderRadius,
@@ -53,6 +60,7 @@ const SearchIconWrapper = styled('div')(({ theme }) => ({
 
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
   color: 'inherit',
+  width: '100%',
   '& .MuiInputBase-input': {
     padding: theme.spacing(1, 1, 1, 0),
     paddingLeft: `calc(1em + ${theme.spacing(4)})`,
@@ -80,6 +88,10 @@ function App() {
   const [searchedTerm, setSearchedTerm] = useState('');
   const [viewMode, setViewMode] = useState('home'); // Default view mode
   const [darkMode, setDarkMode] = useState(false); // Track dark/light mode
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [options, setOptions] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
 
   // Create theme based on darkMode state
   const theme = useMemo(
@@ -111,7 +123,22 @@ function App() {
     const trimmedTerm = searchTerm.trim();
     if (!trimmedTerm) return; // Don't search if input is empty
     
+    setAnchorEl(null);
+    setOpen(false);
     setSearchedTerm(trimmedTerm); // Store the searched term
+  };
+
+  // Handle autocomplete selection
+  const handleOptionClick = (option) => {
+    setSearchTerm(option.symbol);
+    setSearchedTerm(option.symbol);
+    setAnchorEl(null);
+    setOpen(false);
+  };
+
+  // Close the autocomplete dropdown
+  const handleClose = () => {
+    setOpen(false);
   };
 
   // Handle view mode change
@@ -120,6 +147,41 @@ function App() {
       setViewMode(newMode);
       setSearchTerm(''); // Clear search term when switching views
       setSearchedTerm(''); // Clear searched term when switching views
+      setOpen(false);
+    }
+  };
+
+  // Handle input change for autocomplete
+  const handleInputChange = (event) => {
+    const value = event.target.value;
+    setSearchTerm(value);
+    setAnchorEl(event.currentTarget);
+
+    // Fetch autocomplete options when input has at least 1 character
+    if (value.length >= 1) {
+      setLoading(true);
+      setOpen(true);
+      
+      // Call the backend autocomplete API endpoint
+      fetch(`${apiUrl}/api/autocomplete/stocks?query=${encodeURIComponent(value)}`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+          setOptions(data);
+          setLoading(false);
+        })
+        .catch(error => {
+          console.error('Error fetching autocomplete data:', error);
+          setLoading(false);
+          setOptions([]);
+        });
+    } else {
+      setOptions([]);
+      setOpen(false);
     }
   };
 
@@ -189,11 +251,44 @@ function App() {
                   placeholder={getPlaceholderText()}
                   inputProps={{ 'aria-label': 'search' }}
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={handleInputChange}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') handleSearch(e);
                   }}
                 />
+                
+                {/* Autocomplete Dropdown */}
+                {viewMode === 'stock' && (
+                  <Popper 
+                    open={open} 
+                    anchorEl={anchorEl}
+                    placement="bottom-start"
+                    style={{ zIndex: 1301, width: anchorEl ? anchorEl.clientWidth : null }}
+                  >
+                    <Paper>
+                      <ClickAwayListener onClickAway={handleClose}>
+                        <MenuList>
+                          {loading ? (
+                            <Box sx={{ display: 'flex', justifyContent: 'center', p: 2 }}>
+                              <CircularProgress size={24} />
+                            </Box>
+                          ) : options.length > 0 ? (
+                            options.map((option) => (
+                              <MenuItem 
+                                key={option.symbol} 
+                                onClick={() => handleOptionClick(option)}
+                              >
+                                <strong>{option.symbol}</strong> - {option.name}
+                              </MenuItem>
+                            ))
+                          ) : (
+                            <MenuItem disabled>No stocks found</MenuItem>
+                          )}
+                        </MenuList>
+                      </ClickAwayListener>
+                    </Paper>
+                  </Popper>
+                )}
               </Search>
             )}
           </Box>
