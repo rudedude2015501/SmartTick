@@ -47,14 +47,15 @@ def getPolData():
             Trade["type"] = "Tradetype is none"
         else:
             Trade["type"] = TradeType.text
-        Trade["size"] =(tab.find("span","mt-1 text-size-2 text-txt-dimmer hover:text-foreground")).text
+        Trade["size"] =(tab.find("span","mt-1 text-size-2 text-txt-dimmer hover:text-foreground")).get_text(" ")
         Trade["price"] =(tab.find("div","flex place-content-center px-2 lg:px-3 xl:px-6 justify-end pr-0")).text
-
+        img = tab.find_all("img")
+        Trade["img"] = img[0]["src"]
         Trades.append(Trade)
 
     print(Trades[0]) #for testing
 
-    with open ("1yeartrade.json", "w+") as fs:
+    with open ("1yeartrade[Test].json", "w+") as fs:
         json.dump(Trades,fs,indent=2)
         print("success")
 
