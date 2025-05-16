@@ -143,7 +143,6 @@ function StockView({ searchSymbol }) {
         let startDate;
 
         switch (selectedRange) {
-            // Case for '7D' is removed
             case '1M':
                 startDate = new Date(new Date().setMonth(today.getMonth() - 1)).toISOString().split('T')[0];
                 break;
@@ -254,7 +253,7 @@ function StockView({ searchSymbol }) {
               aria-label="historical price range"
               size="small"
             >
-              {/* ToggleButton for 7D is removed */}
+              {}
               <ToggleButton value="1M" aria-label="1 month">1M</ToggleButton>
               <ToggleButton value="6M" aria-label="6 months">6M</ToggleButton>
               <ToggleButton value="1Y" aria-label="1 year">1Y</ToggleButton>
