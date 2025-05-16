@@ -12,10 +12,8 @@ from app.models import Stock
 from app.finnhub_client import get_profile
 from scripts.fetch_sp500_symbols import fetch_sp500_symbols  # not relative since it's a script
 
-SYMBOLS_URL = "https://storage.googleapis.com/kagglesdsdata/datasets/1807380/10273516/sp500_companies.csv?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=gcp-kaggle-com%40kaggle-161607.iam.gserviceaccount.com%2F20250504%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20250504T053436Z&X-Goog-Expires=259200&X-Goog-SignedHeaders=host&X-Goog-Signature=6ae441ddf30a163830991b26d4866c09799bfc057b8b36493bf38a1a265926779936a6210f848fae37d258dd2fb9540c3ce391bec64c5b2591950b3b93e46f9c87e0ea4a85accb91080d699aa1a7e0c5298771acf157fd7c71220fe1d7d08a993f10922102459396500fa23abed40fd4fe04124780b7d60ce40a4ce1e2f1ce6e5b0c3ad46732f47267931580cac698d79f51315ad9f601c4692a778b24d20fca62e6d0930b60f503232652e6548a7ae1fafb13e6ff1a653f6a8f6fbd97416695d3660de46e302c3114e57e37c4ca7acfc18bec8299e122140f8cd3b9a244c426270aa31e697344e8047e5ca73ccb17829b523c0d2fe0c889c7b8071d7d0418b4"
-
 # --- 1) Get list of symbols (S&P 500)
-SYMBOLS = fetch_sp500_symbols(SYMBOLS_URL)
+SYMBOLS = fetch_sp500_symbols()
 
 # --- 2) Mapping from Finnhub keys to your model attributes ---
 FIELD_MAP = {
