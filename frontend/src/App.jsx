@@ -1,5 +1,4 @@
-// App.jsx with StockAutocomplete and original styling
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
 import AppBar from '@mui/material/AppBar';
@@ -23,6 +22,7 @@ import MenuItem from '@mui/material/MenuItem';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
 import MenuList from '@mui/material/MenuList';
 import CircularProgress from '@mui/material/CircularProgress';
+import debounce from 'lodash/debounce'; 
 
 // Import the view components
 import StockView from './StockView';
@@ -109,6 +109,33 @@ function App() {
         },
       }),
     [darkMode]
+  );
+
+  // "debounce" fetch function to improve performance
+  const debouncedFetch = useCallback(
+    debounce((value) => {
+      setLoading(true);
+      
+      fetch(`${apiUrl}/api/autocomplete/stocks?query=${encodeURIComponent(value)}`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+          // sort symbols in dropdown by alphabetical order 
+          const sortedData = data.sort((a, b) => a.symbol.localeCompare(b.symbol));
+          setOptions(sortedData);
+          setLoading(false);
+        })
+        .catch(error => {
+          console.error('Error fetching autocomplete data:', error);
+          setLoading(false);
+          setOptions([]);
+        });
+    }, 300), // 300ms delay for debouncing 
+    []
   );
 
   // Toggle dark mode function
