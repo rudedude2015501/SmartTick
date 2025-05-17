@@ -273,6 +273,7 @@ def create_app():
             })
         except Exception as e:
             return jsonify({"error": str(e)}), 500
+        
 
     @app.route('/api/autocomplete/stocks', methods=["GET"])
     def autocomplete_stocks():
@@ -305,5 +306,5 @@ def create_app():
         except Exception as e:
             app.logger.error(f"error with autocomplete: {e}", exc_info=True)
             return jsonify([]), 500
-        
+
     return app
