@@ -32,7 +32,7 @@ import HomeView from './HomeView';
 // Get API URL from environment variable
 const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
-// Styled components - keeping original styling
+// Styled components 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
   borderRadius: theme.shape.borderRadius,
@@ -75,7 +75,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-// Fixed position FAB for theme toggle
+// theme toggle
 const ThemeToggleFab = styled(Fab)(({ theme }) => ({
   position: 'fixed',
   bottom: theme.spacing(4),
@@ -92,6 +92,7 @@ function App() {
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const [highlightedIndex, setHighlightedIndex] = useState(-1); // track highlighted item in dropdown autocomplete
 
   // Create theme based on darkMode state
   const theme = useMemo(
@@ -100,7 +101,7 @@ function App() {
         palette: {
           mode: darkMode ? 'dark' : 'light',
           primary: {
-            main: darkMode ? '#1976d2' : '#1976d2', // You can customize colors for dark/light modes
+            main: darkMode ? '#1976d2' : '#1976d2', // customize colors for dark/light modes
           },
           background: {
             default: darkMode ? '#121212' : '#f5f5f5',
@@ -155,7 +156,7 @@ function App() {
     setSearchedTerm(trimmedTerm); // Store the searched term
   };
 
-  // Handle autocomplete selection
+  // autocomplete selection
   const handleOptionClick = (option) => {
     setSearchTerm(option.symbol);
     setSearchedTerm(option.symbol);
@@ -178,37 +179,61 @@ function App() {
     }
   };
 
-  // Handle input change for autocomplete
+  // input change for autocomplete
   const handleInputChange = (event) => {
     const value = event.target.value;
     setSearchTerm(value);
     setAnchorEl(event.currentTarget);
+    
+    // Reset highlighted index when input changes
+    setHighlightedIndex(-1);
 
     // Fetch autocomplete options when input has at least 1 character
     if (value.length >= 1) {
-      setLoading(true);
       setOpen(true);
-      
-      // Call the backend autocomplete API endpoint
-      fetch(`${apiUrl}/api/autocomplete/stocks?query=${encodeURIComponent(value)}`)
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-          return response.json();
-        })
-        .then(data => {
-          setOptions(data);
-          setLoading(false);
-        })
-        .catch(error => {
-          console.error('Error fetching autocomplete data:', error);
-          setLoading(false);
-          setOptions([]);
-        });
+      debouncedFetch(value); // debounce for better perfomance
     } else {
       setOptions([]);
       setOpen(false);
+    }
+  };
+
+  // Handle keyboard navigation
+  const handleKeyDown = (event) => {
+    if (!open) return;
+    
+    switch (event.key) {
+      case 'ArrowDown':
+        event.preventDefault(); 
+        setHighlightedIndex(prevIndex => {
+          const newIndex = prevIndex < options.length - 1 ? prevIndex + 1 : 0;
+          return newIndex;
+        });
+        break;
+        
+      case 'ArrowUp':
+        event.preventDefault(); 
+        setHighlightedIndex(prevIndex => {
+          const newIndex = prevIndex > 0 ? prevIndex - 1 : options.length - 1;
+          return newIndex;
+        });
+        break;
+        
+      case 'Enter':
+        if (highlightedIndex >= 0 && highlightedIndex < options.length) {
+          event.preventDefault(); 
+          handleOptionClick(options[highlightedIndex]);
+        } else {
+          handleSearch(event);
+        }
+        break;
+        
+      case 'Escape':
+        setOpen(false);
+        break;
+        
+      default:
+        break;
     }
   };
 
@@ -279,9 +304,7 @@ function App() {
                   inputProps={{ 'aria-label': 'search' }}
                   value={searchTerm}
                   onChange={handleInputChange}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') handleSearch(e);
-                  }}
+                  onKeyDown={handleKeyDown}
                 />
                 
                 {/* Autocomplete Dropdown */}
@@ -300,10 +323,17 @@ function App() {
                               <CircularProgress size={24} />
                             </Box>
                           ) : options.length > 0 ? (
-                            options.map((option) => (
+                            options.map((option, index) => (
                               <MenuItem 
                                 key={option.symbol} 
                                 onClick={() => handleOptionClick(option)}
+                                selected={index === highlightedIndex}
+                                sx={{
+                                  backgroundColor: index === highlightedIndex ? 'action.selected' : 'inherit',
+                                  '&:hover': {
+                                    backgroundColor: index === highlightedIndex ? 'action.selected' : 'action.hover',
+                                  },
+                                }}
                               >
                                 <strong>{option.symbol}</strong> - {option.name}
                               </MenuItem>
