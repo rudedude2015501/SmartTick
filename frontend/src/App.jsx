@@ -125,9 +125,14 @@ function App() {
 
   // Get placeholder text based on view mode
   const getPlaceholderText = () => {
-    return viewMode === 'stock' 
+    return viewMode === 'stock' || viewMode === 'home' 
       ? 'Enter Ticker Symbol...' 
       : 'Enter Politician Name...';
+  };
+
+  const resetSearch = () => {
+    setSearchTerm('');
+    setSearchedTerm('');
   };
 
   return (
@@ -178,24 +183,20 @@ function App() {
                 Congress
               </ToggleButton>
             </ToggleButtonGroup>
-
-            {/* Conditionally render the search bar */}
-            {viewMode !== 'home' && (
-              <Search>
-                <SearchIconWrapper>
-                  <SearchIcon />
-                </SearchIconWrapper>
-                <StyledInputBase
-                  placeholder={getPlaceholderText()}
-                  inputProps={{ 'aria-label': 'search' }}
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') handleSearch(e);
-                  }}
-                />
-              </Search>
-            )}
+            <Search>
+              <SearchIconWrapper>
+                <SearchIcon />
+              </SearchIconWrapper>
+              <StyledInputBase
+                placeholder={getPlaceholderText()}
+                inputProps={{ 'aria-label': 'search' }}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleSearch(e);
+                }}
+              />
+            </Search>
           </Box>
         </Toolbar>
       </AppBar>
@@ -206,7 +207,7 @@ function App() {
       <Box sx={{ minHeight: 'calc(100vh - 64px)', py: 4, px: 2 }}>
         <Container maxWidth="md">
           {viewMode === 'home' ? (
-            <HomeView />
+            <HomeView searchTerm={searchedTerm} onReset={resetSearch} />
           ) : viewMode === 'stock' ? (
             <StockView searchSymbol={searchedTerm} />
           ) : (
