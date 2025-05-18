@@ -304,7 +304,37 @@ def create_app():
 
             return jsonify(results)
         except Exception as e:
-            app.logger.error(f"error with autocomplete: {e}", exc_info=True)
+            app.logger.error(f"error with stock autocomplete: {e}", exc_info=True)
+            return jsonify([]), 500
+
+    @app.route('/api/autocomplete/politicians', methods=["GET"])
+    def autocomplete_politicians():
+        """
+        return a list of politicians based on the search
+        """
+        query = request.args.get('query', '').lower()
+        if not query or len(query) < 1:
+            return jsonify([])
+
+        try:
+            politicians = db.session.query(
+                models.Trade.politician_name, 
+                models.Trade.politician_family
+            ).filter(
+                models.Trade.politician_name.ilike(f"{query}%")
+            ).distinct().limit(10).all()
+
+            results = [
+                {
+                    'name': politician.politician_name,
+                    'affiliation': politician.politician_family
+                }
+                for politician in politicians
+            ]
+
+            return jsonify(results)
+        except Exception as e:
+            app.logger.error(f"error with politician autocomplete: {e}", exc_info=True)
             return jsonify([]), 500
 
     return app
