@@ -114,10 +114,10 @@ function App() {
 
   // "debounce" fetch function to improve performance
   const debouncedFetch = useCallback(
-    debounce((value) => {
+    debounce((value, endpoint) => {
       setLoading(true);
       
-      fetch(`${apiUrl}/api/autocomplete/stocks?query=${encodeURIComponent(value)}`)
+      fetch(`${apiUrl}/api/autocomplete/${endpoint}?query=${encodeURIComponent(value)}`)
         .then(response => {
           if (!response.ok) {
             throw new Error('Network response was not ok');
@@ -125,13 +125,19 @@ function App() {
           return response.json();
         })
         .then(data => {
-          // sort symbols in dropdown by alphabetical order 
-          const sortedData = data.sort((a, b) => a.symbol.localeCompare(b.symbol));
-          setOptions(sortedData);
+          if (endpoint === 'stocks') {
+            // sort symbols in dropdown by alphabetical order 
+            const sortedData = data.sort((a, b) => a.symbol.localeCompare(b.symbol));
+            setOptions(sortedData);
+          } else {
+            // For politicians, sort by name
+            const sortedData = data.sort((a, b) => a.name.localeCompare(b.name));
+            setOptions(sortedData);
+          }
           setLoading(false);
         })
         .catch(error => {
-          console.error('Error fetching autocomplete data:', error);
+          console.error(`Error fetching autocomplete data from ${endpoint}:`, error);
           setLoading(false);
           setOptions([]);
         });
@@ -158,8 +164,13 @@ function App() {
 
   // autocomplete selection
   const handleOptionClick = (option) => {
-    setSearchTerm(option.symbol);
-    setSearchedTerm(option.symbol);
+    if (viewMode === 'stock') {
+      setSearchTerm(option.symbol);
+      setSearchedTerm(option.symbol);
+    } else if (viewMode === 'congress') {
+      setSearchTerm(option.name);
+      setSearchedTerm(option.name);
+    }
     setAnchorEl(null);
     setOpen(false);
   };
@@ -176,6 +187,7 @@ function App() {
       setSearchTerm(''); // Clear search term when switching views
       setSearchedTerm(''); // Clear searched term when switching views
       setOpen(false);
+      setOptions([]); // clear options in search bar 
     }
   };
 
@@ -191,7 +203,8 @@ function App() {
     // Fetch autocomplete options when input has at least 1 character
     if (value.length >= 1) {
       setOpen(true);
-      debouncedFetch(value); // debounce for better perfomance
+      const endpoint = viewMode === 'stock' ? 'stocks' : 'politicians';
+      debouncedFetch(value, endpoint); // debounce for better perfomance
     } else {
       setOptions([]);
       setOpen(false);
@@ -308,44 +321,60 @@ function App() {
                 />
                 
                 {/* Autocomplete Dropdown */}
-                {viewMode === 'stock' && (
-                  <Popper 
-                    open={open} 
-                    anchorEl={anchorEl}
-                    placement="bottom-start"
-                    style={{ zIndex: 1301, width: anchorEl ? anchorEl.clientWidth : null }}
-                  >
-                    <Paper>
-                      <ClickAwayListener onClickAway={handleClose}>
-                        <MenuList>
-                          {loading ? (
-                            <Box sx={{ display: 'flex', justifyContent: 'center', p: 2 }}>
-                              <CircularProgress size={24} />
-                            </Box>
-                          ) : options.length > 0 ? (
-                            options.map((option, index) => (
-                              <MenuItem 
-                                key={option.symbol} 
-                                onClick={() => handleOptionClick(option)}
-                                selected={index === highlightedIndex}
-                                sx={{
-                                  backgroundColor: index === highlightedIndex ? 'action.selected' : 'inherit',
-                                  '&:hover': {
-                                    backgroundColor: index === highlightedIndex ? 'action.selected' : 'action.hover',
-                                  },
-                                }}
-                              >
-                                <strong>{option.symbol}</strong> - {option.name}
-                              </MenuItem>
-                            ))
-                          ) : (
-                            <MenuItem disabled>No stocks found</MenuItem>
-                          )}
-                        </MenuList>
-                      </ClickAwayListener>
-                    </Paper>
-                  </Popper>
-                )}
+                <Popper 
+                  open={open} 
+                  anchorEl={anchorEl}
+                  placement="bottom-start"
+                  style={{ zIndex: 1301, width: anchorEl ? anchorEl.clientWidth : null }}
+                >
+                  <Paper>
+                    <ClickAwayListener onClickAway={handleClose}>
+                      <MenuList>
+                        {loading ? (
+                          <Box sx={{ display: 'flex', justifyContent: 'center', p: 2 }}>
+                            <CircularProgress size={24} />
+                          </Box>
+                        ) : options.length > 0 ? (
+                          options.map((option, index) => (
+                            <MenuItem 
+                              key={viewMode === 'stock' ? option.symbol : option.name} 
+                              onClick={() => handleOptionClick(option)}
+                              selected={index === highlightedIndex}
+                              sx={{
+                                backgroundColor: index === highlightedIndex ? 'action.selected' : 'inherit',
+                                '&:hover': {
+                                  backgroundColor: index === highlightedIndex ? 'action.selected' : 'action.hover',
+                                },
+                              }}
+                            >
+                              {viewMode === 'stock' ? (
+                                <Box sx={{ 
+                                  display: 'flex',
+                                  flexDirection: 'column',
+                                  width: '100%'
+                                }}>
+                                  <Typography noWrap variant="body2"><strong>{option.symbol}</strong></Typography>
+                                  <Typography noWrap variant="caption" color="text.secondary">{option.name}</Typography>
+                                </Box>
+                              ) : (
+                                <Box sx={{ 
+                                  display: 'flex',
+                                  flexDirection: 'column',
+                                  width: '100%'
+                                }}>
+                                  <Typography noWrap variant="body2"><strong>{option.name}</strong></Typography>
+                                  <Typography noWrap variant="caption" color="text.secondary">{option.affiliation}</Typography>
+                                </Box>
+                              )}
+                            </MenuItem>
+                          ))
+                        ) : (
+                          <MenuItem disabled>{`No ${viewMode === 'stock' ? 'stocks' : 'politicians'} found`}</MenuItem>
+                        )}
+                      </MenuList>
+                    </ClickAwayListener>
+                  </Paper>
+                </Popper>
               </Search>
             )}
           </Box>
