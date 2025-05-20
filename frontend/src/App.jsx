@@ -118,11 +118,9 @@ function App() {
       })
       .then(data => {
         if (endpoint === 'stocks') {
-          const sortedData = data.sort((a, b) => a.symbol.localeCompare(b.symbol));
-          setOptions(sortedData);
+          setOptions(data);
         } else {
-          const sortedData = data.sort((a, b) => a.name.localeCompare(b.name));
-          setOptions(sortedData);
+          setOptions(data);
         }
         setLoading(false);
       })
