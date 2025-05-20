@@ -30,6 +30,12 @@ def fetchRequest(pageNumber:int = 1):
     PoliticianTable.prettify()
     Page_Indicators = (PoliticianTable.find("p", class_= "hidden leading-7 sm:block")).find_all("b")
     return PoliticianTable, Page_Indicators
+def swapWords(string:str):
+    """
+    Swaps the number and days for "published after" column
+    """
+    words = string.split()
+    return f"{words[1]} {words[0]}"
 
 def getPolData():
     Trades = []
