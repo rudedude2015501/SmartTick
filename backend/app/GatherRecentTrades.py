@@ -57,10 +57,10 @@ def getPolData():
         Politicians.append(Politician)
     print(Trades[0]) #for testing
 
-    with open ("1yeartrade[Test].json", "w+") as fs:
+    with open ("backend/1yeartrade.json", "w+") as fs:
         json.dump(Trades,fs,indent=2)
         print("trades success")
-    with open ("PoliticianPhotos.json", "w+") as fs:
+    with open ("backend/PoliticianPhotos.json", "w+") as fs:
         json.dump(Politicians,fs,indent=2)
         print("img success")
 
