@@ -144,7 +144,7 @@ function App() {
   };
 
   const handleOptionClick = (option) => {
-    if (viewMode === VIEW_STOCK || viewMode === VIEW_HOME) {
+    if (viewMode === VIEW_STOCK) {
       setSearchTerm(option.symbol);
       setSearchedTerm(option.symbol);
     } else {
@@ -177,7 +177,7 @@ function App() {
     // Fetch autocomplete options when input has at least 1 character
     if (value.length >= 1) {
       setOpen(true);
-      const endpoint = (viewMode === VIEW_STOCK || viewMode === VIEW_HOME) ? 'stocks' : 'politicians';
+      const endpoint = (viewMode === VIEW_STOCK) ? 'stocks' : 'politicians';
       if (searchTerm === '') {
         // No debounce if previous search was empty
         fetchData(value, endpoint);
@@ -230,14 +230,9 @@ function App() {
   };
 
   const getPlaceholderText = () =>
-    (viewMode === VIEW_STOCK || viewMode === VIEW_HOME)
+    (viewMode === VIEW_STOCK)
       ? 'Enter Ticker Symbol...'
       : 'Enter Politician Name...';
-
-  const resetSearch = () => {
-    setSearchTerm('');
-    setSearchedTerm('');
-  };
 
   // Render
   return (
@@ -278,66 +273,69 @@ function App() {
                 <AccountBalanceIcon sx={{ mr: 1 }} />Congress
               </ToggleButton>
             </ToggleButtonGroup>
-            <Search>
-              <SearchIconWrapper>
-                <SearchIcon />
-              </SearchIconWrapper>
-              <StyledInputBase
-                placeholder={getPlaceholderText()}
-                inputProps={{ 'aria-label': 'search' }}
-                value={searchTerm}
-                onChange={handleInputChange}
-                onKeyDown={handleKeyDown}
-              />
-              <Popper
-                open={open}
-                anchorEl={anchorEl}
-                placement="bottom-start"
-                style={{ zIndex: 1301, width: anchorEl ? anchorEl.clientWidth : null }}
-              >
-                <Paper>
-                  <ClickAwayListener onClickAway={handleClose}>
-                    <MenuList>
-                      {loading ? (
-                        <Box sx={{ display: 'flex', justifyContent: 'center', p: 2 }}>
-                          <CircularProgress size={24} />
-                        </Box>
-                      ) : options.length > 0 ? (
-                        options.map((option, idx) => (
-                          <MenuItem
-                            key={(viewMode === VIEW_STOCK || viewMode === VIEW_HOME) ? option.symbol : option.name}
-                            onClick={() => handleOptionClick(option)}
-                            selected={idx === highlightedIndex}
-                            sx={{
-                              backgroundColor: idx === highlightedIndex ? 'action.selected' : 'inherit',
-                              '&:hover': {
-                                backgroundColor: idx === highlightedIndex ? 'action.selected' : 'action.hover',
-                              },
-                            }}
-                          >
-                            {(viewMode === VIEW_STOCK || viewMode === VIEW_HOME) ? (
-                              <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-                                <Typography noWrap variant="body2"><strong>{option.symbol}</strong></Typography>
-                                <Typography noWrap variant="caption" color="text.secondary">{option.name}</Typography>
-                              </Box>
-                            ) : (
-                              <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-                                <Typography noWrap variant="body2"><strong>{option.name}</strong></Typography>
-                                <Typography noWrap variant="caption" color="text.secondary">{option.affiliation}</Typography>
-                              </Box>
-                            )}
+            {/* Only render search bar if not in HOME view */}
+            {viewMode !== VIEW_HOME && (
+              <Search>
+                <SearchIconWrapper>
+                  <SearchIcon />
+                </SearchIconWrapper>
+                <StyledInputBase
+                  placeholder={getPlaceholderText()}
+                  inputProps={{ 'aria-label': 'search' }}
+                  value={searchTerm}
+                  onChange={handleInputChange}
+                  onKeyDown={handleKeyDown}
+                />
+                <Popper
+                  open={open}
+                  anchorEl={anchorEl}
+                  placement="bottom-start"
+                  style={{ zIndex: 1301, width: anchorEl ? anchorEl.clientWidth : null }}
+                >
+                  <Paper>
+                    <ClickAwayListener onClickAway={handleClose}>
+                      <MenuList>
+                        {loading ? (
+                          <Box sx={{ display: 'flex', justifyContent: 'center', p: 2 }}>
+                            <CircularProgress size={24} />
+                          </Box>
+                        ) : options.length > 0 ? (
+                          options.map((option, idx) => (
+                            <MenuItem
+                              key={(viewMode === VIEW_STOCK) ? option.symbol : option.name}
+                              onClick={() => handleOptionClick(option)}
+                              selected={idx === highlightedIndex}
+                              sx={{
+                                backgroundColor: idx === highlightedIndex ? 'action.selected' : 'inherit',
+                                '&:hover': {
+                                  backgroundColor: idx === highlightedIndex ? 'action.selected' : 'action.hover',
+                                },
+                              }}
+                            >
+                              {(viewMode === VIEW_STOCK) ? (
+                                <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+                                  <Typography noWrap variant="body2"><strong>{option.symbol}</strong></Typography>
+                                  <Typography noWrap variant="caption" color="text.secondary">{option.name}</Typography>
+                                </Box>
+                              ) : (
+                                <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+                                  <Typography noWrap variant="body2"><strong>{option.name}</strong></Typography>
+                                  <Typography noWrap variant="caption" color="text.secondary">{option.affiliation}</Typography>
+                                </Box>
+                              )}
+                            </MenuItem>
+                          ))
+                        ) : (
+                          <MenuItem disabled>
+                            {`No ${(viewMode === VIEW_STOCK) ? 'stocks' : 'politicians'} found`}
                           </MenuItem>
-                        ))
-                      ) : (
-                        <MenuItem disabled>
-                          {`No ${(viewMode === VIEW_STOCK || viewMode === VIEW_HOME) ? 'stocks' : 'politicians'} found`}
-                        </MenuItem>
-                      )}
-                    </MenuList>
-                  </ClickAwayListener>
-                </Paper>
-              </Popper>
-            </Search>
+                        )}
+                      </MenuList>
+                    </ClickAwayListener>
+                  </Paper>
+                </Popper>
+              </Search>
+            )}
           </Box>
         </Toolbar>
       </AppBar>
@@ -347,7 +345,7 @@ function App() {
       <Box sx={{ minHeight: 'calc(100vh - 64px)', py: 4, px: 2 }}>
         <Container maxWidth="md">
           {viewMode === VIEW_HOME ? (
-            <HomeView searchTerm={searchedTerm} onReset={resetSearch} />
+            <HomeView />
           ) : viewMode === VIEW_STOCK ? (
             <StockView searchSymbol={searchedTerm} />
           ) : (
