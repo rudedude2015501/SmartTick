@@ -270,7 +270,7 @@ function StockView({ searchSymbol }) {
                         padding: 1,
                         border: `1px solid ${theme.palette.divider}`,
                         borderRadius: 1,
-                        backgroundColor: theme.palette.mode === 'dark' ? '#000' : 'transparent'
+                        backgroundColor: theme.palette.mode === 'dark' ? 'grey.850' : 'transparent'
                       }}
                     />
                   )}
