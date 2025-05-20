@@ -11,7 +11,6 @@ CapitalTrades = "https://www.capitoltrades.com/trades?pageSize=96&page=1"
 def getPolData():
     response = requests.get(CapitalTrades) #GET request
     soup = BeautifulSoup(response.content, 'html5lib') # If this line causes an error, run 'pip install html5lib' or install html5lib
-    # print(soup.prettify())
     if response.status_code != 200:
         raise Exception(f"Error with URL requests: {response.status_code}")
 
@@ -20,11 +19,7 @@ def getPolData():
     table = soup.find_all("tr", class_= "border-b transition-colors hover:bg-neutral-100/50 data-[state=selected]:bg-neutral-100 dark:hover:bg-neutral-800/50 dark:data-[state=selected]:bg-neutral-800 h-14 border-primary-15")
 
     
-    
-    # buySell = table[0].find("span", class_=["q-field tx-type tx-type--sell has-asterisk","q-field tx-type tx-type--buy has-asterisk",\
-    #                                             "q-field tx-type tx-type--buy","q-field tx-type tx-type--sell"])
-    
-    # print(buySell.text)
+
     Trades = []
     Politicians = []
     for tab in table:
