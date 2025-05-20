@@ -324,5 +324,68 @@ def create_app():
             })
         except Exception as e:
             return jsonify({"error": str(e)}), 500
+        
+
+    @app.route('/api/autocomplete/stocks', methods=["GET"])
+    def autocomplete_stocks():
+        """
+        return a list of stock symbols based on the search 
+        """
+        query = request.args.get('query', '').upper()
+        if not query or len(query) < 1:
+            return jsonify([])
+
+        try:
+            # search for stocks where symbol starts with input
+            stocks = db.session.query(models.Stock).filter(
+                db.or_(
+                    models.Stock.symbol.ilike(f"{query}%"),
+                    models.Stock.name.ilike(f"{query}%")
+                )
+            ).limit(10).all()
+
+            # format results 
+            results = [
+                {
+                    'symbol': stock.symbol,
+                    'name': stock.name,
+                }
+                for stock in stocks
+            ]
+
+            return jsonify(results)
+        except Exception as e:
+            app.logger.error(f"error with stock autocomplete: {e}", exc_info=True)
+            return jsonify([]), 500
+
+    @app.route('/api/autocomplete/politicians', methods=["GET"])
+    def autocomplete_politicians():
+        """
+        return a list of politicians based on the search
+        """
+        query = request.args.get('query', '').lower()
+        if not query or len(query) < 1:
+            return jsonify([])
+
+        try:
+            politicians = db.session.query(
+                models.Trade.politician_name, 
+                models.Trade.politician_family
+            ).filter(
+                models.Trade.politician_name.ilike(f"{query}%")
+            ).distinct().limit(10).all()
+
+            results = [
+                {
+                    'name': politician.politician_name,
+                    'affiliation': politician.politician_family
+                }
+                for politician in politicians
+            ]
+
+            return jsonify(results)
+        except Exception as e:
+            app.logger.error(f"error with politician autocomplete: {e}", exc_info=True)
+            return jsonify([]), 500
 
     return app

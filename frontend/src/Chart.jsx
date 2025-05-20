@@ -28,8 +28,8 @@ function TradeChart({ data }) {
   
   // Theme colors
   const colors = {
-    buyBar: isDarkMode ? '#4ade80' : '#4ade80', // Keep green in both modes
-    sellBar: isDarkMode ? '#f87171' : '#f87171', // Keep red in both modes
+    buyBar: '#4ade80', // Keep green in both modes
+    sellBar: '#f87171', // Keep red in both modes
     grid: isDarkMode ? '#555555' : '#e0e0e0',
     text: isDarkMode ? '#ffffff' : '#333333',
     tooltipBg: isDarkMode ? '#333333' : '#ffffff',

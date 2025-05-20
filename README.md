@@ -16,8 +16,7 @@
 
 3. Load trade data: docker-compose exec backend python scripts/import_trades.py (not needed on subsequent reruns)
 
-4. Load stock profile data: docker-compose exec backend python scripts/import_profiles.py  
-(currently data unused so not needed to run, not needed on subsequent reruns)
+4. Load stock profile data: docker-compose exec backend python scripts/import_profiles.py (not needed on subsequent reruns)
 
 ## ⚠️ Errors
 
