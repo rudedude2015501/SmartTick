@@ -7,11 +7,12 @@ from datetime import date
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+
 from flask_cors import CORS
 from sqlalchemy import func
 
-# Local application imports
 from .finnhub_client import get_profile, get_quote_data
+from .tiingo_client import get_daily_prices
 
 # Shared extension objects
 db = SQLAlchemy()
@@ -247,5 +248,93 @@ def create_app():
             }
             for key, data in sorted(monthly_summary.items())
         ]
+
+    @app.route("/api/prices/<symbol>", methods=["GET"])
+    def daily_prices(symbol):
+        """
+        GET /api/prices/AAPL?start=2024-01-01&end=2024-02-01
+        returns Tiingo daily OHLC data between those dates
+        """
+        # grab and validate query params
+        start_date = request.args.get("start")
+        end_date   = request.args.get("end")
+        if not start_date or not end_date:
+            return jsonify({
+                "error": "Both 'start' and 'end' query parameters are required, in YYYY-MM-DD format."
+            }), 400
+
+        try:
+            data = get_daily_prices(symbol, start_date, end_date)
+            return jsonify({
+                "symbol": symbol.upper(),
+                "start":  start_date,
+                "end":    end_date,
+                "prices": data
+            })
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+        
+
+    @app.route('/api/autocomplete/stocks', methods=["GET"])
+    def autocomplete_stocks():
+        """
+        return a list of stock symbols based on the search 
+        """
+        query = request.args.get('query', '').upper()
+        if not query or len(query) < 1:
+            return jsonify([])
+
+        try:
+            # search for stocks where symbol starts with input
+            stocks = db.session.query(models.Stock).filter(
+                db.or_(
+                    models.Stock.symbol.ilike(f"{query}%"),
+                    models.Stock.name.ilike(f"{query}%")
+                )
+            ).limit(10).all()
+
+            # format results 
+            results = [
+                {
+                    'symbol': stock.symbol,
+                    'name': stock.name,
+                }
+                for stock in stocks
+            ]
+
+            return jsonify(results)
+        except Exception as e:
+            app.logger.error(f"error with stock autocomplete: {e}", exc_info=True)
+            return jsonify([]), 500
+
+    @app.route('/api/autocomplete/politicians', methods=["GET"])
+    def autocomplete_politicians():
+        """
+        return a list of politicians based on the search
+        """
+        query = request.args.get('query', '').lower()
+        if not query or len(query) < 1:
+            return jsonify([])
+
+        try:
+            politicians = db.session.query(
+                models.Trade.politician_name, 
+                models.Trade.politician_family
+            ).filter(
+                models.Trade.politician_name.ilike(f"{query}%")
+            ).distinct().limit(10).all()
+
+            results = [
+                {
+                    'name': politician.politician_name,
+                    'affiliation': politician.politician_family
+                }
+                for politician in politicians
+            ]
+
+            return jsonify(results)
+        except Exception as e:
+            app.logger.error(f"error with politician autocomplete: {e}", exc_info=True)
+            return jsonify([]), 500
 
     return app
