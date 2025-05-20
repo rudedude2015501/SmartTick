@@ -1,7 +1,7 @@
 // Stock analysis using Tiingo and politician trading data
 // Based on Investopedia metrics and my own additions for congressional trading
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useTheme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import Card from '@mui/material/Card';
@@ -17,10 +17,6 @@ import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import InfoIcon from '@mui/icons-material/Info';
 import Tooltip from '@mui/material/Tooltip';
-import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, 
-  Tooltip as RechartsTooltip, ResponsiveContainer, Legend
-} from 'recharts';
 
 const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -482,11 +478,11 @@ function StockAnalysis({ symbol, historicalPriceData, trades }) {
     const rating = getOverallRating();
     
     const descriptions = {
-      "STRONG BUY": `Multiple technical indicators for ${symbol} are showing strong positive signals, with favorable congressional trading activity.`,
-      "BUY": `${symbol} is showing more positive signals than negative, suggesting potential upside in the near term.`,
-      "NEUTRAL": `Technical indicators for ${symbol} are mixed, with no clear directional bias. Consider waiting for clearer signals.`,
-      "SELL": `${symbol} is showing more negative signals than positive, suggesting potential downside risk.`,
-      "STRONG SELL": `Multiple technical indicators for ${symbol} are showing strong negative signals, with concerning congressional trading patterns.`
+      "STRONG BUY": `Multiple technical indicators for ${symbol.toUpperCase()} are showing strong positive signals, with favorable congressional trading activity.`,
+      "BUY": `${symbol.toUpperCase()} is showing more positive signals than negative, suggesting potential upside in the near term.`,
+      "NEUTRAL": `Technical indicators for ${symbol.toUpperCase()} are mixed, with no clear directional bias. Consider waiting for clearer signals.`,
+      "SELL": `${symbol.toUpperCase()} is showing more negative signals than positive, suggesting potential downside risk.`,
+      "STRONG SELL": `Multiple technical indicators for ${symbol.toUpperCase()} are showing strong negative signals, with concerning congressional trading patterns.`
     };
     
     return descriptions[rating];
@@ -535,7 +531,7 @@ function StockAnalysis({ symbol, historicalPriceData, trades }) {
   if (!metrics) {
     return (
       <Alert severity="info">
-        Insufficient data to calculate technical metrics for {symbol}.
+        Insufficient data to calculate technical metrics for {symbol.toUpperCase()}.
       </Alert>
     );
   }
@@ -551,7 +547,7 @@ function StockAnalysis({ symbol, historicalPriceData, trades }) {
       <CardContent sx={{ p: 0 }}>
         {/* Title Bar */}
         <Typography variant="h6" sx={{ p: 2, borderBottom: `1px solid ${theme.palette.divider}` }}>
-          Technical Analysis for {symbol}
+          Technical Analysis for {symbol.toUpperCase()}
         </Typography>
         
         {/* Overall Rating Card */}
