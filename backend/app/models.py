@@ -72,4 +72,8 @@ class PoliticianImg(db.Model):
     img = db.Column(db.String(256))
 
     def to_dict(self):
-        None
+        return {
+            "politician_name" : self.politician_name,
+            "politician_family" : self.politician_family,
+            "img" : self.img
+        }
