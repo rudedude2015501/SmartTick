@@ -26,12 +26,14 @@ def getPolData():
     
     # print(buySell.text)
     Trades = []
+    Politicians = []
     for tab in table:
         Trade = {}
+        Politician = {} #gets politician name and profile
         Trade["politician_name"] = (tab.find('a',class_="text-txt-interactive")).text
-        
+        Politician["politician_name"] = (tab.find('a',class_="text-txt-interactive")).text
         Trade["politician_family"] = (tab.find('div',class_="politician-info mt-1 text-size-2 font-medium leading-none text-txt-dimmer").get_text(" "))
-        
+        Politician["politician_family"] = (tab.find('div',class_="politician-info mt-1 text-size-2 font-medium leading-none text-txt-dimmer").get_text(" "))
         Trade["politician_link"] = "N/A"
         Trade["traded_issuer_name"] =(tab.find('h3',class_="q-fieldset issuer-name")).text
         Trade["traded_issuer_ticker"] =(tab.find("span","q-field issuer-ticker")).text
@@ -50,13 +52,16 @@ def getPolData():
         Trade["size"] =(tab.find("span","mt-1 text-size-2 text-txt-dimmer hover:text-foreground")).get_text(" ")
         Trade["price"] =(tab.find("div","flex place-content-center px-2 lg:px-3 xl:px-6 justify-end pr-0")).text
         img = tab.find_all("img")
-        Trade["img"] = img[0]["src"]
+        Politician["img"] = img[0]["src"]
         Trades.append(Trade)
-
+        Politicians.append(Politician)
     print(Trades[0]) #for testing
 
     with open ("1yeartrade[Test].json", "w+") as fs:
         json.dump(Trades,fs,indent=2)
-        print("success")
+        print("trades success")
+    with open ("PoliticianPhotos.json", "w+") as fs:
+        json.dump(Politicians,fs,indent=2)
+        print("img success")
 
 getPolData()

@@ -64,3 +64,12 @@ class Trade(db.Model):
             'price': self.price,
             'created_at': self.created_at.isoformat() if self.created_at else None
         }
+
+class PoliticianImg(db.Model):
+    id = db.Column(db.Integer, primary_key= True)
+    politician_name = db.Column(db.String(128), nullable = False)
+    politician_family = db.Column(db.String(128))
+    img = db.Column(db.String(256))
+
+    def to_dict(self):
+        None
