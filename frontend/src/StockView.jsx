@@ -21,6 +21,9 @@ import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import TradeChart from './Chart'; // For politician trade summary
 import HistoricalPriceChart from './HistoricalPriceChart'; // For Tiingo stock price history
 
+// Adding StockAnalysis.jsx, with analysis functionality
+import StockAnalysis from './StockAnalysis';
+
 // Get API URL from environment variable
 const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -267,6 +270,31 @@ function StockView({ searchSymbol }) {
             <HistoricalPriceChart data={historicalPriceData} symbol={searchSymbol} />
           )}
         </Card>
+      </Box>
+
+      {/* Technical Analysis Section */}
+      <Box mt={4}>
+        {isLoadingHistoricalPrices || isLoadingTrades ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+            <CircularProgress />
+          </Box>
+        ) : (
+          historicalPriceData.length > 0 && trades.length > 0 ? (
+            <StockAnalysis 
+              symbol={searchSymbol} 
+              historicalPriceData={historicalPriceData}
+              trades={trades} 
+            />
+          ) : (
+            <Alert severity="info">
+              {historicalPriceData.length === 0 && trades.length === 0 ? 
+                "Both historical price data and congressional trade data are required for technical analysis." :
+                historicalPriceData.length === 0 ? 
+                "Historical price data is missing. Unable to perform technical analysis." :
+                "No congressional trade data available for sentiment analysis."}
+            </Alert>
+          )
+        )}
       </Box>
       
       {/* Recent Politician Trades Section */}
