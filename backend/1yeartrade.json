@@ -1,5 +1,320 @@
 [
   {
+    "politician_name": "Marjorie Taylor Greene",
+    "politician_family": "Republican House GA",
+    "politician_link": "N/A",
+    "traded_issuer_name": "Advanced Micro Devices Inc",
+    "traded_issuer_ticker": "AMD:US",
+    "traded_issuer_link": "N/A",
+    "published": "13:05 Today",
+    "traded": "14 May 2025",
+    "filed_after": "  days 5",
+    "owner": "Undisclosed",
+    "type": "buy",
+    "size": "1K-15K",
+    "price": "$117.72"
+  },
+  {
+    "politician_name": "Marjorie Taylor Greene",
+    "politician_family": "Republican House GA",
+    "politician_link": "N/A",
+    "traded_issuer_name": "Alphabet Inc",
+    "traded_issuer_ticker": "GOOGL:US",
+    "traded_issuer_link": "N/A",
+    "published": "13:05 Today",
+    "traded": "14 May 2025",
+    "filed_after": "  days 5",
+    "owner": "Undisclosed",
+    "type": "buy",
+    "size": "1K-15K",
+    "price": "$166.81"
+  },
+  {
+    "politician_name": "Marjorie Taylor Greene",
+    "politician_family": "Republican House GA",
+    "politician_link": "N/A",
+    "traded_issuer_name": "Amgen Inc",
+    "traded_issuer_ticker": "AMGN:US",
+    "traded_issuer_link": "N/A",
+    "published": "13:05 Today",
+    "traded": "14 May 2025",
+    "filed_after": "  days 5",
+    "owner": "Undisclosed",
+    "type": "buy",
+    "size": "1K-15K",
+    "price": "$262.28"
+  },
+  {
+    "politician_name": "Marjorie Taylor Greene",
+    "politician_family": "Republican House GA",
+    "politician_link": "N/A",
+    "traded_issuer_name": "Blackstone Group Inc",
+    "traded_issuer_ticker": "BX:US",
+    "traded_issuer_link": "N/A",
+    "published": "13:05 Today",
+    "traded": "14 May 2025",
+    "filed_after": "  days 5",
+    "owner": "Undisclosed",
+    "type": "buy",
+    "size": "1K-15K",
+    "price": "$148.42"
+  },
+  {
+    "politician_name": "Marjorie Taylor Greene",
+    "politician_family": "Republican House GA",
+    "politician_link": "N/A",
+    "traded_issuer_name": "Cardinal Health Inc",
+    "traded_issuer_ticker": "CAH:US",
+    "traded_issuer_link": "N/A",
+    "published": "13:05 Today",
+    "traded": "14 May 2025",
+    "filed_after": "  days 5",
+    "owner": "Undisclosed",
+    "type": "buy",
+    "size": "1K-15K",
+    "price": "$148.41"
+  },
+  {
+    "politician_name": "Marjorie Taylor Greene",
+    "politician_family": "Republican House GA",
+    "politician_link": "N/A",
+    "traded_issuer_name": "Chevron Corp",
+    "traded_issuer_ticker": "CVX:US",
+    "traded_issuer_link": "N/A",
+    "published": "13:05 Today",
+    "traded": "14 May 2025",
+    "filed_after": "  days 5",
+    "owner": "Undisclosed",
+    "type": "buy",
+    "size": "1K-15K",
+    "price": "$141.67"
+  },
+  {
+    "politician_name": "Marjorie Taylor Greene",
+    "politician_family": "Republican House GA",
+    "politician_link": "N/A",
+    "traded_issuer_name": "Corning Inc",
+    "traded_issuer_ticker": "GLW:US",
+    "traded_issuer_link": "N/A",
+    "published": "13:05 Today",
+    "traded": "14 May 2025",
+    "filed_after": "  days 5",
+    "owner": "Undisclosed",
+    "type": "buy",
+    "size": "1K-15K",
+    "price": "$47.01"
+  },
+  {
+    "politician_name": "Marjorie Taylor Greene",
+    "politician_family": "Republican House GA",
+    "politician_link": "N/A",
+    "traded_issuer_name": "Dollar General Corporation",
+    "traded_issuer_ticker": "DG:US",
+    "traded_issuer_link": "N/A",
+    "published": "13:05 Today",
+    "traded": "14 May 2025",
+    "filed_after": "  days 5",
+    "owner": "Undisclosed",
+    "type": "buy",
+    "size": "1K-15K",
+    "price": "$87.70"
+  },
+  {
+    "politician_name": "Marjorie Taylor Greene",
+    "politician_family": "Republican House GA",
+    "politician_link": "N/A",
+    "traded_issuer_name": "Eli Lilly and Co",
+    "traded_issuer_ticker": "LLY:US",
+    "traded_issuer_link": "N/A",
+    "published": "13:05 Today",
+    "traded": "14 May 2025",
+    "filed_after": "  days 5",
+    "owner": "Undisclosed",
+    "type": "buy",
+    "size": "1K-15K",
+    "price": "$715.56"
+  },
+  {
+    "politician_name": "Marjorie Taylor Greene",
+    "politician_family": "Republican House GA",
+    "politician_link": "N/A",
+    "traded_issuer_name": "Impinj Inc",
+    "traded_issuer_ticker": "PI:US",
+    "traded_issuer_link": "N/A",
+    "published": "13:05 Today",
+    "traded": "14 May 2025",
+    "filed_after": "  days 5",
+    "owner": "Undisclosed",
+    "type": "buy",
+    "size": "1K-15K",
+    "price": "$121.46"
+  },
+  {
+    "politician_name": "Marjorie Taylor Greene",
+    "politician_family": "Republican House GA",
+    "politician_link": "N/A",
+    "traded_issuer_name": "MercadoLibre Inc",
+    "traded_issuer_ticker": "MELI:US",
+    "traded_issuer_link": "N/A",
+    "published": "13:05 Today",
+    "traded": "14 May 2025",
+    "filed_after": "  days 5",
+    "owner": "Undisclosed",
+    "type": "buy",
+    "size": "15K-50K",
+    "price": "$2,564.00"
+  },
+  {
+    "politician_name": "Marjorie Taylor Greene",
+    "politician_family": "Republican House GA",
+    "politician_link": "N/A",
+    "traded_issuer_name": "Meta Platforms Inc",
+    "traded_issuer_ticker": "META:US",
+    "traded_issuer_link": "N/A",
+    "published": "13:05 Today",
+    "traded": "14 May 2025",
+    "filed_after": "  days 5",
+    "owner": "Undisclosed",
+    "type": "buy",
+    "size": "1K-15K",
+    "price": "$659.36"
+  },
+  {
+    "politician_name": "Marjorie Taylor Greene",
+    "politician_family": "Republican House GA",
+    "politician_link": "N/A",
+    "traded_issuer_name": "Morgan Stanley",
+    "traded_issuer_ticker": "MS:US",
+    "traded_issuer_link": "N/A",
+    "published": "13:05 Today",
+    "traded": "14 May 2025",
+    "filed_after": "  days 5",
+    "owner": "Undisclosed",
+    "type": "buy",
+    "size": "1K-15K",
+    "price": "$131.04"
+  },
+  {
+    "politician_name": "Marjorie Taylor Greene",
+    "politician_family": "Republican House GA",
+    "politician_link": "N/A",
+    "traded_issuer_name": "Netflix Inc",
+    "traded_issuer_ticker": "NFLX:US",
+    "traded_issuer_link": "N/A",
+    "published": "13:05 Today",
+    "traded": "14 May 2025",
+    "filed_after": "  days 5",
+    "owner": "Undisclosed",
+    "type": "buy",
+    "size": "1K-15K",
+    "price": "$1,150.99"
+  },
+  {
+    "politician_name": "Marjorie Taylor Greene",
+    "politician_family": "Republican House GA",
+    "politician_link": "N/A",
+    "traded_issuer_name": "NVIDIA Corporation",
+    "traded_issuer_ticker": "NVDA:US",
+    "traded_issuer_link": "N/A",
+    "published": "13:05 Today",
+    "traded": "14 May 2025",
+    "filed_after": "  days 5",
+    "owner": "Undisclosed",
+    "type": "buy",
+    "size": "1K-15K",
+    "price": "$135.34"
+  },
+  {
+    "politician_name": "Marjorie Taylor Greene",
+    "politician_family": "Republican House GA",
+    "politician_link": "N/A",
+    "traded_issuer_name": "ServiceNow Inc",
+    "traded_issuer_ticker": "NOW:US",
+    "traded_issuer_link": "N/A",
+    "published": "13:05 Today",
+    "traded": "14 May 2025",
+    "filed_after": "  days 5",
+    "owner": "Undisclosed",
+    "type": "buy",
+    "size": "1K-15K",
+    "price": "$1,026.82"
+  },
+  {
+    "politician_name": "Marjorie Taylor Greene",
+    "politician_family": "Republican House GA",
+    "politician_link": "N/A",
+    "traded_issuer_name": "Tesla Inc",
+    "traded_issuer_ticker": "TSLA:US",
+    "traded_issuer_link": "N/A",
+    "published": "13:05 Today",
+    "traded": "14 May 2025",
+    "filed_after": "  days 5",
+    "owner": "Undisclosed",
+    "type": "buy",
+    "size": "1K-15K",
+    "price": "$347.68"
+  },
+  {
+    "politician_name": "Marjorie Taylor Greene",
+    "politician_family": "Republican House GA",
+    "politician_link": "N/A",
+    "traded_issuer_name": "The Hershey Co",
+    "traded_issuer_ticker": "HSY:US",
+    "traded_issuer_link": "N/A",
+    "published": "13:05 Today",
+    "traded": "14 May 2025",
+    "filed_after": "  days 5",
+    "owner": "Undisclosed",
+    "type": "buy",
+    "size": "1K-15K",
+    "price": "$161.72"
+  },
+  {
+    "politician_name": "Marjorie Taylor Greene",
+    "politician_family": "Republican House GA",
+    "politician_link": "N/A",
+    "traded_issuer_name": "Unitedhealth Group Inc",
+    "traded_issuer_ticker": "UNH:US",
+    "traded_issuer_link": "N/A",
+    "published": "13:05 Today",
+    "traded": "14 May 2025",
+    "filed_after": "  days 5",
+    "owner": "Undisclosed",
+    "type": "buy",
+    "size": "15K-50K",
+    "price": "$308.01"
+  },
+  {
+    "politician_name": "Marjorie Taylor Greene",
+    "politician_family": "Republican House GA",
+    "politician_link": "N/A",
+    "traded_issuer_name": "Unitedhealth Group Inc",
+    "traded_issuer_ticker": "UNH:US",
+    "traded_issuer_link": "N/A",
+    "published": "13:05 Today",
+    "traded": "16 May 2025",
+    "filed_after": "  days 3",
+    "owner": "Undisclosed",
+    "type": "buy",
+    "size": "1K-15K",
+    "price": "$291.91"
+  },
+  {
+    "politician_name": "Marjorie Taylor Greene",
+    "politician_family": "Republican House GA",
+    "politician_link": "N/A",
+    "traded_issuer_name": "US TREASURY BILLS",
+    "traded_issuer_ticker": "N/A",
+    "traded_issuer_link": "N/A",
+    "published": "13:05 Today",
+    "traded": "16 May 2025",
+    "filed_after": "  days 3",
+    "owner": "Undisclosed",
+    "type": "buy",
+    "size": "100K-250K",
+    "price": "N/A"
+  },
+  {
     "politician_name": "Dan Newhouse",
     "politician_family": "Republican House WA",
     "politician_link": "N/A",
@@ -11,7 +326,7 @@
     "filed_after": "  days 35",
     "owner": "Spouse",
     "type": "sell",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "$284.34"
   },
   {
@@ -26,7 +341,7 @@
     "filed_after": "  days 35",
     "owner": "Spouse",
     "type": "sell",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "$352.47"
   },
   {
@@ -41,7 +356,7 @@
     "filed_after": "  days 35",
     "owner": "Spouse",
     "type": "buy",
-    "size": "15K\u201350K",
+    "size": "15K-50K",
     "price": "N/A"
   },
   {
@@ -56,7 +371,7 @@
     "filed_after": "  days 35",
     "owner": "Spouse",
     "type": "sell",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "$157.14"
   },
   {
@@ -71,7 +386,7 @@
     "filed_after": "  days 35",
     "owner": "Spouse",
     "type": "sell",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "$184.87"
   },
   {
@@ -86,7 +401,7 @@
     "filed_after": "  days 35",
     "owner": "Spouse",
     "type": "sell",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "$179.16"
   },
   {
@@ -101,7 +416,7 @@
     "filed_after": "  days 35",
     "owner": "Spouse",
     "type": "sell",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "$198.15"
   },
   {
@@ -116,7 +431,7 @@
     "filed_after": "  days 35",
     "owner": "Spouse",
     "type": "sell",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "$26.79"
   },
   {
@@ -131,7 +446,7 @@
     "filed_after": "  days 35",
     "owner": "Spouse",
     "type": "buy",
-    "size": "15K\u201350K",
+    "size": "15K-50K",
     "price": "N/A"
   },
   {
@@ -146,7 +461,7 @@
     "filed_after": "  days 35",
     "owner": "Spouse",
     "type": "sell",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "$878.78"
   },
   {
@@ -161,7 +476,7 @@
     "filed_after": "  days 35",
     "owner": "Spouse",
     "type": "sell",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "$4,586.53"
   },
   {
@@ -176,7 +491,7 @@
     "filed_after": "  days 35",
     "owner": "Spouse",
     "type": "sell",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "$181.94"
   },
   {
@@ -191,7 +506,7 @@
     "filed_after": "  days 35",
     "owner": "Spouse",
     "type": "sell",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "$188.73"
   },
   {
@@ -206,7 +521,7 @@
     "filed_after": "  days 35",
     "owner": "Spouse",
     "type": "sell",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "$459.13"
   },
   {
@@ -221,7 +536,7 @@
     "filed_after": "  days 35",
     "owner": "Spouse",
     "type": "sell",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "$89.04"
   },
   {
@@ -236,7 +551,7 @@
     "filed_after": "  days 35",
     "owner": "Spouse",
     "type": "sell",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "$439.81"
   },
   {
@@ -251,7 +566,7 @@
     "filed_after": "  days 35",
     "owner": "Spouse",
     "type": "sell",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "$732.41"
   },
   {
@@ -266,7 +581,7 @@
     "filed_after": "  days 35",
     "owner": "Spouse",
     "type": "sell",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "$64.64"
   },
   {
@@ -281,7 +596,7 @@
     "filed_after": "  days 35",
     "owner": "Spouse",
     "type": "sell",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "$39.37"
   },
   {
@@ -296,7 +611,7 @@
     "filed_after": "  days 35",
     "owner": "Spouse",
     "type": "sell",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "$55.23"
   },
   {
@@ -311,7 +626,7 @@
     "filed_after": "  days 35",
     "owner": "Spouse",
     "type": "sell",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "$66.52"
   },
   {
@@ -326,7 +641,7 @@
     "filed_after": "  days 35",
     "owner": "Spouse",
     "type": "sell",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "$208.14"
   },
   {
@@ -341,7 +656,7 @@
     "filed_after": "  days 35",
     "owner": "Spouse",
     "type": "sell",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "$97.73"
   },
   {
@@ -356,7 +671,7 @@
     "filed_after": "  days 35",
     "owner": "Spouse",
     "type": "sell",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "$198.55"
   },
   {
@@ -371,7 +686,7 @@
     "filed_after": "  days 35",
     "owner": "Spouse",
     "type": "sell",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "$587.04"
   },
   {
@@ -386,7 +701,7 @@
     "filed_after": "  days 35",
     "owner": "Spouse",
     "type": "buy",
-    "size": "15K\u201350K",
+    "size": "15K-50K",
     "price": "N/A"
   },
   {
@@ -401,7 +716,7 @@
     "filed_after": "  days 35",
     "owner": "Spouse",
     "type": "sell",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "$441.83"
   },
   {
@@ -416,7 +731,7 @@
     "filed_after": "  days 35",
     "owner": "Spouse",
     "type": "sell",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "$220.35"
   },
   {
@@ -431,7 +746,7 @@
     "filed_after": "  days 35",
     "owner": "Spouse",
     "type": "sell",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "$32.21"
   },
   {
@@ -446,7 +761,7 @@
     "filed_after": "  days 35",
     "owner": "Spouse",
     "type": "sell",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "$123.43"
   },
   {
@@ -461,7 +776,7 @@
     "filed_after": "  days 35",
     "owner": "Spouse",
     "type": "sell",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "$388.45"
   },
   {
@@ -476,7 +791,7 @@
     "filed_after": "  days 35",
     "owner": "Spouse",
     "type": "sell",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "$67.05"
   },
   {
@@ -491,7 +806,7 @@
     "filed_after": "  days 35",
     "owner": "Spouse",
     "type": "sell",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "$428.43"
   },
   {
@@ -506,7 +821,7 @@
     "filed_after": "  days 35",
     "owner": "Spouse",
     "type": "sell",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "$918.29"
   },
   {
@@ -521,7 +836,7 @@
     "filed_after": "  days 35",
     "owner": "Spouse",
     "type": "sell",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "$38.49"
   },
   {
@@ -536,7 +851,7 @@
     "filed_after": "  days 35",
     "owner": "Spouse",
     "type": "sell",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "$110.93"
   },
   {
@@ -551,7 +866,7 @@
     "filed_after": "  days 35",
     "owner": "Spouse",
     "type": "sell",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "$62.59"
   },
   {
@@ -566,7 +881,7 @@
     "filed_after": "  days 35",
     "owner": "Spouse",
     "type": "sell",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "$144.43"
   },
   {
@@ -581,7 +896,7 @@
     "filed_after": "  days 35",
     "owner": "Spouse",
     "type": "buy",
-    "size": "15K\u201350K",
+    "size": "15K-50K",
     "price": "N/A"
   },
   {
@@ -596,7 +911,7 @@
     "filed_after": "  days 35",
     "owner": "Spouse",
     "type": "sell",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "$128.26"
   },
   {
@@ -611,7 +926,7 @@
     "filed_after": "  days 35",
     "owner": "Spouse",
     "type": "sell",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "$255.00"
   },
   {
@@ -626,7 +941,7 @@
     "filed_after": "  days 35",
     "owner": "Spouse",
     "type": "sell",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "$785.67"
   },
   {
@@ -641,7 +956,7 @@
     "filed_after": "  days 35",
     "owner": "Spouse",
     "type": "sell",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "$85.43"
   },
   {
@@ -656,7 +971,7 @@
     "filed_after": "  days 35",
     "owner": "Spouse",
     "type": "sell",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "$252.31"
   },
   {
@@ -671,7 +986,7 @@
     "filed_after": "  days 35",
     "owner": "Spouse",
     "type": "sell",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "$165.65"
   },
   {
@@ -686,7 +1001,7 @@
     "filed_after": "  days 35",
     "owner": "Spouse",
     "type": "sell",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "$438.15"
   },
   {
@@ -701,7 +1016,7 @@
     "filed_after": "  days 35",
     "owner": "Spouse",
     "type": "sell",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "$35.39"
   },
   {
@@ -716,7 +1031,7 @@
     "filed_after": "  days 35",
     "owner": "Spouse",
     "type": "sell",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "$218.59"
   },
   {
@@ -731,7 +1046,7 @@
     "filed_after": "  days 35",
     "owner": "Spouse",
     "type": "sell",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "$599.47"
   },
   {
@@ -746,7 +1061,7 @@
     "filed_after": "  days 35",
     "owner": "Spouse",
     "type": "sell",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "$11.11"
   },
   {
@@ -761,7 +1076,7 @@
     "filed_after": "  days 35",
     "owner": "Spouse",
     "type": "sell",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "$43.73"
   },
   {
@@ -776,7 +1091,7 @@
     "filed_after": "  days 35",
     "owner": "Spouse",
     "type": "sell",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "$333.40"
   },
   {
@@ -791,7 +1106,7 @@
     "filed_after": "  days 35",
     "owner": "Spouse",
     "type": "buy",
-    "size": "15K\u201350K",
+    "size": "15K-50K",
     "price": "N/A"
   },
   {
@@ -806,7 +1121,7 @@
     "filed_after": "  days 32",
     "owner": "Spouse",
     "type": "buy",
-    "size": "15K\u201350K",
+    "size": "15K-50K",
     "price": "N/A"
   },
   {
@@ -821,7 +1136,7 @@
     "filed_after": "  days 35",
     "owner": "Spouse",
     "type": "sell",
-    "size": "250K\u2013500K",
+    "size": "250K-500K",
     "price": "N/A"
   },
   {
@@ -836,7 +1151,7 @@
     "filed_after": "  days 36",
     "owner": "Spouse",
     "type": "buy",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "$594.40"
   },
   {
@@ -851,7 +1166,7 @@
     "filed_after": "  days 4",
     "owner": "Joint",
     "type": "sell",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "$155.43"
   },
   {
@@ -866,7 +1181,7 @@
     "filed_after": "  days 4",
     "owner": "Joint",
     "type": "sell",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "$119.08"
   },
   {
@@ -881,7 +1196,7 @@
     "filed_after": "  days 34",
     "owner": "Spouse",
     "type": "sell",
-    "size": "15K\u201350K",
+    "size": "15K-50K",
     "price": "$438.15"
   },
   {
@@ -896,7 +1211,7 @@
     "filed_after": "  days 30",
     "owner": "Spouse",
     "type": "sell",
-    "size": "15K\u201350K",
+    "size": "15K-50K",
     "price": "N/A"
   },
   {
@@ -911,7 +1226,7 @@
     "filed_after": "  days 30",
     "owner": "Spouse",
     "type": "sell",
-    "size": "50K\u2013100K",
+    "size": "50K-100K",
     "price": "N/A"
   },
   {
@@ -926,7 +1241,7 @@
     "filed_after": "  days 30",
     "owner": "Spouse",
     "type": "sell",
-    "size": "100K\u2013250K",
+    "size": "100K-250K",
     "price": "N/A"
   },
   {
@@ -941,7 +1256,7 @@
     "filed_after": "  days 22",
     "owner": "Child",
     "type": "sell",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "N/A"
   },
   {
@@ -956,7 +1271,7 @@
     "filed_after": "  days 23",
     "owner": "Child",
     "type": "sell",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "N/A"
   },
   {
@@ -971,7 +1286,7 @@
     "filed_after": "  days 23",
     "owner": "Child",
     "type": "sell",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "N/A"
   },
   {
@@ -986,7 +1301,7 @@
     "filed_after": "  days 23",
     "owner": "Child",
     "type": "sell",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "N/A"
   },
   {
@@ -1001,7 +1316,7 @@
     "filed_after": "  days 492",
     "owner": "Self",
     "type": "sell",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "$34.50"
   },
   {
@@ -1016,7 +1331,7 @@
     "filed_after": "  days 30",
     "owner": "Self",
     "type": "sell",
-    "size": "1K\u201315K",
+    "size": "1K-15K",
     "price": "$50.00"
   },
   {
@@ -1031,7 +1346,7 @@
     "filed_after": "  days 30",
     "owner": "Self",
     "type": "sell",
-    "size": "15K\u201350K",
+    "size": "15K-50K",
     "price": "$62.00"
   },
   {
@@ -1046,7 +1361,7 @@
     "filed_after": "  days 30",
     "owner": "Self",
     "type": "buy",
-    "size": "50K\u2013100K",
+    "size": "50K-100K",
     "price": "N/A"
   },
   {
@@ -1061,7 +1376,7 @@
     "filed_after": "  days 30",
     "owner": "Joint",
     "type": "sell",
-    "size": "15K\u201350K",
+    "size": "15K-50K",
     "price": "$233.13"
   },
   {
@@ -1076,7 +1391,7 @@
     "filed_after": "  days 30",
     "owner": "Joint",
     "type": "sell",
-    "size": "15K\u201350K",
+    "size": "15K-50K",
     "price": "$156.31"
   },
   {
@@ -1091,7 +1406,7 @@
     "filed_after": "  days 30",
     "owner": "Joint",
     "type": "sell",
-    "size": "15K\u201350K",
+    "size": "15K-50K",
     "price": "$295.30"
   },
   {
@@ -1106,7 +1421,7 @@
     "filed_after": "  days 30",
     "owner": "Joint",
     "type": "sell",
-    "size": "15K\u201350K",
+    "size": "15K-50K",
     "price": "$202.14"
   },
   {
@@ -1121,322 +1436,7 @@
     "filed_after": "  days 30",
     "owner": "Joint",
     "type": "sell",
-    "size": "15K\u201350K",
+    "size": "15K-50K",
     "price": "$46.07"
-  },
-  {
-    "politician_name": "Tommy Tuberville",
-    "politician_family": "Republican Senate AL",
-    "politician_link": "N/A",
-    "traded_issuer_name": "CSX Corp",
-    "traded_issuer_ticker": "CSX:US",
-    "traded_issuer_link": "N/A",
-    "published": "15 May 2025",
-    "traded": "15 Apr 2025",
-    "filed_after": "  days 30",
-    "owner": "Joint",
-    "type": "sell",
-    "size": "15K\u201350K",
-    "price": "$27.90"
-  },
-  {
-    "politician_name": "Tommy Tuberville",
-    "politician_family": "Republican Senate AL",
-    "politician_link": "N/A",
-    "traded_issuer_name": "Constellation Brands Inc",
-    "traded_issuer_ticker": "STZ:US",
-    "traded_issuer_link": "N/A",
-    "published": "15 May 2025",
-    "traded": "15 Apr 2025",
-    "filed_after": "  days 30",
-    "owner": "Joint",
-    "type": "sell",
-    "size": "15K\u201350K",
-    "price": "$183.86"
-  },
-  {
-    "politician_name": "Tommy Tuberville",
-    "politician_family": "Republican Senate AL",
-    "politician_link": "N/A",
-    "traded_issuer_name": "Duke Energy Corp",
-    "traded_issuer_ticker": "DUK:US",
-    "traded_issuer_link": "N/A",
-    "published": "15 May 2025",
-    "traded": "15 Apr 2025",
-    "filed_after": "  days 30",
-    "owner": "Joint",
-    "type": "sell",
-    "size": "15K\u201350K",
-    "price": "$120.49"
-  },
-  {
-    "politician_name": "Tommy Tuberville",
-    "politician_family": "Republican Senate AL",
-    "politician_link": "N/A",
-    "traded_issuer_name": "The Goldman Sachs Group Inc",
-    "traded_issuer_ticker": "GS:US",
-    "traded_issuer_link": "N/A",
-    "published": "15 May 2025",
-    "traded": "15 Apr 2025",
-    "filed_after": "  days 30",
-    "owner": "Joint",
-    "type": "sell",
-    "size": "15K\u201350K",
-    "price": "$507.89"
-  },
-  {
-    "politician_name": "Tommy Tuberville",
-    "politician_family": "Republican Senate AL",
-    "politician_link": "N/A",
-    "traded_issuer_name": "Eli Lilly and Co",
-    "traded_issuer_ticker": "LLY:US",
-    "traded_issuer_link": "N/A",
-    "published": "15 May 2025",
-    "traded": "15 Apr 2025",
-    "filed_after": "  days 30",
-    "owner": "Joint",
-    "type": "sell",
-    "size": "15K\u201350K",
-    "price": "$757.18"
-  },
-  {
-    "politician_name": "Tommy Tuberville",
-    "politician_family": "Republican Senate AL",
-    "politician_link": "N/A",
-    "traded_issuer_name": "Mastercard Inc",
-    "traded_issuer_ticker": "MA:US",
-    "traded_issuer_link": "N/A",
-    "published": "15 May 2025",
-    "traded": "15 Apr 2025",
-    "filed_after": "  days 30",
-    "owner": "Joint",
-    "type": "sell",
-    "size": "15K\u201350K",
-    "price": "$517.38"
-  },
-  {
-    "politician_name": "Tommy Tuberville",
-    "politician_family": "Republican Senate AL",
-    "politician_link": "N/A",
-    "traded_issuer_name": "Microsoft Corp",
-    "traded_issuer_ticker": "MSFT:US",
-    "traded_issuer_link": "N/A",
-    "published": "15 May 2025",
-    "traded": "15 Apr 2025",
-    "filed_after": "  days 30",
-    "owner": "Joint",
-    "type": "sell",
-    "size": "15K\u201350K",
-    "price": "$385.73"
-  },
-  {
-    "politician_name": "Tommy Tuberville",
-    "politician_family": "Republican Senate AL",
-    "politician_link": "N/A",
-    "traded_issuer_name": "QUALCOMM Inc",
-    "traded_issuer_ticker": "QCOM:US",
-    "traded_issuer_link": "N/A",
-    "published": "15 May 2025",
-    "traded": "15 Apr 2025",
-    "filed_after": "  days 30",
-    "owner": "Joint",
-    "type": "sell",
-    "size": "15K\u201350K",
-    "price": "$138.60"
-  },
-  {
-    "politician_name": "Tony Wied",
-    "politician_family": "Republican House WI",
-    "politician_link": "N/A",
-    "traded_issuer_name": "MercadoLibre Inc",
-    "traded_issuer_ticker": "MELI:US",
-    "traded_issuer_link": "N/A",
-    "published": "15 May 2025",
-    "traded": "4 Apr 2025",
-    "filed_after": "  days 39",
-    "owner": "Joint",
-    "type": "sell",
-    "size": "15K\u201350K",
-    "price": "$1,841.29"
-  },
-  {
-    "politician_name": "Tony Wied",
-    "politician_family": "Republican House WI",
-    "politician_link": "N/A",
-    "traded_issuer_name": "Microsoft Corp",
-    "traded_issuer_ticker": "MSFT:US",
-    "traded_issuer_link": "N/A",
-    "published": "15 May 2025",
-    "traded": "4 Apr 2025",
-    "filed_after": "  days 39",
-    "owner": "Joint",
-    "type": "sell",
-    "size": "15K\u201350K",
-    "price": "$359.84"
-  },
-  {
-    "politician_name": "Tony Wied",
-    "politician_family": "Republican House WI",
-    "politician_link": "N/A",
-    "traded_issuer_name": "RH",
-    "traded_issuer_ticker": "RH:US",
-    "traded_issuer_link": "N/A",
-    "published": "15 May 2025",
-    "traded": "4 Apr 2025",
-    "filed_after": "  days 39",
-    "owner": "Joint",
-    "type": "buy",
-    "size": "15K\u201350K",
-    "price": "$145.66"
-  },
-  {
-    "politician_name": "Tony Wied",
-    "politician_family": "Republican House WI",
-    "politician_link": "N/A",
-    "traded_issuer_name": "The Trade Desk Inc",
-    "traded_issuer_ticker": "TTD:US",
-    "traded_issuer_link": "N/A",
-    "published": "15 May 2025",
-    "traded": "4 Apr 2025",
-    "filed_after": "  days 39",
-    "owner": "Joint",
-    "type": "buy",
-    "size": "15K\u201350K",
-    "price": "$46.24"
-  },
-  {
-    "politician_name": "Tony Wied",
-    "politician_family": "Republican House WI",
-    "politician_link": "N/A",
-    "traded_issuer_name": "American Express Co",
-    "traded_issuer_ticker": "AXP:US",
-    "traded_issuer_link": "N/A",
-    "published": "15 May 2025",
-    "traded": "9 Apr 2025",
-    "filed_after": "  days 34",
-    "owner": "Joint",
-    "type": "sell",
-    "size": "15K\u201350K",
-    "price": "N/A"
-  },
-  {
-    "politician_name": "Tony Wied",
-    "politician_family": "Republican House WI",
-    "politician_link": "N/A",
-    "traded_issuer_name": "US TREASURY BILLS",
-    "traded_issuer_ticker": "N/A",
-    "traded_issuer_link": "N/A",
-    "published": "15 May 2025",
-    "traded": "15 Apr 2025",
-    "filed_after": "  days 28",
-    "owner": "Joint",
-    "type": "sell",
-    "size": "50K\u2013100K",
-    "price": "N/A"
-  },
-  {
-    "politician_name": "Tony Wied",
-    "politician_family": "Republican House WI",
-    "politician_link": "N/A",
-    "traded_issuer_name": "US TREASURY BILLS",
-    "traded_issuer_ticker": "N/A",
-    "traded_issuer_link": "N/A",
-    "published": "15 May 2025",
-    "traded": "30 Apr 2025",
-    "filed_after": "  days 13",
-    "owner": "Joint",
-    "type": "buy",
-    "size": "100K\u2013250K",
-    "price": "N/A"
-  },
-  {
-    "politician_name": "Tony Wied",
-    "politician_family": "Republican House WI",
-    "politician_link": "N/A",
-    "traded_issuer_name": "Adobe Inc",
-    "traded_issuer_ticker": "ADBE:US",
-    "traded_issuer_link": "N/A",
-    "published": "15 May 2025",
-    "traded": "30 Apr 2025",
-    "filed_after": "  days 13",
-    "owner": "Joint",
-    "type": "buy",
-    "size": "15K\u201350K",
-    "price": "$374.98"
-  },
-  {
-    "politician_name": "Tony Wied",
-    "politician_family": "Republican House WI",
-    "politician_link": "N/A",
-    "traded_issuer_name": "Lam Research Corp",
-    "traded_issuer_ticker": "LRCX:US",
-    "traded_issuer_link": "N/A",
-    "published": "15 May 2025",
-    "traded": "30 Apr 2025",
-    "filed_after": "  days 13",
-    "owner": "Joint",
-    "type": "buy",
-    "size": "15K\u201350K",
-    "price": "$71.67"
-  },
-  {
-    "politician_name": "Tony Wied",
-    "politician_family": "Republican House WI",
-    "politician_link": "N/A",
-    "traded_issuer_name": "KINSALE CAPITAL GROUP INC",
-    "traded_issuer_ticker": "KNSL:US",
-    "traded_issuer_link": "N/A",
-    "published": "15 May 2025",
-    "traded": "30 Apr 2025",
-    "filed_after": "  days 13",
-    "owner": "Joint",
-    "type": "buy",
-    "size": "15K\u201350K",
-    "price": "$435.26"
-  },
-  {
-    "politician_name": "Michael McCaul",
-    "politician_family": "Republican House TX",
-    "politician_link": "N/A",
-    "traded_issuer_name": "WASHINGTON KING COUNTY",
-    "traded_issuer_ticker": "N/A",
-    "traded_issuer_link": "N/A",
-    "published": "15 May 2025",
-    "traded": "8 Apr 2025",
-    "filed_after": "  days 34",
-    "owner": "Spouse",
-    "type": "buy",
-    "size": "100K\u2013250K",
-    "price": "N/A"
-  },
-  {
-    "politician_name": "Michael McCaul",
-    "politician_family": "Republican House TX",
-    "politician_link": "N/A",
-    "traded_issuer_name": "BDT CAPITAL PARTNERS FUND 4 LP",
-    "traded_issuer_ticker": "N/A",
-    "traded_issuer_link": "N/A",
-    "published": "15 May 2025",
-    "traded": "30 Apr 2025",
-    "filed_after": "  days 12",
-    "owner": "Spouse",
-    "type": "buy",
-    "size": "100K\u2013250K",
-    "price": "N/A"
-  },
-  {
-    "politician_name": "Michael McCaul",
-    "politician_family": "Republican House TX",
-    "politician_link": "N/A",
-    "traded_issuer_name": "PORT AUTHORITY OF NEW YORK AND NEW JERSEY",
-    "traded_issuer_ticker": "N/A",
-    "traded_issuer_link": "N/A",
-    "published": "15 May 2025",
-    "traded": "9 Apr 2025",
-    "filed_after": "  days 33",
-    "owner": "Spouse",
-    "type": "buy",
-    "size": "100K\u2013250K",
-    "price": "N/A"
   }
 ]

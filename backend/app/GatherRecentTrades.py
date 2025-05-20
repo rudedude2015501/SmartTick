@@ -8,7 +8,13 @@ import json
 
 CapitalTrades = "https://www.capitoltrades.com/trades?pageSize=96&page=1"
 
+def checkIfEndOfPage():
+    None
+
 def getPolData():
+    Trades = []
+    Politicians = []
+    
     response = requests.get(CapitalTrades) #GET request
     soup = BeautifulSoup(response.content, 'html5lib') # If this line causes an error, run 'pip install html5lib' or install html5lib
     if response.status_code != 200:
@@ -20,8 +26,7 @@ def getPolData():
 
     
 
-    Trades = []
-    Politicians = []
+    
     for tab in table:
         Trade = {}
         Politician = {} #gets politician name and profile
@@ -44,7 +49,8 @@ def getPolData():
             Trade["type"] = "Tradetype is none"
         else:
             Trade["type"] = TradeType.text
-        Trade["size"] =(tab.find("span","mt-1 text-size-2 text-txt-dimmer hover:text-foreground")).get_text(" ")
+        size =(tab.find("span","mt-1 text-size-2 text-txt-dimmer hover:text-foreground")).get_text(" ")
+        Trade["size"] = size.replace("\u2013","-")
         Trade["price"] =(tab.find("div","flex place-content-center px-2 lg:px-3 xl:px-6 justify-end pr-0")).text
         img = tab.find_all("img")
         Politician["img"] = img[0]["src"]
