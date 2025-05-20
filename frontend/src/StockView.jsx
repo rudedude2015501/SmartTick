@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useTheme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import Card from '@mui/material/Card';
@@ -17,6 +17,10 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import Accordion from '@mui/material/Accordion';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 import TradeChart from './Chart'; // For politician trade summary
 import HistoricalPriceChart from './HistoricalPriceChart'; // For Tiingo stock price history
@@ -48,6 +52,13 @@ function StockView({ searchSymbol }) {
   const [historicalPriceError, setHistoricalPriceError] = useState(null);
   
   const [selectedRange, setSelectedRange] = useState('1Y'); // Default to 1 Year for historical prices
+
+  // Track which accordion is expanded
+  const [expanded, setExpanded] = useState('profile');
+
+  const handleAccordionChange = (panel) => (event, isExpanded) => {
+    setExpanded(isExpanded ? panel : false);
+  };
 
   // Effect to clear all data when searchSymbol becomes empty
   useEffect(() => {
@@ -206,141 +217,215 @@ function StockView({ searchSymbol }) {
   return (
     <Box>
       {/* Profile Section */}
-      <Box mb={4}>
-        <Card sx={{ boxShadow: 3, borderRadius: 2, backgroundColor: theme.palette.background.paper }}>
-          <CardContent>
-            {isLoadingProfile && (
-              <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}><CircularProgress /></Box>
-            )}
-            {profileError && <Alert severity="warning" sx={{ mt: 1, mb: 1 }}>{profileError}</Alert>}
-            {!isLoadingProfile && !profileError && !profileData && (
-              <Typography sx={{ p: 2, color: 'text.secondary' }}>No profile data found.</Typography>
-            )}
-            {profileData && (
-              <>
-                <Typography variant="h6" component="div">{profileData.name} ({profileData.ticker})</Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}><strong>Industry:</strong> {profileData.finnhubIndustry || 'N/A'}</Typography>
-                <Typography variant="body2" color="text.secondary"><strong>Market Cap:</strong> ${profileData.marketCapitalization?.toLocaleString() || 'N/A'} Billion</Typography>
-                <Typography variant="body2" color="text.secondary"><strong>IPO Date:</strong> {profileData.ipo || 'N/A'}</Typography>
-                <Typography variant="body2" color="text.secondary"><strong>Exchange:</strong> {profileData.exchange || 'N/A'}</Typography>
-                <Typography variant="body2" color="text.secondary">
-                  <strong>Website:</strong>{' '}
-                  {profileData.weburl ? (<Link href={profileData.weburl} target="_blank" rel="noopener noreferrer" sx={{ color: getLinkColor('link'), '&:visited': { color: getLinkColor('visited') }, '&:hover': { color: getLinkColor('hover') } }}>{profileData.weburl}</Link>) : ('N/A')}
-                </Typography>
-                {profileData.logo && (<CardMedia component="img" image={profileData.logo} alt={`${profileData.name} logo`} sx={{ maxWidth: 100, margin: '16px auto 0', padding: 1, border: `1px solid ${theme.palette.divider}`, borderRadius: 1, backgroundColor: theme.palette.mode === 'dark' ? '#000' : 'transparent' }} />)}
-                {realtimePrice && (
-                  <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-                    <strong>Real-Time Price:</strong> ${realtimePrice.c?.toFixed(2)}{' '}
-                    <span style={{ color: realtimePrice.d >= 0 ? (theme.palette.mode === 'dark' ? '#4caf50' : 'green') : (theme.palette.mode === 'dark' ? '#f44336' : 'red') }}>
-                      ({realtimePrice.d >= 0 ? '+' : ''}{realtimePrice.d?.toFixed(2)} / {realtimePrice.dp?.toFixed(2)}%){realtimePrice.d >= 0 ? ' ↑' : ' ↓'} Today
-                    </span>
-                  </Typography>
+      <Accordion
+        expanded={expanded === 'profile'}
+        onChange={handleAccordionChange('profile')}
+        sx={{ boxShadow: 3, borderRadius: 2, mb: 2 }}
+      >
+        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+          <Typography variant="h6">Stock Profile</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          {expanded === 'profile' && (
+            <Card sx={{ boxShadow: 3, borderRadius: 2, backgroundColor: theme.palette.background.paper }}>
+              <CardContent>
+                {/* ...profile content... */}
+                {isLoadingProfile && (
+                  <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}><CircularProgress /></Box>
                 )}
-              </>
-            )}
-          </CardContent>
-        </Card>
-      </Box>
+                {!isLoadingProfile && !profileError && !profileData && (
+                  <Typography sx={{ p: 2, color: 'text.secondary' }}>No profile data found.</Typography>
+                )}
+                {profileData && (
+                  <>
+                    <Typography variant="h6" component="div">{profileData.name} ({profileData.ticker})</Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}><strong>Industry:</strong> {profileData.finnhubIndustry || 'N/A'}</Typography>
+                    <Typography variant="body2" color="text.secondary"><strong>Market Cap:</strong> ${profileData.marketCapitalization?.toLocaleString() || 'N/A'} Billion</Typography>
+                    <Typography variant="body2" color="text.secondary"><strong>IPO Date:</strong> {profileData.ipo || 'N/A'}</Typography>
+                    <Typography variant="body2" color="text.secondary"><strong>Exchange:</strong> {profileData.exchange || 'N/A'}</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      <strong>Website:</strong>{' '}
+                      {profileData.weburl ? (<Link href={profileData.weburl} target="_blank" rel="noopener noreferrer" sx={{ color: getLinkColor('link'), '&:visited': { color: getLinkColor('visited') }, '&:hover': { color: getLinkColor('hover') } }}>{profileData.weburl}</Link>) : ('N/A')}
+                    </Typography>
+                    {realtimePrice && (
+                      <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+                        <strong>Real-Time Price:</strong> ${realtimePrice.c?.toFixed(2)}{' '}
+                        <span style={{ color: realtimePrice.d >= 0 ? (theme.palette.mode === 'dark' ? '#4caf50' : 'green') : (theme.palette.mode === 'dark' ? '#f44336' : 'red') }}>
+                          ({realtimePrice.d >= 0 ? '+' : ''}{realtimePrice.d?.toFixed(2)} / {realtimePrice.dp?.toFixed(2)}%){realtimePrice.d >= 0 ? ' ↑' : ' ↓'} Today
+                        </span>
+                      </Typography>
+                    )}
+                    {profileData.logo && (
+                      <CardMedia
+                        component="img"
+                        image={profileData.logo}
+                        alt={`${profileData.name} logo`}
+                        loading="lazy"
+                        sx={{
+                          maxWidth: 100,
+                          width: 100,
+                          height: 100,
+                          objectFit: 'contain',
+                          margin: '16px auto 0',
+                          padding: 1,
+                          border: `1px solid ${theme.palette.divider}`,
+                          borderRadius: 1,
+                          backgroundColor: theme.palette.mode === 'dark' ? '#000' : 'transparent'
+                        }}
+                      />
+                    )}
+                  </>
+                )}
+              </CardContent>
+            </Card>
+          )}
+        </AccordionDetails>
+      </Accordion>
 
-      {/* Historical Price Chart Section (Tiingo Data) */}
-      <Box mt={4} mb={4}>
-        <Card sx={{ boxShadow: 3, borderRadius: 2, p: 2, backgroundColor: theme.palette.background.paper }}>
-          <Typography variant="h6" gutterBottom component="div" sx={{ mb: 1, textAlign: 'center' }}>
-            Historical Price Chart for {searchSymbol}
-          </Typography>
-          <Box sx={{ mb: 2, display: 'flex', justifyContent: 'center' }}>
-            <ToggleButtonGroup
-              value={selectedRange}
-              exclusive
-              onChange={handleRangeChange}
-              aria-label="historical price range"
-              size="small"
-            >
-              {}
-              <ToggleButton value="1M" aria-label="1 month">1M</ToggleButton>
-              <ToggleButton value="6M" aria-label="6 months">6M</ToggleButton>
-              <ToggleButton value="1Y" aria-label="1 year">1Y</ToggleButton>
-            </ToggleButtonGroup>
-          </Box>
-          {isLoadingHistoricalPrices && (
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 300 }}><CircularProgress /></Box>
+      {/* Historical Price Chart Section */}
+      <Accordion
+        expanded={expanded === 'history'}
+        onChange={handleAccordionChange('history')}
+        sx={{ boxShadow: 3, borderRadius: 2, mb: 2 }}
+      >
+        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+          <Typography variant="h6">Historical Price Chart</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          {expanded === 'history' && (
+            <Card sx={{ boxShadow: 3, borderRadius: 2, p: 2, backgroundColor: theme.palette.background.paper }}>
+              <Typography variant="h6" gutterBottom component="div" sx={{ mb: 1, textAlign: 'center' }}>
+                Historical Price Chart for {searchSymbol}
+              </Typography>
+              <Box sx={{ mb: 2, display: 'flex', justifyContent: 'center' }}>
+                <ToggleButtonGroup
+                  value={selectedRange}
+                  exclusive
+                  onChange={handleRangeChange}
+                  aria-label="historical price range"
+                  size="small"
+                >
+                  <ToggleButton value="1M" aria-label="1 month">1M</ToggleButton>
+                  <ToggleButton value="6M" aria-label="6 months">6M</ToggleButton>
+                  <ToggleButton value="1Y" aria-label="1 year">1Y</ToggleButton>
+                </ToggleButtonGroup>
+              </Box>
+              {isLoadingHistoricalPrices && (
+                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 300 }}><CircularProgress /></Box>
+              )}
+              {historicalPriceError && <Alert severity="warning" sx={{mt: 1, mb: 1}}>{historicalPriceError}</Alert>}
+              {!isLoadingHistoricalPrices && !historicalPriceError && (
+                <HistoricalPriceChart data={historicalPriceData} symbol={searchSymbol} />
+              )}
+            </Card>
           )}
-          {historicalPriceError && <Alert severity="warning" sx={{mt: 1, mb: 1}}>{historicalPriceError}</Alert>}
-          {!isLoadingHistoricalPrices && !historicalPriceError && (
-            <HistoricalPriceChart data={historicalPriceData} symbol={searchSymbol} />
-          )}
-        </Card>
-      </Box>
+        </AccordionDetails>
+      </Accordion>
 
       {/* Technical Analysis Section */}
-      <Box mt={4}>
-        {isLoadingHistoricalPrices || isLoadingTrades ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
-            <CircularProgress />
-          </Box>
-        ) : (
-          historicalPriceData.length > 0 && trades.length > 0 ? (
-            <StockAnalysis 
-              symbol={searchSymbol} 
-              historicalPriceData={historicalPriceData}
-              trades={trades} 
-            />
-          ) : (
-            <Alert severity="info">
-              {historicalPriceData.length === 0 && trades.length === 0 ? 
-                "Both historical price data and congressional trade data are required for technical analysis." :
-                historicalPriceData.length === 0 ? 
-                "Historical price data is missing. Unable to perform technical analysis." :
-                "No congressional trade data available for sentiment analysis."}
-            </Alert>
-          )
-        )}
-      </Box>
+      <Accordion
+        expanded={expanded === 'analysis'}
+        onChange={handleAccordionChange('analysis')}
+        sx={{ boxShadow: 3, borderRadius: 2, mb: 2 }}
+      >
+        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+          <Typography variant="h6">Technical & Sentiment Analysis</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          {expanded === 'analysis' && (
+            isLoadingHistoricalPrices || isLoadingTrades ? (
+              <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+                <CircularProgress />
+              </Box>
+            ) : (
+              historicalPriceData.length > 0 && trades.length > 0 ? (
+                <StockAnalysis 
+                  symbol={searchSymbol} 
+                  historicalPriceData={historicalPriceData}
+                  trades={trades} 
+                />
+              ) : (
+                <Alert severity="info">
+                  {historicalPriceData.length === 0 && trades.length === 0 ? 
+                    "Both historical price data and congressional trade data are required for technical analysis." :
+                    historicalPriceData.length === 0 ? 
+                    "Historical price data is missing. Unable to perform technical analysis." :
+                    "No congressional trade data available for sentiment analysis."}
+                </Alert>
+              )
+            )
+          )}
+        </AccordionDetails>
+      </Accordion>
       
       {/* Recent Politician Trades Section */}
-      <Box mt={4}>
-        <Typography variant="h6" gutterBottom>Recent Politician Trades for {searchSymbol}</Typography>
-        {isLoadingTrades && (<Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}><CircularProgress /></Box>)}
-        {tradesError && <Alert severity="error">{tradesError}</Alert>}
-        {!isLoadingTrades && trades.length === 0 && !tradesError && (<Typography sx={{ color: 'text.secondary', mt: 2 }}>No recent politician trades found for this stock.</Typography>)}
-        {!isLoadingTrades && trades.length > 0 && (
-          <TableContainer component={Paper} sx={{ mt: 2, maxHeight: 400 }}>
-            <Table stickyHeader>
-              <TableHead>
-                <TableRow>
-                  <TableCell><strong>Politician</strong></TableCell>
-                  <TableCell><strong>Trade Type</strong></TableCell>
-                  <TableCell><strong>Trade Date</strong></TableCell>
-                  <TableCell><strong>Size</strong></TableCell>
-                  <TableCell><strong>Price</strong></TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {trades.map((trade) => (
-                  <TableRow key={trade.id}>
-                    <TableCell>{trade.politician_name || 'N/A'}</TableCell>
-                    <TableCell>{trade.type ? trade.type.charAt(0).toUpperCase() + trade.type.slice(1) : 'N/A'}</TableCell>
-                    <TableCell>{trade.traded ? new Intl.DateTimeFormat('en-US').format(new Date(trade.traded)) : 'N/A'}</TableCell>
-                    <TableCell>{trade.size || 'N/A'}</TableCell>
-                    <TableCell>{trade.price || 'N/A'}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        )}
-      </Box>
+      <Accordion
+        expanded={expanded === 'trades'}
+        onChange={handleAccordionChange('trades')}
+        sx={{ boxShadow: 3, borderRadius: 2, mb: 2 }}
+      >
+        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+          <Typography variant="h6">Recent Politician Trades</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          {expanded === 'trades' && (
+            <>
+              <Typography variant="h6" gutterBottom>Recent Politician Trades for {searchSymbol}</Typography>
+              {isLoadingTrades && (<Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}><CircularProgress /></Box>)}
+              {tradesError && <Alert severity="error">{tradesError}</Alert>}
+              {!isLoadingTrades && trades.length === 0 && !tradesError && (<Typography sx={{ color: 'text.secondary', mt: 2 }}>No recent politician trades found for this stock.</Typography>)}
+              {!isLoadingTrades && trades.length > 0 && (
+                <TableContainer component={Paper} sx={{ mt: 2, maxHeight: 400 }}>
+                  <Table stickyHeader>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell><strong>Politician</strong></TableCell>
+                        <TableCell><strong>Trade Type</strong></TableCell>
+                        <TableCell><strong>Trade Date</strong></TableCell>
+                        <TableCell><strong>Size</strong></TableCell>
+                        <TableCell><strong>Price</strong></TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {trades.map((trade) => (
+                        <TableRow key={trade.id}>
+                          <TableCell>{trade.politician_name || 'N/A'}</TableCell>
+                          <TableCell>{trade.type ? trade.type.charAt(0).toUpperCase() + trade.type.slice(1) : 'N/A'}</TableCell>
+                          <TableCell>{trade.traded ? new Intl.DateTimeFormat('en-US').format(new Date(trade.traded)) : 'N/A'}</TableCell>
+                          <TableCell>{trade.size || 'N/A'}</TableCell>
+                          <TableCell>{trade.price || 'N/A'}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              )}
+            </>
+          )}
+        </AccordionDetails>
+      </Accordion>
 
       {/* Politician Trade Summary Chart Section */}
-      <Box mt={4}>
-        <Card sx={{ boxShadow: 3, borderRadius: 2, p: 2, minHeight: 450, backgroundColor: theme.palette.background.paper }}>
-           <Typography variant="h6" gutterBottom component="div" sx={{ mb: 2, textAlign: 'center' }}>Politician Monthly Trade Summary</Typography>
-          {isLoadingPoliticianChart && (<Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', minHeight: 300 }}><CircularProgress /></Box>)}
-          {politicianChartError && <Alert severity="warning" sx={{ mt: 1, mb: 1 }}>{politicianChartError}</Alert>}
-          {!isLoadingPoliticianChart && !politicianChartError && politicianTradeChartData.length === 0 && (<Typography sx={{ p: 2, color: 'text.secondary', textAlign: 'center', mt: 4 }}>No politician trade summary data found for this period.</Typography>)}
-          {!isLoadingPoliticianChart && politicianTradeChartData.length > 0 && (<TradeChart data={politicianTradeChartData} />)}
-        </Card>
-      </Box>
+      <Accordion
+        expanded={expanded === 'summary'}
+        onChange={handleAccordionChange('summary')}
+        sx={{ boxShadow: 3, borderRadius: 2, mb: 2 }}
+      >
+        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+          <Typography variant="h6">Politician Monthly Trade Summary</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          {expanded === 'summary' && (
+            <Card sx={{ boxShadow: 3, borderRadius: 2, p: 2, minHeight: 450, backgroundColor: theme.palette.background.paper }}>
+              <Typography variant="h6" gutterBottom component="div" sx={{ mb: 2, textAlign: 'center' }}>Politician Monthly Trade Summary</Typography>
+              {isLoadingPoliticianChart && (<Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', minHeight: 300 }}><CircularProgress /></Box>)}
+              {politicianChartError && <Alert severity="warning" sx={{ mt: 1, mb: 1 }}>{politicianChartError}</Alert>}
+              {!isLoadingPoliticianChart && !politicianChartError && politicianTradeChartData.length === 0 && (<Typography sx={{ p: 2, color: 'text.secondary', textAlign: 'center', mt: 4 }}>No politician trade summary data found for this period.</Typography>)}
+              {!isLoadingPoliticianChart && politicianTradeChartData.length > 0 && (<TradeChart data={politicianTradeChartData} />)}
+            </Card>
+          )}
+        </AccordionDetails>
+      </Accordion>
     </Box>
   );
 }
