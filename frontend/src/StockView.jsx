@@ -430,7 +430,6 @@ function StockView({ searchSymbol }) {
         </AccordionSummary>
         <AccordionDetails>
           <>
-            <Typography variant="h6" gutterBottom>Recent Politician Trades for {searchSymbol}</Typography>
             {isLoadingTrades && (<Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}><CircularProgress /></Box>)}
             {tradesError && <Alert severity="error">{tradesError}</Alert>}
             {!isLoadingTrades && trades.length === 0 && !tradesError && (<Typography sx={{ color: 'text.secondary', mt: 2 }}>No recent politician trades found for this stock.</Typography>)}
@@ -487,7 +486,6 @@ function StockView({ searchSymbol }) {
         </AccordionSummary>
         <AccordionDetails>
           <Card sx={{ boxShadow: 3, borderRadius: 2, p: 2, minHeight: 450, backgroundColor: theme.palette.background.paper }}>
-            <Typography variant="h6" gutterBottom component="div" sx={{ mb: 2, textAlign: 'center' }}>Politician Monthly Trade Summary</Typography>
             {isLoadingPoliticianChart && (<Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', minHeight: 300 }}><CircularProgress /></Box>)}
             {politicianChartError && <Alert severity="warning" sx={{ mt: 1, mb: 1 }}>{politicianChartError}</Alert>}
             {!isLoadingPoliticianChart && !politicianChartError && politicianTradeChartData.length === 0 && (<Typography sx={{ p: 2, color: 'text.secondary', textAlign: 'center', mt: 4 }}>No politician trade summary data found for this period.</Typography>)}
