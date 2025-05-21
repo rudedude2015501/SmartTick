@@ -28,6 +28,9 @@ import HistoricalPriceChart from './HistoricalPriceChart'; // For Tiingo stock p
 // Adding StockAnalysis.jsx, with analysis functionality
 import StockAnalysis from './StockAnalysis';
 
+// Adding Financials.jsx to format financial information
+import { metricData, MetricsSection } from './Financials';
+
 // Get API URL from environment variable
 const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -52,6 +55,10 @@ function StockView({ searchSymbol }) {
   const [historicalPriceError, setHistoricalPriceError] = useState(null);
   
   const [selectedRange, setSelectedRange] = useState('1Y'); // Default to 1 Year for historical prices
+
+  const [financialRaw, setFinancialRaw] = useState(null);
+  const [isLoadingFinancials, setIsLoadingFinancials] = useState(false);
+  const [financialError, setFinancialError] = useState(null);
 
   // Track which accordion is expanded
   const [expanded, setExpanded] = useState('profile');
@@ -193,6 +200,33 @@ function StockView({ searchSymbol }) {
     }
   }, [searchSymbol, selectedRange]);
 
+  // Effect for stock financial information
+  useEffect(() => {
+    const fetchFinancials = async () => {
+      setIsLoadingFinancials(true);
+      setFinancialError(null);
+      setFinancialRaw(null);
+
+      try {
+        const res = await fetch(`${apiUrl}/api/financials-compact/${searchSymbol}`);
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.error || `Status ${res.status}`);
+        }
+        const data = await res.json();
+        setFinancialRaw(data);
+      } catch (err) {
+        setFinancialError(err.message);
+      } finally {
+        setIsLoadingFinancials(false);
+      }
+    };
+
+    if (searchSymbol) {
+      fetchFinancials();
+    }
+  }, [searchSymbol]);
+
   const handleRangeChange = (event, newRange) => {
     if (newRange !== null) {
       setSelectedRange(newRange);
@@ -205,6 +239,34 @@ function StockView({ searchSymbol }) {
     }
     return { link: '#1976d2', visited: '#6c2dc7', hover: '#0a4b8c' }[state] || '#1976d2';
   };
+
+  // number of politician trades to show
+  const MAX_ROWS = 5;
+
+  // Helper to format raw financial values 
+  const formatValue = (key, val) => {
+    if (val == null) return 'N/A';
+    // simple currency/percent heuristics:
+    if (key.includes('high') || key.includes('low') || key.includes('eps') || key.includes('per_share')) {
+      return typeof val === 'number' ? `$${val.toLocaleString()}` : val;
+    }
+    if (key.includes('return') || key.includes('growth') || key.includes('yield')) {
+      return `${val.toLocaleString()}%`;
+    }
+    if (key.includes('volume')) {
+      return `${val.toLocaleString()} M`;
+    }
+    return val.toString();
+  };
+
+  // Merge financial values into metricData
+  const filledMetrics = {};
+  Object.entries(metricData).forEach(([category, arr]) => {
+    filledMetrics[category] = arr.map(m => ({
+      ...m,
+      value: financialRaw ? formatValue(m.key, financialRaw[m.key]) : m.value,
+    }));
+  });
 
   if (!searchSymbol) {
     return (
@@ -385,15 +447,26 @@ function StockView({ searchSymbol }) {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {trades.map((trade) => (
-                      <TableRow key={trade.id}>
-                        <TableCell>{trade.politician_name || 'N/A'}</TableCell>
-                        <TableCell>{trade.type ? trade.type.charAt(0).toUpperCase() + trade.type.slice(1) : 'N/A'}</TableCell>
-                        <TableCell>{trade.traded ? new Intl.DateTimeFormat('en-US').format(new Date(trade.traded)) : 'N/A'}</TableCell>
-                        <TableCell>{trade.size || 'N/A'}</TableCell>
-                        <TableCell>{trade.price || 'N/A'}</TableCell>
-                      </TableRow>
-                    ))}
+                    {trades
+                      .slice(0, MAX_ROWS)        // ← only take the first MAX_ROWS elements
+                      .map(trade => (
+                        <TableRow key={trade.id}>
+                          <TableCell>{trade.politician_name || 'N/A'}</TableCell>
+                          <TableCell>
+                            {trade.type
+                              ? trade.type.charAt(0).toUpperCase() + trade.type.slice(1)
+                              : 'N/A'}
+                          </TableCell>
+                          <TableCell>
+                            {trade.traded
+                              ? new Intl.DateTimeFormat('en-US').format(new Date(trade.traded))
+                              : 'N/A'}
+                          </TableCell>
+                          <TableCell>{trade.size || 'N/A'}</TableCell>
+                          <TableCell>{trade.price || 'N/A'}</TableCell>
+                        </TableRow>
+                      ))
+                    }
                   </TableBody>
                 </Table>
               </TableContainer>
@@ -420,6 +493,35 @@ function StockView({ searchSymbol }) {
             {!isLoadingPoliticianChart && !politicianChartError && politicianTradeChartData.length === 0 && (<Typography sx={{ p: 2, color: 'text.secondary', textAlign: 'center', mt: 4 }}>No politician trade summary data found for this period.</Typography>)}
             {!isLoadingPoliticianChart && politicianTradeChartData.length > 0 && (<TradeChart data={politicianTradeChartData} />)}
           </Card>
+        </AccordionDetails>
+      </Accordion>
+
+      {/* Stock Financials Information Section */}
+      <Accordion
+        expanded={expanded === 'financials'}
+        onChange={handleAccordionChange('financials')}
+        sx={{ boxShadow: 3, borderRadius: 2, mb: 2 }}
+        slotProps={{ transition: { mountOnEnter: true, unmountOnExit: true } }}
+      >
+        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+          <Typography variant="h6">Financial Information Summary</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          {isLoadingFinancials ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+              <CircularProgress />
+            </Box>
+          ) : financialError ? (
+            <Alert severity="error">{financialError}</Alert>
+          ) : (
+            <Card sx={{ boxShadow: 3, borderRadius: 2, p: 2, backgroundColor: theme.palette.background.paper }}>
+              <MetricsSection title="Market Performance" metrics={filledMetrics.marketPerformance} />
+              <MetricsSection title="Valuation"           metrics={filledMetrics.valuation}         />
+              <MetricsSection title="Profitability"       metrics={filledMetrics.profitability}     />
+              <MetricsSection title="Growth"              metrics={filledMetrics.growth}            />
+              <MetricsSection title="Liquidity"           metrics={filledMetrics.liquidity}         />
+            </Card>
+          )}
         </AccordionDetails>
       </Accordion>
     </Box>
