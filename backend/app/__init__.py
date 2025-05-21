@@ -11,8 +11,12 @@ from flask_migrate import Migrate
 from flask_cors import CORS
 from sqlalchemy import func
 
-from .finnhub_client import get_profile, get_quote_data
+from .finnhub_client import get_profile, get_quote_data, get_financials
 from .tiingo_client import get_daily_prices
+
+# local utility items 
+from app.utils import extract_key_metrics
+
 
 # Shared extension objects
 db = SQLAlchemy()
@@ -86,6 +90,7 @@ def create_app():
     def home():
         return "Hello from SmartTick Backend!"
 
+
     @app.route('/api/profile/<symbol>', methods=["GET"])
     def stock_profile(symbol):
         """
@@ -103,6 +108,48 @@ def create_app():
             app.logger.error(f"Failed to fetch profile for {symbol}: {e}", exc_info=True)
             return jsonify({"error": "An internal server error occurred"}), 500
     
+
+    @app.route('/api/financials-compact/<symbol>', methods=["GET"])
+    def stock_financials_compact(symbol):
+        """
+        Fetches a short list of key financial metrics for a stock 
+        from the Finnhub client.
+        """
+        if not symbol:
+            return jsonify({"error": "Stock symbol is required"}), 400
+
+        try:
+            raw = get_financials(symbol.upper())
+            if not raw or "metric" not in raw:
+                return jsonify({"error": f"No financial data for {symbol}"}), 404
+
+            # narrow it down to our 18 fields
+            data = extract_key_metrics(raw)
+
+            return jsonify(data)
+        except Exception as e:
+            app.logger.error(f"Failed to fetch financials for {symbol}: {e}", exc_info=True)
+            return jsonify({"error": "An internal server error occurred"}), 500
+    
+
+    @app.route('/api/financials-extended/<symbol>', methods=["GET"])
+    def stock_financials_extended(symbol):
+        """
+        Fetches the raw stock financial data from the Finnhub client.
+        """
+        if not symbol:
+            return jsonify({"error": "Stock symbol is required"}), 400
+
+        try:
+            financial_data = get_financials(symbol.upper())
+            if not financial_data:
+                return jsonify({"error": f"No profile data found for symbol {symbol}"}), 404
+            return jsonify(financial_data)
+        except Exception as e:
+            app.logger.error(f"Failed to fetch profile for {symbol}: {e}", exc_info=True)
+            return jsonify({"error": "An internal server error occurred"}), 500
+    
+
     @app.route('/api/price/<symbol>', methods=["GET"])
     def realtime_price(symbol):
         """
@@ -119,6 +166,7 @@ def create_app():
         except Exception as e:
             app.logger.error(f"Failed to fetch real-time price for {symbol}: {e}", exc_info=True)
             return jsonify({"error": "An internal server error occurred"}), 500
+
 
     @app.route('/api/trades/summary/<symbol>', methods=["GET"])
     def trade_summary(symbol):
@@ -144,6 +192,7 @@ def create_app():
             app.logger.error(f"Failed to fetch trade summary for {symbol}: {e}", exc_info=True)
             return jsonify({"error": "An internal server error occurred"}), 500
 
+
     @app.route('/api/trades/<symbol>', methods=["GET"])
     def get_trades_by_symbol(symbol):
         """
@@ -168,6 +217,7 @@ def create_app():
         except Exception as e:
             app.logger.error(f"Failed to fetch trades for {symbol}: {e}", exc_info=True)
             return jsonify({"error": "An internal server error occurred"}), 500
+
 
     @app.route('/api/trades', methods=["GET"])
     def get_recent_trades():
@@ -248,6 +298,7 @@ def create_app():
             }
             for key, data in sorted(monthly_summary.items())
         ]
+
 
     @app.route("/api/prices/<symbol>", methods=["GET"])
     def daily_prices(symbol):

@@ -29,6 +29,8 @@ class Stock(db.Model):
 
     created_at            = db.Column(db.DateTime, server_default=func.now())
 
+    metrics = db.relationship('StockMetric', back_populates='stock', cascade='all, delete-orphan')
+
     def to_dict(self):
         return {
             'id':                    self.id,
@@ -47,6 +49,74 @@ class Stock(db.Model):
             'shares_outstanding':    self.shares_outstanding,
             'weburl':                self.weburl,
             'created_at':            self.created_at.isoformat() if self.created_at else None
+        }
+
+# Stock Financial Information
+class StockMetric(db.Model):
+    __tablename__ = 'stock_metric'
+    id                          = db.Column(db.Integer, primary_key=True)
+    stock_id                    = db.Column(
+                                      db.Integer,
+                                      db.ForeignKey('stock.id'),
+                                      nullable=False
+                                  )
+    as_of_date                   = db.Column(
+                                      Date,
+                                      nullable=False,
+                                      server_default=func.current_date()
+                                  )
+
+    # ─── Selected Subset of Finnhub metrics ─────────────────────────────────────────
+    ten_day_avg_volume          = db.Column('10d_avg_vol',   db.Float)
+    thirteen_week_return        = db.Column('13w_ret',       db.Float)
+    fifty_two_wk_high           = db.Column('52w_high',      db.Float)
+    fifty_two_wk_high_date      = db.Column('52w_high_dt',   Date)
+    fifty_two_wk_low            = db.Column('52w_low',       db.Float)
+    fifty_two_wk_low_date       = db.Column('52w_low_dt',    Date)
+    beta                        = db.Column(db.Float)
+    pe_ttm                      = db.Column(db.Float)
+    pb                          = db.Column(db.Float)
+    ps_ttm                      = db.Column(db.Float)
+    dividend_yield_ttm          = db.Column(db.Float)
+    current_ratio_quarterly     = db.Column(db.Float)
+    quick_ratio_quarterly       = db.Column(db.Float)
+    roe_ttm                     = db.Column(db.Float)
+    roa_ttm                     = db.Column(db.Float)
+    eps_ttm                     = db.Column(db.Float)
+    rev_per_share_ttm           = db.Column(db.Float)
+    rev_growth_ttm_yoy          = db.Column(db.Float)
+    eps_growth_ttm_yoy          = db.Column(db.Float)
+    # ──────────────────────────────────────────────────────────────────────
+
+    created_at                  = db.Column(db.DateTime, server_default=func.now())
+
+    stock                       = db.relationship('Stock', back_populates='metrics')
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'stock_id': self.stock_id,
+            'as_of_date': self.as_of_date.isoformat(),
+            '10d_avg_vol': self.ten_day_avg_volume,
+            '13w_ret': self.thirteen_week_return,
+            '52w_high': self.fifty_two_wk_high,
+            '52w_high_dt': self.fifty_two_wk_high_date.isoformat() if self.fifty_two_wk_high_date else None,
+            '52w_low': self.fifty_two_wk_low,
+            '52w_low_dt': self.fifty_two_wk_low_date.isoformat() if self.fifty_two_wk_low_date else None,
+            'beta': self.beta,
+            'pe_ttm': self.pe_ttm,
+            'pb': self.pb,
+            'ps_ttm': self.ps_ttm,
+            'dividend_yield_ttm': self.dividend_yield_ttm,
+            'current_ratio_quarterly': self.current_ratio_quarterly,
+            'quick_ratio_quarterly': self.quick_ratio_quarterly,
+            'roe_ttm': self.roe_ttm,
+            'roa_ttm': self.roa_ttm,
+            'eps_ttm': self.eps_ttm,
+            'rev_per_share_ttm': self.rev_per_share_ttm,
+            'rev_growth_ttm_yoy': self.rev_growth_ttm_yoy,
+            'eps_growth_ttm_yoy': self.eps_growth_ttm_yoy,
+            'created_at': self.created_at.isoformat()
         }
 
 # Define the Trade model
