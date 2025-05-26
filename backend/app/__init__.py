@@ -166,7 +166,61 @@ def create_app():
         except Exception as e:
             app.logger.error(f"Failed to fetch real-time price for {symbol}: {e}", exc_info=True)
             return jsonify({"error": "An internal server error occurred"}), 500
+    
+    def fetch_trade_data(base_symbol):
+        """
+        Fetches trade data for the given stock symbol from the database.
+        """
+        return db.session.query(
+            models.Trade.traded,
+            models.Trade.type,
+            models.Trade.size
+        ).filter(
+            models.Trade.traded_issuer_ticker.ilike(f"%{base_symbol}%"),  # Match the symbol
+            models.Trade.traded.isnot(None)
+        ).order_by(models.Trade.traded).all()
 
+
+    def process_trade_data(results):
+        """
+        Processes trade data into a monthly summary.
+        """
+        monthly_summary = {}
+
+        for trade_date, trade_type, trade_size_str in results:
+            if not isinstance(trade_date, date):
+                app.logger.warning(f"Skipping record with invalid date: {trade_date}")
+                continue
+
+            year, month = trade_date.year, trade_date.month
+            month_key = (year, month)
+            numeric_size = size_to_numeric(trade_size_str)
+
+            if month_key not in monthly_summary:
+                monthly_summary[month_key] = {'buy': 0, 'sell': 0}
+
+            if trade_type.lower() == 'buy':
+                monthly_summary[month_key]['buy'] += numeric_size
+            elif trade_type.lower() == 'sell':
+                monthly_summary[month_key]['sell'] += numeric_size
+
+        return monthly_summary
+
+
+    def format_monthly_summary(monthly_summary):
+        """
+        Formats the monthly summary into a list of dictionaries for the API response.
+        """
+        return [
+            {
+                "year": key[0],
+                "month": key[1],
+                "month_label": f"{key[0]}-{key[1]:02d}",
+                "buy_total": data['buy'],
+                "sell_total": data['sell']
+            }
+            for key, data in sorted(monthly_summary.items())
+        ]
 
     @app.route('/api/trades/summary/<symbol>', methods=["GET"])
     def trade_summary(symbol):
@@ -230,7 +284,7 @@ def create_app():
             limit = request.args.get('limit', default=50, type=int)
 
             # Query the database for trades and sort by date (descending), applying the limit
-            trades = db.session.query(models.Trade).order_by(models.Trade.traded.desc()).limit(limit).all()
+            trades = db.session.query(models.Trade).join(models.PoliticianImg, models.Trade.politician_name == models.PoliticianImg.politician_name,isouter=True).order_by(models.Trade.traded.desc()).limit(limit).all()
 
             if not trades:
                 return jsonify({"error": "No trade data found"}), 404
@@ -242,62 +296,6 @@ def create_app():
         except Exception as e:
             app.logger.error(f"Failed to fetch trades: {e}", exc_info=True)
             return jsonify({"error": "An internal server error occurred"}), 500
-
-
-    def fetch_trade_data(base_symbol):
-        """
-        Fetches trade data for the given stock symbol from the database.
-        """
-        return db.session.query(
-            models.Trade.traded,
-            models.Trade.type,
-            models.Trade.size
-        ).filter(
-            models.Trade.traded_issuer_ticker.ilike(f"%{base_symbol}%"),  # Match the symbol
-            models.Trade.traded.isnot(None)
-        ).order_by(models.Trade.traded).all()
-
-
-    def process_trade_data(results):
-        """
-        Processes trade data into a monthly summary.
-        """
-        monthly_summary = {}
-
-        for trade_date, trade_type, trade_size_str in results:
-            if not isinstance(trade_date, date):
-                app.logger.warning(f"Skipping record with invalid date: {trade_date}")
-                continue
-
-            year, month = trade_date.year, trade_date.month
-            month_key = (year, month)
-            numeric_size = size_to_numeric(trade_size_str)
-
-            if month_key not in monthly_summary:
-                monthly_summary[month_key] = {'buy': 0, 'sell': 0}
-
-            if trade_type.lower() == 'buy':
-                monthly_summary[month_key]['buy'] += numeric_size
-            elif trade_type.lower() == 'sell':
-                monthly_summary[month_key]['sell'] += numeric_size
-
-        return monthly_summary
-
-
-    def format_monthly_summary(monthly_summary):
-        """
-        Formats the monthly summary into a list of dictionaries for the API response.
-        """
-        return [
-            {
-                "year": key[0],
-                "month": key[1],
-                "month_label": f"{key[0]}-{key[1]:02d}",
-                "buy_total": data['buy'],
-                "sell_total": data['sell']
-            }
-            for key, data in sorted(monthly_summary.items())
-        ]
 
 
     @app.route("/api/prices/<symbol>", methods=["GET"])
@@ -369,16 +367,16 @@ def create_app():
 
         try:
             politicians = db.session.query(
-                models.Trade.politician_name, 
-                models.Trade.politician_family
+                models.PoliticianImg
             ).filter(
-                models.Trade.politician_name.ilike(f"{query}%")
+                models.PoliticianImg.politician_name.ilike(f"{query}%")
             ).distinct().limit(10).all()
 
             results = [
                 {
                     'name': politician.politician_name,
-                    'affiliation': politician.politician_family
+                    'affiliation': politician.politician_family,
+                    'img': politician.img
                 }
                 for politician in politicians
             ]
@@ -387,5 +385,26 @@ def create_app():
         except Exception as e:
             app.logger.error(f"error with politician autocomplete: {e}", exc_info=True)
             return jsonify([]), 500
+
+    @app.route('/api/pol/image', methods=["GET"])
+    def get_pol_image():
+        """
+        Gets a politician image from database, filtered by politician name.
+        Requires a 'name' parameter. Returns a single object or 404.
+        """
+        query = request.args.get('name', '')
+        if not query or len(query) < 1:
+            return jsonify({"error": "Query parameter 'name' is required."}), 400
+
+        try:
+            image = db.session.query(models.PoliticianImg).filter(
+                func.lower(models.PoliticianImg.politician_name) == query.lower()
+            ).first()
+            if not image:
+                return jsonify({"error": "No Image data found"}), 404
+            return jsonify(image.to_dict())
+        except Exception as e:
+            app.logger.error(f"failed to fetch images: {e}", exc_info=True)
+            return jsonify({"error": "an internal server error occured"}), 500
 
     return app
