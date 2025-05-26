@@ -66,7 +66,7 @@ def getPolData():
 
             TradeType =tab.find("span", class_=["q-field tx-type tx-type--sell has-asterisk","q-field tx-type tx-type--buy has-asterisk","q-field tx-type tx-type--buy","q-field tx-type tx-type--sell"])
             if TradeType == None:
-                Trade["type"] = "Tradetype is none"
+                Trade["type"] = "exchange"
             else:
                 Trade["type"] = TradeType.text
             size =(tab.find("span","mt-1 text-size-2 text-txt-dimmer hover:text-foreground")).get_text(" ")
