@@ -545,11 +545,6 @@ function StockAnalysis({ symbol, historicalPriceData, trades }) {
       overflow: 'hidden'
     }}>
       <CardContent sx={{ p: 0 }}>
-        {/* Title Bar */}
-        <Typography variant="h6" sx={{ p: 2, borderBottom: `1px solid ${theme.palette.divider}` }}>
-          Technical Analysis for {symbol.toUpperCase()}
-        </Typography>
-        
         {/* Overall Rating Card */}
         <Paper sx={{ 
           mx: 2, 
