@@ -7,11 +7,16 @@ from datetime import date
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+
 from flask_cors import CORS
 from sqlalchemy import func
 
-# Local application imports
-from .finnhub_client import get_profile, get_quote_data
+from .finnhub_client import get_profile, get_quote_data, get_financials
+from .tiingo_client import get_daily_prices
+
+# local utility items 
+from app.utils import extract_key_metrics
+
 
 # Shared extension objects
 db = SQLAlchemy()
@@ -85,6 +90,7 @@ def create_app():
     def home():
         return "Hello from SmartTick Backend!"
 
+
     @app.route('/api/profile/<symbol>', methods=["GET"])
     def stock_profile(symbol):
         """
@@ -102,6 +108,48 @@ def create_app():
             app.logger.error(f"Failed to fetch profile for {symbol}: {e}", exc_info=True)
             return jsonify({"error": "An internal server error occurred"}), 500
     
+
+    @app.route('/api/financials-compact/<symbol>', methods=["GET"])
+    def stock_financials_compact(symbol):
+        """
+        Fetches a short list of key financial metrics for a stock 
+        from the Finnhub client.
+        """
+        if not symbol:
+            return jsonify({"error": "Stock symbol is required"}), 400
+
+        try:
+            raw = get_financials(symbol.upper())
+            if not raw or "metric" not in raw:
+                return jsonify({"error": f"No financial data for {symbol}"}), 404
+
+            # narrow it down to our 18 fields
+            data = extract_key_metrics(raw)
+
+            return jsonify(data)
+        except Exception as e:
+            app.logger.error(f"Failed to fetch financials for {symbol}: {e}", exc_info=True)
+            return jsonify({"error": "An internal server error occurred"}), 500
+    
+
+    @app.route('/api/financials-extended/<symbol>', methods=["GET"])
+    def stock_financials_extended(symbol):
+        """
+        Fetches the raw stock financial data from the Finnhub client.
+        """
+        if not symbol:
+            return jsonify({"error": "Stock symbol is required"}), 400
+
+        try:
+            financial_data = get_financials(symbol.upper())
+            if not financial_data:
+                return jsonify({"error": f"No profile data found for symbol {symbol}"}), 404
+            return jsonify(financial_data)
+        except Exception as e:
+            app.logger.error(f"Failed to fetch profile for {symbol}: {e}", exc_info=True)
+            return jsonify({"error": "An internal server error occurred"}), 500
+    
+
     @app.route('/api/price/<symbol>', methods=["GET"])
     def realtime_price(symbol):
         """
@@ -118,81 +166,7 @@ def create_app():
         except Exception as e:
             app.logger.error(f"Failed to fetch real-time price for {symbol}: {e}", exc_info=True)
             return jsonify({"error": "An internal server error occurred"}), 500
-
-    @app.route('/api/trades/summary/<symbol>', methods=["GET"])
-    def trade_summary(symbol):
-        """
-        Provides aggregated monthly buy/sell data for a given stock symbol.
-        """
-        if not symbol:
-            return jsonify({"error": "Stock symbol is required"}), 400
-
-        base_symbol = symbol.upper()
-        try:
-            # Fetch trade data from the database
-            results = fetch_trade_data(base_symbol)
-
-            # Process the results into a monthly summary
-            monthly_summary = process_trade_data(results)
-
-            # Format the summary for the response
-            summary_list = format_monthly_summary(monthly_summary)
-
-            return jsonify(summary_list)
-        except Exception as e:
-            app.logger.error(f"Failed to fetch trade summary for {symbol}: {e}", exc_info=True)
-            return jsonify({"error": "An internal server error occurred"}), 500
-
-    @app.route('/api/trades/<symbol>', methods=["GET"])
-    def get_trades_by_symbol(symbol):
-        """
-        Fetches all trade data for the given stock symbol from the Trade table.
-        """
-        if not symbol:
-            return jsonify({"error": "Stock symbol is required"}), 400
-
-        try:
-            # Query the database for trades matching the symbol and sort by date (descending)
-            trades = db.session.query(models.Trade).filter(
-                models.Trade.traded_issuer_ticker.ilike(f"%{symbol.upper()}%")
-            ).order_by(models.Trade.traded.desc()).all()
-
-            if not trades:
-                return jsonify({"error": f"No trade data found for symbol {symbol}"}), 404
-
-            # Convert the trade data to a list of dictionaries
-            trades_data = [trade.to_dict() for trade in trades]
-
-            return jsonify(trades_data)
-        except Exception as e:
-            app.logger.error(f"Failed to fetch trades for {symbol}: {e}", exc_info=True)
-            return jsonify({"error": "An internal server error occurred"}), 500
-
-    @app.route('/api/trades', methods=["GET"])
-    def get_recent_trades():
-        """
-        Fetches trade data from the Trade table, sorted by trade date in descending order.
-        Allows specifying a limit for the number of trades returned via a query parameter.
-        """
-        try:
-            # Get the limit from the query parameters, default to 50 if not provided
-            limit = request.args.get('limit', default=50, type=int)
-
-            # Query the database for trades and sort by date (descending), applying the limit
-            trades = db.session.query(models.Trade).order_by(models.Trade.traded.desc()).limit(limit).all()
-
-            if not trades:
-                return jsonify({"error": "No trade data found"}), 404
-
-            # Convert the trade data to a list of dictionaries
-            trades_data = [trade.to_dict() for trade in trades]
-
-            return jsonify(trades_data)
-        except Exception as e:
-            app.logger.error(f"Failed to fetch trades: {e}", exc_info=True)
-            return jsonify({"error": "An internal server error occurred"}), 500
-
-
+    
     def fetch_trade_data(base_symbol):
         """
         Fetches trade data for the given stock symbol from the database.
@@ -247,5 +221,190 @@ def create_app():
             }
             for key, data in sorted(monthly_summary.items())
         ]
+
+    @app.route('/api/trades/summary/<symbol>', methods=["GET"])
+    def trade_summary(symbol):
+        """
+        Provides aggregated monthly buy/sell data for a given stock symbol.
+        """
+        if not symbol:
+            return jsonify({"error": "Stock symbol is required"}), 400
+
+        base_symbol = symbol.upper()
+        try:
+            # Fetch trade data from the database
+            results = fetch_trade_data(base_symbol)
+
+            # Process the results into a monthly summary
+            monthly_summary = process_trade_data(results)
+
+            # Format the summary for the response
+            summary_list = format_monthly_summary(monthly_summary)
+
+            return jsonify(summary_list)
+        except Exception as e:
+            app.logger.error(f"Failed to fetch trade summary for {symbol}: {e}", exc_info=True)
+            return jsonify({"error": "An internal server error occurred"}), 500
+
+
+    @app.route('/api/trades/<symbol>', methods=["GET"])
+    def get_trades_by_symbol(symbol):
+        """
+        Fetches all trade data for the given stock symbol from the Trade table.
+        """
+        if not symbol:
+            return jsonify({"error": "Stock symbol is required"}), 400
+
+        try:
+            # Query the database for trades matching the symbol and sort by date (descending)
+            trades = db.session.query(models.Trade).filter(
+                models.Trade.traded_issuer_ticker.ilike(f"%{symbol.upper()}%")
+            ).order_by(models.Trade.traded.desc()).all()
+
+            if not trades:
+                return jsonify({"error": f"No trade data found for symbol {symbol}"}), 404
+
+            # Convert the trade data to a list of dictionaries
+            trades_data = [trade.to_dict() for trade in trades]
+
+            return jsonify(trades_data)
+        except Exception as e:
+            app.logger.error(f"Failed to fetch trades for {symbol}: {e}", exc_info=True)
+            return jsonify({"error": "An internal server error occurred"}), 500
+
+
+    @app.route('/api/trades', methods=["GET"])
+    def get_recent_trades():
+        """
+        Fetches trade data from the Trade table, sorted by trade date in descending order.
+        Allows specifying a limit for the number of trades returned via a query parameter.
+        """
+        try:
+            # Get the limit from the query parameters, default to 50 if not provided
+            limit = request.args.get('limit', default=50, type=int)
+
+            # Query the database for trades and sort by date (descending), applying the limit
+            trades = db.session.query(models.Trade).join(models.PoliticianImg, models.Trade.politician_name == models.PoliticianImg.politician_name,isouter=True).order_by(models.Trade.traded.desc()).limit(limit).all()
+
+            if not trades:
+                return jsonify({"error": "No trade data found"}), 404
+
+            # Convert the trade data to a list of dictionaries
+            trades_data = [trade.to_dict() for trade in trades]
+
+            return jsonify(trades_data)
+        except Exception as e:
+            app.logger.error(f"Failed to fetch trades: {e}", exc_info=True)
+            return jsonify({"error": "An internal server error occurred"}), 500
+
+
+    @app.route("/api/prices/<symbol>", methods=["GET"])
+    def daily_prices(symbol):
+        """
+        GET /api/prices/AAPL?start=2024-01-01&end=2024-02-01
+        returns Tiingo daily OHLC data between those dates
+        """
+        # grab and validate query params
+        start_date = request.args.get("start")
+        end_date   = request.args.get("end")
+        if not start_date or not end_date:
+            return jsonify({
+                "error": "Both 'start' and 'end' query parameters are required, in YYYY-MM-DD format."
+            }), 400
+
+        try:
+            data = get_daily_prices(symbol, start_date, end_date)
+            return jsonify({
+                "symbol": symbol.upper(),
+                "start":  start_date,
+                "end":    end_date,
+                "prices": data
+            })
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+        
+
+    @app.route('/api/autocomplete/stocks', methods=["GET"])
+    def autocomplete_stocks():
+        """
+        return a list of stock symbols based on the search 
+        """
+        query = request.args.get('query', '').upper()
+        if not query or len(query) < 1:
+            return jsonify([])
+
+        try:
+            # search for stocks where symbol starts with input
+            stocks = db.session.query(models.Stock).filter(
+                db.or_(
+                    models.Stock.symbol.ilike(f"{query}%"),
+                    models.Stock.name.ilike(f"{query}%")
+                )
+            ).limit(10).all()
+
+            # format results 
+            results = [
+                {
+                    'symbol': stock.symbol,
+                    'name': stock.name,
+                }
+                for stock in stocks
+            ]
+
+            return jsonify(results)
+        except Exception as e:
+            app.logger.error(f"error with stock autocomplete: {e}", exc_info=True)
+            return jsonify([]), 500
+
+    @app.route('/api/autocomplete/politicians', methods=["GET"])
+    def autocomplete_politicians():
+        """
+        return a list of politicians based on the search
+        """
+        query = request.args.get('query', '').lower()
+        if not query or len(query) < 1:
+            return jsonify([])
+
+        try:
+            politicians = db.session.query(
+                models.PoliticianImg
+            ).filter(
+                models.PoliticianImg.politician_name.ilike(f"{query}%")
+            ).distinct().limit(10).all()
+
+            results = [
+                {
+                    'name': politician.politician_name,
+                    'affiliation': politician.politician_family,
+                    'img': politician.img
+                }
+                for politician in politicians
+            ]
+
+            return jsonify(results)
+        except Exception as e:
+            app.logger.error(f"error with politician autocomplete: {e}", exc_info=True)
+            return jsonify([]), 500
+
+    @app.route('/api/pol/image', methods=["GET"])
+    def get_pol_image():
+        """
+        Gets a politician image from database, filtered by politician name.
+        Requires a 'name' parameter. Returns a single object or 404.
+        """
+        query = request.args.get('name', '')
+        if not query or len(query) < 1:
+            return jsonify({"error": "Query parameter 'name' is required."}), 400
+
+        try:
+            image = db.session.query(models.PoliticianImg).filter(
+                func.lower(models.PoliticianImg.politician_name) == query.lower()
+            ).first()
+            if not image:
+                return jsonify({"error": "No Image data found"}), 404
+            return jsonify(image.to_dict())
+        except Exception as e:
+            app.logger.error(f"failed to fetch images: {e}", exc_info=True)
+            return jsonify({"error": "an internal server error occured"}), 500
 
     return app
