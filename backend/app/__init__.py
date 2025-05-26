@@ -390,15 +390,15 @@ def create_app():
     def get_pol_image():
         """
         Gets a politician image from database, filtered by politician name.
-        Requires a 'query' parameter. Returns a single object or 404.
+        Requires a 'name' parameter. Returns a single object or 404.
         """
-        query = request.args.get('query', '').lower()
+        query = request.args.get('name', '')
         if not query or len(query) < 1:
-            return jsonify({"error": "Query parameter 'query' is required."}), 400
+            return jsonify({"error": "Query parameter 'name' is required."}), 400
 
         try:
             image = db.session.query(models.PoliticianImg).filter(
-                models.PoliticianImg.politician_name == query
+                func.lower(models.PoliticianImg.politician_name) == query.lower()
             ).first()
             if not image:
                 return jsonify({"error": "No Image data found"}), 404
