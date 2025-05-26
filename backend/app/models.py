@@ -206,3 +206,16 @@ class StockPrice(db.Model):
 
     def __repr__(self):
         return f"<StockPrice {self.date} Close={self.close}>"
+
+class PoliticianImg(db.Model):
+    id = db.Column(db.Integer, primary_key= True)
+    politician_name = db.Column(db.String(128), nullable = False)
+    politician_family = db.Column(db.String(128))
+    img = db.Column(db.String(256))
+
+    def to_dict(self):
+        return {
+            "politician_name" : self.politician_name,
+            "politician_family" : self.politician_family,
+            "img" : self.img
+        }

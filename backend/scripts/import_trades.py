@@ -136,7 +136,7 @@ def load_trade_data():
     """
     app = create_app()
     with app.app_context():
-        file_path = '1yeartrade.json'
+        file_path = 'data/3yeartrade.json'
 
         try:
             trade_data = load_trade_data_from_file(file_path)
