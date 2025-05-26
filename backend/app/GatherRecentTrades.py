@@ -76,7 +76,8 @@ def getPolData():
             img = tab.find_all("img")
             Politician["img"] = img[0]["src"]
             Trades.append(Trade)
-            Politicians.append(Politician)
+            if Politician not in Politicians:
+                Politicians.append(Politician)
         page_number += 1
         PoliticianTable, pageIndicators = fetchRequest(page_number)
         print(Trades[-1], end=f"\npage:{page_number}\n") #indicates if working

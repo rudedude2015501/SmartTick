@@ -180,7 +180,7 @@ def create_app():
             limit = request.args.get('limit', default=50, type=int)
 
             # Query the database for trades and sort by date (descending), applying the limit
-            trades = db.session.query(models.Trade).order_by(models.Trade.traded.desc()).limit(limit).all()
+            trades = db.session.query(models.Trade).join(models.PoliticianImg, models.Trade.politician_name == models.PoliticianImg.politician_name,isouter=True).order_by(models.Trade.traded.desc()).limit(limit).all()
 
             if not trades:
                 return jsonify({"error": "No trade data found"}), 404
@@ -336,5 +336,22 @@ def create_app():
         except Exception as e:
             app.logger.error(f"error with politician autocomplete: {e}", exc_info=True)
             return jsonify([]), 500
+
+    @app.route('/api/images', methods=["GET"])
+    def get_images():
+        """
+        Get's politician images from database
+        """
+        try:
+            limit = request.args.get('limit', default =50, type=int)
+            #query the db for trades
+            images = db.session.query(models.PoliticianImg).join().limit(limit).all()
+            if not images:
+                return jsonify({"error" : "No Image data found"}), 404
+            image_data = [image.to_dict() for image in images]
+            return jsonify(image_data)
+        except:
+            app.logger.error(f"failed to fet images", exc_info=True)
+            return jsonify({"error": "an internal server error occured"}), 500
 
     return app
