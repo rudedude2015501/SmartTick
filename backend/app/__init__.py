@@ -222,20 +222,6 @@ def create_app():
             for key, data in sorted(monthly_summary.items())
         ]
 
-    def get_politician_total_spending(politician_name):
-        trades = db.session.query(models.Trade.size).filter(
-            models.Trade.politician_name == politician_name,
-            models.Trade.size.isnot(None)
-        ).all()
-        
-        total = 0
-        for trade in trades:
-            if trade.size:
-                amount = size_to_numeric(trade.size)
-                total += amount
-        
-        return total
-
     @app.route('/api/trades/summary/<symbol>', methods=["GET"])
     def trade_summary(symbol):
         """
@@ -420,6 +406,20 @@ def create_app():
         except Exception as e:
             app.logger.error(f"failed to fetch images: {e}", exc_info=True)
             return jsonify({"error": "an internal server error occured"}), 500
+
+    def get_politician_total_spending(politician_name):
+        trades = db.session.query(models.Trade.size).filter(
+            models.Trade.politician_name == politician_name,
+            models.Trade.size.isnot(None)
+        ).all()
+        
+        total = 0
+        for trade in trades:
+            if trade.size:
+                amount = size_to_numeric(trade.size)
+                total += amount
+        
+        return total
 
     @app.route('/api/politicians/stats', methods=["GET"])
     def get_politician_stats():
