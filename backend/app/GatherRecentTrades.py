@@ -30,6 +30,7 @@ def fetchRequest(pageNumber:int = 1):
     PoliticianTable.prettify()
     Page_Indicators = (PoliticianTable.find("p", class_= "hidden leading-7 sm:block")).find_all("b")
     return PoliticianTable, Page_Indicators
+
 def swapWords(string:str):
     """
     Swaps the number and days for "published after" column
@@ -62,7 +63,8 @@ def getPolData():
             datesPublishedAndPosted = tab.find_all("div",class_="text-center")
             Trade["published"] = datesPublishedAndPosted[0].get_text(" ")
             Trade["traded"] = datesPublishedAndPosted[1].get_text(" ")
-            Trade["filed_after"] =(tab.find("div",class_="q-cell cell--reporting-gap flavour--lv")).get_text(" ")
+            raw_filed_after = (tab.find("div", class_="q-cell cell--reporting-gap flavour--lv")).get_text(" ")
+            Trade["filed_after"] = swapWords(raw_filed_after)
             Trade["owner"] =(tab.find("span",class_="q-label")).get_text(" ")
 
             TradeType =tab.find("span", class_=["q-field tx-type tx-type--sell has-asterisk","q-field tx-type tx-type--buy has-asterisk","q-field tx-type tx-type--buy","q-field tx-type tx-type--sell"])
