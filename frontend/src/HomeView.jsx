@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useTheme } from '@mui/material/styles';
 import {
   Box,
@@ -19,29 +19,65 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 
 const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
+// <<<<<<< HEAD
+// export default function HomeView() {
+// =======
+// Simple module-level cache
+let tradesCache = null;
+
 export default function HomeView() {
+  const [allTrades, setAllTrades] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+// >>>>>>> dev
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === 'dark';
   const lightTheme = themeQuartz;
   const darkTheme = themeQuartz.withPart(colorSchemeDark);
+  const fetchTimeout = useRef();
 
-  const [allTrades, setAllTrades] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
+  // const [allTrades, setAllTrades] = useState([]);
+  // const [isLoading, setIsLoading] = useState(false);
+  // const [error, setError] = useState(null);
 
   // fetch trades
   useEffect(() => {
-    setIsLoading(true);
-    setError(null);
+// <<<<<<< HEAD
+    // setIsLoading(true);
+    // setError(null);
 
-    fetch(`${apiUrl}/api/trades?limit=1000000`)
-      .then(res => {
-        if (!res.ok) throw new Error(res.statusText);
-        return res.json();
-      })
-      .then(setAllTrades)
-      .catch(err => setError(err.message))
-      .finally(() => setIsLoading(false));
+    // fetch(`${apiUrl}/api/trades?limit=1000000`)
+    //   .then(res => {
+    //     if (!res.ok) throw new Error(res.statusText);
+    //     return res.json();
+    //   })
+    //   .then(setAllTrades)
+    //   .catch(err => setError(err.message))
+    //   .finally(() => setIsLoading(false));
+// =======
+    if (tradesCache) {
+      setAllTrades(tradesCache);
+      setIsLoading(false);
+      return;
+    }
+
+    const fetchTrades = async () => {
+      try {
+        const response = await fetch(`${apiUrl}/api/trades`);
+        if (!response.ok) {
+          throw new Error(`Error: ${response.statusText}`);
+        }
+        const data = await response.json();
+        tradesCache = data;
+        setAllTrades(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchTrades();
+// >>>>>>> dev
   }, []);
 
   // same columnDefs you already had
