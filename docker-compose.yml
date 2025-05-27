@@ -55,6 +55,21 @@ services:
       - "5433:5432"
     profiles:
       - testing 
+
+  # backend testing service 
+  testbackend: 
+    build: ./backend
+    volumes: 
+      - ./backend:/app 
+    environment:
+      - FLASK_ENV=testing
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@testdb:5432/${POSTGRES_DB}_test
+    depends_on:
+      - testdb
+    #command:
+      #-
+    profiles:
+      - testing
 volumes:
   postgres_data:
   frontend_node_modules:
