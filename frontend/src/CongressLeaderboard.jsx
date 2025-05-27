@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -13,21 +13,22 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { DataGrid } from '@mui/x-data-grid';
 
 // ─── Sample politician data ───
-const politicianData = [
-  {
-    id: 1,
-    name: 'Ashley Moody',
-    party: 'Republican Senate FL',
-    profilePic: '/images/moody.jpg',
-    total_trades: 53,
-    estimated_spending: 2068500.0,
-    sell_trades: 41,
-    buy_trades: 12,
-    buy_percentage: 22.6,
-    different_stocks: 12,
-  },
-  // … add more entries as needed …
-];
+// const politicianData = [
+//   {
+//     id: 1,
+//     name: 'Ashley Moody',
+//     party: 'Republican Senate FL',
+//     profilePic: '/images/moody.jpg',
+//     total_trades: 53,
+//     estimated_spending: 2068500.0,
+//     sell_trades: 41,
+//     buy_trades: 12,
+//     buy_percentage: 22.6,
+//     different_stocks: 12,
+//   },
+//   // … add more entries as needed …
+// ];
+const politicianData = [];
 
 // ─── Metric options ───
 const metricOptions = [
@@ -39,9 +40,33 @@ const metricOptions = [
   { value: 'different_stocks',   label: 'Trade Diversity',    description: 'Count of distinct stocks traded.' },
 ];
 
-export default function CongressLeaderboard() {
+export default function CongressLeaderboard({
+  data,       // <- fetched politicianData
+  isLoading,  // <- loading flag
+  error       // <- error message (if any)
+}) {
+
+  // drop data into local variable
+  const politicianData = data;
+
+  // spinner and error display
+  if (isLoading) return <CircularProgress />;
+  if (error)     return <Alert severity="error">{error}</Alert>;
+
   const [rankMapping, setRankMapping] = useState(politicianData.map(p => p.id));
   const [selectedMetric, setSelectedMetric] = useState(metricOptions[0].value);
+
+  // for pagination functionality
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+
+  useEffect(() => {
+    const initialSorted = [...politicianData]
+      .sort((a, b) => b[selectedMetric] - a[selectedMetric])
+      .map(p => p.id);
+    setRankMapping(initialSorted);
+  }, []); // empty deps so it only runs once
+
 
   const handleMetricChange = (e) => {
     const key = e.target.value;
@@ -128,7 +153,7 @@ export default function CongressLeaderboard() {
       //   if (selectedMetric === 'buy_percentage') return `${Number(value).toFixed(1)}%`;
       //   return Number(value).toLocaleString();
       // },
-      
+
       renderCell: (params) => (
         <Typography sx={{ fontWeight: 'bold', width: '100%', textAlign: 'center' }}>
           {params.formattedValue}
@@ -174,7 +199,15 @@ export default function CongressLeaderboard() {
       <DataGrid
         rows={rows}
         columns={columns}
-        hideFooter
+
+        // pagination options
+        pagination
+        page={page}
+        pageSize={pageSize}
+        onPageChange={(newPage)     => setPage(newPage)}
+        onPageSizeChange={(size)    => setPageSize(size)}
+        rowsPerPageOptions={[5, 10, 25, 50]}  // choose whatever page-sizes you like
+
         disableColumnMenu
         disableSelectionOnClick
         sx={{

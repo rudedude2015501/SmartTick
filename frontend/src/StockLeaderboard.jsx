@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -12,11 +12,12 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { DataGrid } from '@mui/x-data-grid';
 
 // ─── Sample stock data ───
-const stockData = [
-  { id: 'MSFT', name: 'Microsoft Corp', symbol: 'MSFT:US', buy_count: 49, sell_count: 75, buy_ratio: 39.5, trade_count: 124 },
-  { id: 'AAPL', name: 'Apple Inc.',      symbol: 'AAPL:US', buy_count: 60, sell_count: 90, buy_ratio: 40.0, trade_count: 150 },
-  // … add more entries as needed …
-];
+// const stockData = [
+//   { id: 'MSFT', name: 'Microsoft Corp', symbol: 'MSFT:US', buy_count: 49, sell_count: 75, buy_ratio: 39.5, trade_count: 124 },
+//   { id: 'AAPL', name: 'Apple Inc.',      symbol: 'AAPL:US', buy_count: 60, sell_count: 90, buy_ratio: 40.0, trade_count: 150 },
+//   // … add more entries as needed …
+// ];
+const stockData = [];
 
 // ─── Metric options for stocks ───
 const stockMetrics = [
@@ -26,15 +27,47 @@ const stockMetrics = [
   { value: 'buy_ratio',   label: 'Buy %',       description: 'Percentage of trades that are buys.' },
 ];
 
-export default function StockLeaderboard() {
-  const [rankMapping, setRankMapping] = useState(stockData.map((s) => s.id));
+export default function StockLeaderboard({
+  data,       // <- fetched stockData
+  isLoading,  // <- loading flag
+  error       // <- error message (if any)
+}) {
+
+  // drop data into local variable
+  const stockData = data;
+
+  // spinner and error display
+  if (isLoading) return <CircularProgress />;
+  if (error)     return <Alert severity="error">{error}</Alert>;
+
+  const [rankMapping, setRankMapping] = useState(
+    stockData
+      .filter((s) => s.symbol !== 'N/A')
+      .map((s) => s.id)
+  );
+
   const [selectedMetric, setSelectedMetric] = useState(stockMetrics[0].value);
+
+  // for pagination functionality
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+
+
+  useEffect(() => {
+    const initial = stockData
+      .filter(s => s.symbol !== 'N/A')
+      .sort((a, b) => b[selectedMetric] - a[selectedMetric])
+      .map(s => s.id);
+    setRankMapping(initial);
+  }, []); // empty deps so it only runs once
+
 
   const handleMetricChange = (e) => {
     const key = e.target.value;
     setSelectedMetric(key);
     setRankMapping(
-      [...stockData]
+      stockData
+        .filter((s) => s.symbol !== 'N/A')
         .sort((a, b) => b[key] - a[key])
         .map((s) => s.id)
     );
@@ -110,7 +143,7 @@ export default function StockLeaderboard() {
       //   if (selectedMetric === 'buy_ratio') return `${Number(value).toFixed(1)}%`;
       //   return Number(value).toLocaleString();
       // },
-      
+
       renderCell: (params) => (
         <Typography sx={{ fontWeight: 'bold', width: '100%', textAlign: 'center' }}>
           {params.formattedValue}
@@ -156,7 +189,15 @@ export default function StockLeaderboard() {
       <DataGrid
         rows={rows}
         columns={columns}
-        hideFooter
+        
+        // pagination options
+        pagination
+        page={page}
+        pageSize={pageSize}
+        onPageChange={(newPage)     => setPage(newPage)}
+        onPageSizeChange={(size)    => setPageSize(size)}
+        rowsPerPageOptions={[5, 10, 25, 50]}  // choose whatever page-sizes you like
+
         disableColumnMenu
         disableSelectionOnClick
         sx={{

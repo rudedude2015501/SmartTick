@@ -20,42 +20,44 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 
 const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
-// <<<<<<< HEAD
-// export default function HomeView() {
-// =======
 // Simple module-level cache
 let tradesCache = null;
 
 export default function HomeView() {
+  // ——————————— Trades state ———————————
   const [allTrades, setAllTrades] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-// >>>>>>> dev
+
+  // ————————— Politicians state —————————
+  const [politicianData, setPoliticianData] = useState([]);
+  const [politicianCount, setPoliticianCount] = useState(0);
+  const [politicianLoading, setPoliticianLoading] = useState(true);
+  const [politicianError, setPoliticianError] = useState(null);
+
+  // ————————— Stocks state —————————
+  const [stockData, setStockData] = useState([]);
+  const [stockCount, setStockCount] = useState(0);
+  const [stockLoading, setStockLoading] = useState(true);
+  const [stockError, setStockError] = useState(null);
+
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === 'dark';
   const lightTheme = themeQuartz;
   const darkTheme = themeQuartz.withPart(colorSchemeDark);
   const fetchTimeout = useRef();
 
-  // const [allTrades, setAllTrades] = useState([]);
-  // const [isLoading, setIsLoading] = useState(false);
-  // const [error, setError] = useState(null);
+  // helper to assign IDs to stock and politician data
+  const assignUniqueIds = (arr) =>
+  arr.map((item, idx) => ({
+    ...item,
+    // use name + index (or any other unique combo) for id
+    id: `${item.name.replace(/\s+/g, '_').toLowerCase()}_${idx}`,
+  }));
 
   // fetch trades
   useEffect(() => {
-// <<<<<<< HEAD
-    // setIsLoading(true);
-    // setError(null);
 
-    // fetch(`${apiUrl}/api/trades?limit=1000000`)
-    //   .then(res => {
-    //     if (!res.ok) throw new Error(res.statusText);
-    //     return res.json();
-    //   })
-    //   .then(setAllTrades)
-    //   .catch(err => setError(err.message))
-    //   .finally(() => setIsLoading(false));
-// =======
     if (tradesCache) {
       setAllTrades(tradesCache);
       setIsLoading(false);
@@ -78,10 +80,58 @@ export default function HomeView() {
       }
     };
     fetchTrades();
-// >>>>>>> dev
   }, []);
 
-  // same columnDefs you already had
+
+  // ————————— Fetch Politician Stats —————————
+  useEffect(() => {
+    setPoliticianLoading(true);
+    setPoliticianError(null);
+
+    const fetchPoliticians = async () => {
+      try {
+        const res = await fetch(`${apiUrl}/api/politicians/stats`);
+        if (!res.ok) throw new Error(res.statusText);
+        const { count, data: results } = await res.json();
+        const dataWithIds = assignUniqueIds(results);
+        setPoliticianCount(count);
+        setPoliticianData(dataWithIds);
+      } catch (err) {
+        setPoliticianError(err.message);
+      } finally {
+        setPoliticianLoading(false);
+      }
+    };
+
+    fetchPoliticians();
+  }, [apiUrl]);
+
+  // ————————— Fetch Popular Stocks —————————
+  useEffect(() => {
+    setStockLoading(true);
+    setStockError(null);
+
+    const fetchStocks = async () => {
+      try {
+        const res = await fetch(`${apiUrl}/api/stocks/popular`);
+        if (!res.ok) throw new Error(res.statusText);
+        const { count, stocks } = await res.json();
+        const dataWithIds = assignUniqueIds(stocks);
+        console.log(count);
+        setStockCount(count);
+        setStockData(dataWithIds);
+      } catch (err) {
+        setStockError(err.message);
+      } finally {
+        setStockLoading(false);
+      }
+    };
+
+    fetchStocks();
+  }, [apiUrl]);
+
+
+  // column definitions for recent trades table
   const columnDefs = useMemo(() => [
     {
       headerName: 'Politician',
@@ -162,66 +212,8 @@ export default function HomeView() {
     },
   ], []);
 
-  // OLD DESIGN
 
-  // return (
-  //   <Box
-  //     sx={{
-  //       display: 'flex',
-  //       gap: 2,
-  //       alignItems: 'flex-start',
-  //       p: 2,
-  //     }}
-  //   >
-  //     {/* LEFT: Leaderboard */}
-  //     <Paper elevation={2} sx={{ width: '40%', p: 2, borderRadius: 3 }}>
-  //     {/*<Box sx={{ width: '40%' }}>*/}
-  //       <Leaderboard />
-  //     {/*</Box>*/}
-  //     </Paper>
-
-  //     {/* RIGHT: Recent Trades */}
-  //     <Paper elevation={2} sx={{ flex: 1, p: 2, borderRadius: 3 }}>
-  //     {/*<Box sx={{ flex: 1 }}>*/}
-  //       {isLoading && (
-  //         <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
-  //           <CircularProgress />
-  //         </Box>
-  //       )}
-  //       {error && <Alert severity="error">{error}</Alert>}
-  //       {!isLoading && !error && (
-  //         allTrades.length === 0 ? (
-  //           <Typography
-  //             variant="h6"
-  //             align="center"
-  //             sx={{ color: 'text.secondary', mt: 4 }}
-  //           >
-  //             No recent trades found.
-  //           </Typography>
-  //         ) : (
-  //           <>
-  //             <Typography variant="h5" align="center" sx={{ mb: 2 }}>
-  //               Recent Trades
-  //             </Typography>
-  //             <Box sx={{ width: '100%', height: 600 }}>
-  //               <AgGridReact
-  //                 rowData={allTrades}
-  //                 columnDefs={columnDefs}
-  //                 pagination
-  //                 paginationPageSize={20}
-  //                 suppressCellFocus
-  //                 theme={isDarkMode ? darkTheme : lightTheme}
-  //               />
-  //             </Box>
-  //           </>
-  //         )
-  //       )}
-  //     {/*</Box>*/}
-  //     </Paper>
-  //   </Box>
-  // );
-
-  // REDESIGN
+  // NEW DESIGN
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 6, p: 4, alignItems: 'center' }}>
       {/* ─── Top Section: Overall Scores ─── */}
@@ -335,15 +327,30 @@ export default function HomeView() {
             {/* LEFT: Politician Metrics Leaderboard */}
             <Paper elevation={2} sx={{ width: '50%', p: 2, borderRadius: 3 }}>
               <Box sx={{ width: '100%' }}>
-                <CongressLeaderboard />
+                {politicianLoading
+                  ? <CircularProgress />
+                  : politicianError
+                    ? <Alert severity="error">{politicianError}</Alert>
+                    : <CongressLeaderboard
+                        data={politicianData}
+                        isLoading={politicianLoading}
+                        error={politicianError}
+                      />}
               </Box>
             </Paper>
 
             {/* RIGHT: Stock Metrics Leaderboard */}
             <Paper elevation={2} sx={{ flex: 1, p: 2, borderRadius: 3 }}>
               <Box sx={{ width: '100%' }}>
-                {/* Placeholder */}
-                <StockLeaderboard />
+                {stockLoading
+                  ? <CircularProgress />
+                  : stockError
+                    ? <Alert severity="error">{politicianError}</Alert>
+                    : <StockLeaderboard
+                        data={stockData}
+                        isLoading={stockLoading}
+                        error={stockError}
+                      />}
               </Box>
             </Paper>
           </Box>

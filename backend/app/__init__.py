@@ -420,7 +420,7 @@ def create_app():
     @app.route('/api/politicians/stats', methods=["GET"])
     def get_politician_stats():
         try:
-            limit = request.args.get('limit', 100, type=int)
+            limit = request.args.get('limit', 500, type=int)
             min_trades = request.args.get('min_trades', 1, type=int)
         
             politician_query = db.session.query(
@@ -477,7 +477,7 @@ def create_app():
     @app.route('/api/stocks/popular', methods=["GET"])
     def get_popular_stocks():
         try:
-            limit = request.args.get('limit', 50, type=int)
+            limit = request.args.get('limit', 500, type=int)
             
             stock_stats = db.session.query(
                 models.Trade.traded_issuer_ticker,
