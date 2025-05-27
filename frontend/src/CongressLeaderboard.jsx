@@ -1,120 +1,174 @@
 import React, { useState } from 'react';
-import { Box, Typography, Avatar, Button } from '@mui/material';
+import {
+  Box,
+  Typography,
+  Avatar,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Tooltip,
+} from '@mui/material';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { DataGrid } from '@mui/x-data-grid';
 
-// ─── Separate politician data ───
+// ─── Sample politician data ───
 const politicianData = [
-  { id: 1, name: 'Rep. Smith',      profilePic: '/images/smith.jpg',      totalTrades: 120, totalSpending: 250_000 },
-  { id: 2, name: 'Sen. Doe',        profilePic: '/images/doe.jpg',        totalTrades: 95,  totalSpending:  18_500 },
-  { id: 3, name: 'Rep. Johnson',    profilePic: '/images/johnson.jpg',    totalTrades: 80,  totalSpending: 160_750 },
-  { id: 4, name: 'Sen. Williams',   profilePic: '/images/williams.jpg',   totalTrades: 150, totalSpending:  30_000 },
-  { id: 5, name: 'Rep. Brown',      profilePic: '/images/brown.jpg',      totalTrades: 45,  totalSpending:  95_000 },
-  { id: 6, name: 'Sen. Davis',      profilePic: '/images/davis.jpg',      totalTrades: 200, totalSpending:  50_000 },
-  { id: 7, name: 'Rep. Miller',     profilePic: '/images/miller.jpg',     totalTrades: 60,  totalSpending: 120_000 },
-  { id: 8, name: 'Sen. Wilson',     profilePic: '/images/wilson.jpg',     totalTrades: 30,  totalSpending:  50_000 },
-  { id: 9, name: 'Rep. Moore',      profilePic: '/images/moore.jpg',      totalTrades: 110, totalSpending: 220_000 },
-  { id: 10, name: 'Sen. Taylor',    profilePic: '/images/taylor.jpg',     totalTrades: 85,  totalSpending: 175_000 },
-  { id: 11, name: 'Rep. Anderson',  profilePic: '/images/anderson.jpg',   totalTrades: 140, totalSpending: 325_000 },
-  { id: 12, name: 'Sen. Thomas',    profilePic: '/images/thomas.jpg',     totalTrades: 25,  totalSpending:  40_000 },
+  {
+    id: 1,
+    name: 'Ashley Moody',
+    party: 'Republican Senate FL',
+    profilePic: '/images/moody.jpg',
+    total_trades: 53,
+    estimated_spending: 2068500.0,
+    sell_trades: 41,
+    buy_trades: 12,
+    buy_percentage: 22.6,
+    different_stocks: 12,
+  },
+  // … add more entries as needed …
 ];
 
-export default function Leaderboard() {
-  // State: an array of politician IDs in current rank order
-  const [rankMapping, setRankMapping] = useState(
-    politicianData.map((p) => p.id)
-  );
+// ─── Metric options ───
+const metricOptions = [
+  { value: 'total_trades',      label: 'Total Trades',      description: 'Total number of buy and sell trades.' },
+  { value: 'estimated_spending', label: 'Estimated Spending', description: 'Approximate total amount spent.' },
+  { value: 'sell_trades',        label: 'Sell Trades',        description: 'Number of sell trades executed.' },
+  { value: 'buy_trades',         label: 'Buy Trades',         description: 'Number of buy trades executed.' },
+  { value: 'buy_percentage',     label: 'Buy %',              description: 'Percent of trades that are buys.' },
+  { value: 'different_stocks',   label: 'Trade Diversity',    description: 'Count of distinct stocks traded.' },
+];
 
-  // Sorting function: takes a key ('totalTrades' or 'totalSpending')
-  const sortBy = (key) => {
-    // Sort a copy of politicianData descending by the chosen key
-    const sortedIds = [...politicianData]
-      .sort((a, b) => b[key] - a[key])
-      .map((p) => p.id);
-    setRankMapping(sortedIds);
+export default function CongressLeaderboard() {
+  const [rankMapping, setRankMapping] = useState(politicianData.map(p => p.id));
+  const [selectedMetric, setSelectedMetric] = useState(metricOptions[0].value);
+
+  const handleMetricChange = (e) => {
+    const key = e.target.value;
+    setSelectedMetric(key);
+    setRankMapping(
+      [...politicianData]
+        .sort((a, b) => b[key] - a[key])
+        .map(p => p.id)
+    );
   };
 
-  // Build rows array for DataGrid based on current rankMapping
   const rows = rankMapping.map((id, idx) => {
-    const p = politicianData.find((x) => x.id === id);
+    const p = politicianData.find(x => x.id === id);
     return {
-      id: p.id,
+      id,
       rank: idx + 1,
       name: p.name,
+      party: p.party,
       profilePic: p.profilePic,
-      totalTrades: p.totalTrades,
-      totalSpending: p.totalSpending,
+      metric: p[selectedMetric],
     };
   });
 
-  // Column definitions: disable built-in sorting on all columns
   const columns = [
     {
       field: 'rank',
       headerName: 'Rank',
-      width: 60,
+      width: 80,
       sortable: false,
       headerAlign: 'center',
       align: 'center',
+      renderCell: (params) => (
+        <Typography sx={{ fontWeight: 'bold', width: '100%', textAlign: 'center' }}>
+          {params.value}
+        </Typography>
+      ),
+      renderHeader: (params) => (
+        <Typography sx={{ fontWeight: 'bold', width: '100%', textAlign: 'center' }}>
+          {params.colDef.headerName}
+        </Typography>
+      ),
     },
     {
       field: 'name',
       headerName: 'Name',
       flex: 1,
       sortable: false,
+      headerAlign: 'left',
+      align: 'left',
       renderCell: (params) => (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Avatar
-            src={params.row.profilePic}
-            alt={params.value}
-            sx={{ width: 28, height: 28, mr: 1 }}
-          />
-          <Typography variant="body2">{params.value}</Typography>
+          <Avatar src={params.row.profilePic} sx={{ width: 24, height: 24, mr: 1 }} />
+          <Typography sx={{ fontWeight: 'bold' }}>{params.value}</Typography>
         </Box>
+      ),
+      renderHeader: (params) => (
+        <Typography sx={{ fontWeight: 'bold' }}>{params.colDef.headerName}</Typography>
       ),
     },
     {
-      field: 'totalTrades',
-      headerName: 'Total Trades',
-      width: 130,
+      field: 'party',
+      headerName: 'Party',
+      flex: 1,
       sortable: false,
-      headerAlign: 'center',
-      align: 'center',
+      headerAlign: 'left',
+      align: 'left',
+      renderCell: (params) => <Typography>{params.value}</Typography>,
+      renderHeader: (params) => (
+        <Typography sx={{ fontWeight: 'bold' }}>{params.colDef.headerName}</Typography>
+      ),
     },
     {
-      field: 'totalSpending',
-      headerName: 'Total Spending',
-      width: 150,
+      field: 'metric',
+      headerName: metricOptions.find(m => m.value === selectedMetric).label,
+      width: 160,
       sortable: false,
       headerAlign: 'center',
       align: 'center',
-      // valueFormatter: ({ value }) => `$${value.toLocaleString()}`,
+
+      // VALUE FORMATTING DOES NOT WORK
+      // valueFormatter: ({ value }) => {
+      //   if (value == null) return '—';
+      //   if (selectedMetric === 'estimated_spending') return `$${Number(value).toLocaleString()}`;
+      //   if (selectedMetric === 'buy_percentage') return `${Number(value).toFixed(1)}%`;
+      //   return Number(value).toLocaleString();
+      // },
+      
+      renderCell: (params) => (
+        <Typography sx={{ fontWeight: 'bold', width: '100%', textAlign: 'center' }}>
+          {params.formattedValue}
+        </Typography>
+      ),
+      renderHeader: (params) => (
+        <Typography sx={{ fontWeight: 'bold', width: '100%', textAlign: 'center' }}>
+          {params.colDef.headerName}
+        </Typography>
+      ),
     },
   ];
 
   return (
     <Box>
-      <Typography
-        variant="h5"
-        align="center"
-        sx={{ mb: 2 }}
-      >
+      <Typography variant="h5" align="center" sx={{ mb: 2 }}>
         Politician Leaderboard
       </Typography>
 
-      {/* Sort buttons */}
-      <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1, mb: 2 }}>
-        <Button
-          variant="outlined"
-          onClick={() => sortBy('totalTrades')}
-        >
-          By Total Trades
-        </Button>
-        <Button
-          variant="outlined"
-          onClick={() => sortBy('totalSpending')}
-        >
-          By Total Spending
-        </Button>
+      <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+        <FormControl size="small">
+          <InputLabel id="metric-select-label">Metric</InputLabel>
+          <Select
+            labelId="metric-select-label"
+            value={selectedMetric}
+            label="Metric"
+            onChange={handleMetricChange}
+          >
+            {metricOptions.map((opt) => (
+              <MenuItem key={opt.value} value={opt.value}>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                  {opt.label}
+                  <Tooltip title={opt.description} arrow>
+                    <InfoOutlinedIcon fontSize="small" sx={{ ml: 1, color: 'text.secondary' }} />
+                  </Tooltip>
+                </Box>
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
       </Box>
 
       <DataGrid
@@ -124,22 +178,20 @@ export default function Leaderboard() {
         disableColumnMenu
         disableSelectionOnClick
         sx={{
-          height: 550, // ← Fixed height here
+          height: 550,
           border: '1px solid',
           borderColor: 'divider',
           borderRadius: 2,
-          '& .MuiDataGrid-cell': {
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'flex-start',
-            fontWeight: 'bold',
-          },
           '& .MuiDataGrid-columnHeader': {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'flex-start',
-            fontWeight: 'bold',
           },
+          '& .MuiDataGrid-cell': {
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'flex-start',
+          }
         }}
       />
     </Box>

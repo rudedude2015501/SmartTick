@@ -14,6 +14,7 @@ import { themeQuartz, colorSchemeDark } from 'ag-grid-community';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 
 import CongressLeaderboard from './CongressLeaderboard';
+import StockLeaderboard from './StockLeaderboard';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -342,7 +343,7 @@ export default function HomeView() {
             <Paper elevation={2} sx={{ flex: 1, p: 2, borderRadius: 3 }}>
               <Box sx={{ width: '100%' }}>
                 {/* Placeholder */}
-                <CongressLeaderboard />
+                <StockLeaderboard />
               </Box>
             </Paper>
           </Box>
