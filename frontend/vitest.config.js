@@ -6,9 +6,9 @@ export default defineConfig({
     test: {
         globals: true,
         environment: 'jsdom',
-        setupFiles: '.src/testsetup.js',
+        setupFiles: './src/testsetup.js',
         coverage: {
-            provider: 'instanbul',
+            provider: 'istanbul',
             reporter: ['text', 'json', 'html']
         }
     }

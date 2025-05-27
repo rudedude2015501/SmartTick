@@ -17,4 +17,4 @@ COPY . .
 EXPOSE 5173
 
 # Command to run the development server when the container starts
-CMD ["npm", "run", "dev", "test"]
+CMD ["npm", "run", "dev"]
