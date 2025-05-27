@@ -25,7 +25,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import TradeChart from './Chart'; // For politician trade summary
 import HistoricalPriceChart from './HistoricalPriceChart'; // For Tiingo stock price history
 
-// Adding StockAnalysis.jsx, with analysis functionality
+// StockAnalysis.jsx module
 import StockAnalysis from './StockAnalysis';
 
 // Adding Financials.jsx to format financial information
