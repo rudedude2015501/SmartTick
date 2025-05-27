@@ -98,7 +98,7 @@ export default function Leaderboard() {
         align="center"
         sx={{ mb: 2 }}
       >
-        Top Traders
+        Politician Leaderboard
       </Typography>
 
       {/* Sort buttons */}

@@ -5,13 +5,15 @@ import {
   Typography,
   CircularProgress,
   Alert,
-  Paper
+  Paper,
+  Grid,
+  Divider
 } from '@mui/material';
 import { AgGridReact } from 'ag-grid-react';
 import { themeQuartz, colorSchemeDark } from 'ag-grid-community';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 
-import Leaderboard from './Leaderboard';
+import CongressLeaderboard from './CongressLeaderboard';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -123,60 +125,192 @@ export default function HomeView() {
     },
   ], []);
 
-  return (
-    <Box
-      sx={{
-        display: 'flex',
-        gap: 2,
-        alignItems: 'flex-start',
-        p: 2,
-      }}
-    >
-      {/* LEFT: Leaderboard */}
-      <Paper elevation={2} sx={{ width: '40%', p: 2, borderRadius: 3 }}>
-      {/*<Box sx={{ width: '40%' }}>*/}
-        <Leaderboard />
-      {/*</Box>*/}
-      </Paper>
+  // OLD DESIGN
 
-      {/* RIGHT: Recent Trades */}
-      <Paper elevation={2} sx={{ flex: 1, p: 2, borderRadius: 3 }}>
-      {/*<Box sx={{ flex: 1 }}>*/}
-        {isLoading && (
-          <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
-            <CircularProgress />
-          </Box>
-        )}
-        {error && <Alert severity="error">{error}</Alert>}
-        {!isLoading && !error && (
-          allTrades.length === 0 ? (
-            <Typography
-              variant="h6"
-              align="center"
-              sx={{ color: 'text.secondary', mt: 4 }}
-            >
-              No recent trades found.
-            </Typography>
-          ) : (
-            <>
-              <Typography variant="h5" align="center" sx={{ mb: 2 }}>
-                Recent Trades
-              </Typography>
-              <Box sx={{ width: '100%', height: 600 }}>
-                <AgGridReact
-                  rowData={allTrades}
-                  columnDefs={columnDefs}
-                  pagination
-                  paginationPageSize={20}
-                  suppressCellFocus
-                  theme={isDarkMode ? darkTheme : lightTheme}
-                />
+  // return (
+  //   <Box
+  //     sx={{
+  //       display: 'flex',
+  //       gap: 2,
+  //       alignItems: 'flex-start',
+  //       p: 2,
+  //     }}
+  //   >
+  //     {/* LEFT: Leaderboard */}
+  //     <Paper elevation={2} sx={{ width: '40%', p: 2, borderRadius: 3 }}>
+  //     {/*<Box sx={{ width: '40%' }}>*/}
+  //       <Leaderboard />
+  //     {/*</Box>*/}
+  //     </Paper>
+
+  //     {/* RIGHT: Recent Trades */}
+  //     <Paper elevation={2} sx={{ flex: 1, p: 2, borderRadius: 3 }}>
+  //     {/*<Box sx={{ flex: 1 }}>*/}
+  //       {isLoading && (
+  //         <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+  //           <CircularProgress />
+  //         </Box>
+  //       )}
+  //       {error && <Alert severity="error">{error}</Alert>}
+  //       {!isLoading && !error && (
+  //         allTrades.length === 0 ? (
+  //           <Typography
+  //             variant="h6"
+  //             align="center"
+  //             sx={{ color: 'text.secondary', mt: 4 }}
+  //           >
+  //             No recent trades found.
+  //           </Typography>
+  //         ) : (
+  //           <>
+  //             <Typography variant="h5" align="center" sx={{ mb: 2 }}>
+  //               Recent Trades
+  //             </Typography>
+  //             <Box sx={{ width: '100%', height: 600 }}>
+  //               <AgGridReact
+  //                 rowData={allTrades}
+  //                 columnDefs={columnDefs}
+  //                 pagination
+  //                 paginationPageSize={20}
+  //                 suppressCellFocus
+  //                 theme={isDarkMode ? darkTheme : lightTheme}
+  //               />
+  //             </Box>
+  //           </>
+  //         )
+  //       )}
+  //     {/*</Box>*/}
+  //     </Paper>
+  //   </Box>
+  // );
+
+  // REDESIGN
+  return (
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 6, p: 4, alignItems: 'center' }}>
+      {/* ─── Top Section: Overall Scores ─── */}
+      <Box sx={{ width: '100%', textAlign: 'center' }}>
+        <Typography
+          variant="h4"
+          component="h2"
+          sx={{ fontWeight: 'bold', mb: 1, color: 'primary.main' }}
+        >
+          Market Pulse
+        </Typography>
+        <Typography
+          variant="subtitle1"
+          sx={{ mb: 3, fontStyle: 'italic', color: 'text.secondary' }}
+        >
+          Discover the overall buy/sell strength of stocks and performance scores of politicians, all in one snapshot.
+        </Typography>
+        <Grid container spacing={3} justifyContent="center">
+          <Grid item xs={12} md={6}>
+            <Paper elevation={1} sx={{ p: 2, height: 300 }}>
+              {/* Politician Overall Score Leaderboard Placeholder */}
+            </Paper>
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <Paper elevation={1} sx={{ p: 2, height: 300 }}>
+              {/* Stock Buy/Sell Strength Leaderboard Placeholder */}
+            </Paper>
+          </Grid>
+        </Grid>
+      </Box>
+
+      <Divider sx={{ width: '80%' }} />
+
+      {/* ─── Middle Section: Recent Trades ─── */}
+      <Box sx={{ width: '100%', textAlign: 'center' }}>
+        <Typography
+          variant="h4"
+          component="h2"
+          sx={{ fontWeight: 'bold', mb: 1, color: 'primary.main' }}
+        >
+          Recent Trades
+        </Typography>
+        <Typography
+          variant="subtitle1"
+          sx={{ mb: 3, fontStyle: 'italic', color: 'text.secondary' }}
+        >
+          An up-to-date list of the most recent trades made by politicians.
+        </Typography>
+        <Paper elevation={2} sx={{ flex: 1, p: 2, borderRadius: 3 }}>
+          <Box sx={{ flex: 1 }}>
+            {isLoading && (
+              <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+                <CircularProgress />
               </Box>
-            </>
-          )
-        )}
-      {/*</Box>*/}
-      </Paper>
+            )}
+            {error && <Alert severity="error">{error}</Alert>}
+            {!isLoading && !error && (
+              allTrades.length === 0 ? (
+                <Typography
+                  variant="h6"
+                  align="center"
+                  sx={{ color: 'text.secondary', mt: 4 }}
+                >
+                  No recent trades found.
+                </Typography>
+              ) : (
+                <>
+
+                  <Box sx={{ width: '100%', height: 600 }}>
+                    <AgGridReact
+                      rowData={allTrades}
+                      columnDefs={columnDefs}
+                      pagination
+                      paginationPageSize={20}
+                      suppressCellFocus
+                      theme={isDarkMode ? darkTheme : lightTheme}
+                    />
+                  </Box>
+                </>
+              )
+            )}
+          </Box>
+        </Paper>
+      </Box>
+
+      <Divider sx={{ width: '80%' }} />
+
+      {/* ─── Bottom Section: Metric Rankings ─── */}
+      <Box sx={{ width: '100%', textAlign: 'center' }}>
+        <Typography
+          variant="h4"
+          component="h2"
+          sx={{ fontWeight: 'bold', mb: 1, color: 'primary.main' }}
+        >
+          Focused Metrics
+        </Typography>
+        <Typography
+          variant="subtitle1"
+          sx={{ mb: 3, fontStyle: 'italic', color: 'text.secondary' }}
+        >
+          Dive deeper into rankings of politicians and stocks by specific metrics.
+        </Typography>
+          <Box
+            sx={{
+              display: 'flex',
+              gap: 2,
+              alignItems: 'flex-start',
+              p: 2,
+            }}
+          >
+            {/* LEFT: Politician Metrics Leaderboard */}
+            <Paper elevation={2} sx={{ width: '50%', p: 2, borderRadius: 3 }}>
+              <Box sx={{ width: '100%' }}>
+                <CongressLeaderboard />
+              </Box>
+            </Paper>
+
+            {/* RIGHT: Stock Metrics Leaderboard */}
+            <Paper elevation={2} sx={{ flex: 1, p: 2, borderRadius: 3 }}>
+              <Box sx={{ width: '100%' }}>
+                {/* Placeholder */}
+                <CongressLeaderboard />
+              </Box>
+            </Paper>
+          </Box>
+      </Box>
     </Box>
   );
 }
