@@ -276,15 +276,11 @@ def create_app():
     @app.route('/api/trades', methods=["GET"])
     def get_recent_trades():
         """
-        Fetches trade data from the Trade table, sorted by trade date in descending order.
-        Allows specifying a limit for the number of trades returned via a query parameter.
+        Fetches all trade data from the Trade table, sorted by trade date in descending order.
         """
         try:
-            # Get the limit from the query parameters, default to 50 if not provided
-            limit = request.args.get('limit', default=50, type=int)
-
-            # Query the database for trades and sort by date (descending), applying the limit
-            trades = db.session.query(models.Trade).join(models.PoliticianImg, models.Trade.politician_name == models.PoliticianImg.politician_name,isouter=True).order_by(models.Trade.traded.desc()).limit(limit).all()
+            # Query the database for trades and sort by date (descending), no join, no limit
+            trades = db.session.query(models.Trade).order_by(models.Trade.traded.desc()).all()
 
             if not trades:
                 return jsonify({"error": "No trade data found"}), 404
