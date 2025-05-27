@@ -42,6 +42,19 @@ services:
       - CHOKIDAR_USEPOLLING=true
       - VITE_API_URL=http://localhost:5000
 
+
+  # the following are the testing environment services 
+  # separate db service for tesing 
+  testdb:
+    image: postgres:15.10
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}_test
+    ports:
+      - "5433:5432"
+    profiles:
+      - testing 
 volumes:
   postgres_data:
   frontend_node_modules:
