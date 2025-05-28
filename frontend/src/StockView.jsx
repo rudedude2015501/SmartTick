@@ -409,7 +409,7 @@ function StockView({ searchSymbol }) {
                   {historicalPriceData.length === 0 && trades.length === 0 ? 
                     "Both historical price data and congressional trades are required for technical analysis." :
                     historicalPriceData.length === 0 ? 
-                    "Historical price data is missing. Unable to perform technical analysis." :
+                    "Historical price data is missing. Hence, unable to perform technical analysis." :
                     "No congressional trade data available for sentiment analysis."}
                 </Alert>
               )
