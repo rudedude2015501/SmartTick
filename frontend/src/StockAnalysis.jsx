@@ -32,9 +32,9 @@ function StockAnalysis({ symbol, historicalPriceData, trades }) {
     if (!historicalPriceData || historicalPriceData.length < 10 || !trades || trades.length === 0) {
       setMetrics(null);
       if (historicalPriceData && historicalPriceData.length < 10) {
-        setError("Not enough historical price data. Need at least 10 days of data.");
+        setError("There is not enough historical price data. Need at least 10 days of data.");
       } else if (!trades || trades.length === 0) {
-        setError("No congressional trade data available for sentiment analysis.");
+        setError("There is no congressional trade data available for sentiment analysis.");
       }
       return;
     }
