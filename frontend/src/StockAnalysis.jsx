@@ -21,11 +21,11 @@ import Tooltip from '@mui/material/Tooltip';
 const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 function StockAnalysis({ symbol, historicalPriceData, trades }) {
-  const theme = useTheme();
-  const [metrics, setMetrics] = useState(null);
-  const [isCalculating, setIsCalculating] = useState(false);
-  const [error, setError] = useState(null);
-  const [signals, setSignals] = useState([]);
+  //const theme = useTheme();
+  //const [metrics, setMetrics] = useState(null);
+  //const [isCalculating, setIsCalculating] = useState(false);
+  //const [error, setError] = useState(null);
+  //const [signals, setSignals] = useState([]);
 
   useEffect(() => {
     // Require both data sources to proceed
