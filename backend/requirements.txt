@@ -8,10 +8,10 @@ Flask-Migrate==4.0.4      # Database migrations
 psycopg2-binary==2.9.6    # PostgreSQL adapter
 
 # api development 
-python-dotenv==1.0.0      # Environment variables
-requests==2.31.0          # For fetching external API data
-finnhub-python==2.4.0     # Finnhub API Client
-tiingo==0.16.1	  	  # Tiingo API Client
+python-dotenv==1.0.0        # Environment variables
+requests==2.31.0            # For fetching external API data
+finnhub-python==2.4.0       # Finnhub API Client
+tiingo==0.16.1	  	        # Tiingo API Client
 
 # python utility packages
 numpy==1.26.4
@@ -20,3 +20,10 @@ python-dateutil==2.8.2    # For date handling
 
 # WebSocket support
 websocket-client==1.6.2   # For real-time data streaming
+
+# testing dependencies 
+pytest==8.3.5           # testing framework 
+pytest-flask==1.3.0     # flask specific extensions
+pytest-cov==6.1.1       # coverage report
+factory-boy==3.3.3      # test data factories
+responses==0.25.7       # mock HTTP requests 
