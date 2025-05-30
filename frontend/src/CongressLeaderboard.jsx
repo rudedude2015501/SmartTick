@@ -12,22 +12,7 @@ import {
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { DataGrid } from '@mui/x-data-grid';
 
-// ─── Sample politician data ───
-// const politicianData = [
-//   {
-//     id: 1,
-//     name: 'Ashley Moody',
-//     party: 'Republican Senate FL',
-//     profilePic: '/images/moody.jpg',
-//     total_trades: 53,
-//     estimated_spending: 2068500.0,
-//     sell_trades: 41,
-//     buy_trades: 12,
-//     buy_percentage: 22.6,
-//     different_stocks: 12,
-//   },
-//   // … add more entries as needed …
-// ];
+// List containing data for all politicians
 const politicianData = [];
 
 // ─── Metric options ───
@@ -60,6 +45,7 @@ export default function CongressLeaderboard({
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
 
+  // runs once when loading the page to initially sort leaderboard data 
   useEffect(() => {
     const initialSorted = [...politicianData]
       .sort((a, b) => b[selectedMetric] - a[selectedMetric])
@@ -67,7 +53,7 @@ export default function CongressLeaderboard({
     setRankMapping(initialSorted);
   }, []); // empty deps so it only runs once
 
-
+  // automatically sorts leaderboard by the correct metric when selected
   const handleMetricChange = (e) => {
     const key = e.target.value;
     setSelectedMetric(key);
@@ -118,7 +104,7 @@ export default function CongressLeaderboard({
       align: 'left',
       renderCell: (params) => (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Avatar src={params.row.profilePic} sx={{ width: 24, height: 24, mr: 1 }} />
+          {/*<Avatar src={params.row.profilePic} sx={{ width: 24, height: 24, mr: 1 }} />*/}
           <Typography sx={{ fontWeight: 'bold' }}>{params.value}</Typography>
         </Box>
       ),
@@ -173,6 +159,7 @@ export default function CongressLeaderboard({
         Politician Leaderboard
       </Typography>
 
+      {/*Metric dropdown selector*/}
       <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
         <FormControl size="small">
           <InputLabel id="metric-select-label">Metric</InputLabel>
@@ -196,6 +183,7 @@ export default function CongressLeaderboard({
         </FormControl>
       </Box>
 
+      {/*Main Leaderboard Display*/}
       <DataGrid
         rows={rows}
         columns={columns}

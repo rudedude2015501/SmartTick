@@ -15,7 +15,6 @@ import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 
 import CongressLeaderboard from './CongressLeaderboard';
 import StockLeaderboard from './StockLeaderboard';
-import { CongressOverall, StockOverall } from './OverallLeaderboards';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -217,43 +216,8 @@ export default function HomeView() {
   // NEW DESIGN
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 6, p: 4, alignItems: 'center' }}>
-      {/* ─── Top Section: Overall Scores ─── */}
-      {/*<Box sx={{ width: '100%', textAlign: 'center' }}>*/}
-{/*        <Typography
-          variant="h4"
-          component="h2"
-          sx={{ fontWeight: 'bold', mb: 1, color: 'primary.main' }}
-        >
-          Market Pulse
-        </Typography>*/}
-{/*        <Typography
-          variant="subtitle1"
-          sx={{ mb: 3, fontStyle: 'italic', color: 'text.secondary' }}
-        >
-          Discover the overall buy/sell strength of stocks and performance scores of politicians, all in one snapshot.
-        </Typography>*/}
-{/*        <Box
-            sx={{
-              display: 'flex',
-              gap: 2,
-              alignItems: 'flex-start',
-              p: 2,
-            }}
-        >*/}
-          {/*<Paper elevation={2} sx={{ width: '50%', p: 2, borderRadius: 3 }}>*/}
-            {/* Politician Overall Score Leaderboard Placeholder */}
-            {/*<CongressOverall />*/}
-          {/*</Paper>*/}
 
-
-          {/*<Paper elevation={2} sx={{ flex: 1, p: 2, borderRadius: 3 }}>*/}
-            {/* Stock Buy/Sell Strength Leaderboard Placeholder */}
-            {/*<StockOverall />*/}
-          {/*</Paper>*/}
-        {/*</Box>*/}
-      {/*</Box>*/}
-
-      {/* ─── (New) Top Section: Metric Rankings ─── */}
+      {/* ─── Top Section: Metric Rankings ─── */}
       <Box sx={{ width: '100%', textAlign: 'center' }}>
         <Typography
           variant="h4"
@@ -310,7 +274,7 @@ export default function HomeView() {
 
       <Divider sx={{ width: '80%' }} />
 
-      {/* ─── Middle Section: Recent Trades ─── */}
+      {/* ─── Bottom Section: Recent Trades ─── */}
       <Box sx={{ width: '100%', textAlign: 'center' }}>
         <Typography
           variant="h4"

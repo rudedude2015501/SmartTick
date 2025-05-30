@@ -11,12 +11,7 @@ import {
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { DataGrid } from '@mui/x-data-grid';
 
-// ─── Sample stock data ───
-// const stockData = [
-//   { id: 'MSFT', name: 'Microsoft Corp', symbol: 'MSFT:US', buy_count: 49, sell_count: 75, buy_ratio: 39.5, trade_count: 124 },
-//   { id: 'AAPL', name: 'Apple Inc.',      symbol: 'AAPL:US', buy_count: 60, sell_count: 90, buy_ratio: 40.0, trade_count: 150 },
-//   // … add more entries as needed …
-// ];
+// List containing data for all stocks
 const stockData = [];
 
 // ─── Metric options for stocks ───
@@ -42,6 +37,7 @@ export default function StockLeaderboard({
 
   const [rankMapping, setRankMapping] = useState(
     stockData
+      // filter out stocks with invalid (N/A) symbols
       .filter((s) => s.symbol !== 'N/A')
       .map((s) => s.id)
   );
@@ -52,7 +48,7 @@ export default function StockLeaderboard({
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
 
-
+  // runs once when loading the page to initially sort leaderboard data 
   useEffect(() => {
     const initial = stockData
       .filter(s => s.symbol !== 'N/A')
@@ -61,7 +57,7 @@ export default function StockLeaderboard({
     setRankMapping(initial);
   }, []); // empty deps so it only runs once
 
-
+  // automatically sorts leaderboard by the correct metric when selected
   const handleMetricChange = (e) => {
     const key = e.target.value;
     setSelectedMetric(key);
@@ -163,6 +159,7 @@ export default function StockLeaderboard({
         Stock Leaderboard
       </Typography>
 
+      {/*Metric dropdown selector*/}
       <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
         <FormControl size="small">
           <InputLabel id="stock-metric-select-label">Metric</InputLabel>
@@ -186,6 +183,7 @@ export default function StockLeaderboard({
         </FormControl>
       </Box>
 
+      {/*Main Leaderboard Display*/}
       <DataGrid
         rows={rows}
         columns={columns}
