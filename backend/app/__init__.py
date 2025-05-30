@@ -440,7 +440,7 @@ def create_app():
 
             results = []
             for row in politician_query:
-                # Get buy/sell counts separately
+                # Get buy/sell counts separately calculation of metrics
                 buy_count = db.session.query(func.count(models.Trade.id)).filter(
                     models.Trade.politician_name == row.politician_name,
                     models.Trade.type == 'buy'
@@ -495,7 +495,7 @@ def create_app():
 
             stocks = []
             for stock in stock_stats:
-                # Get buy/sell counts separately
+                # Get buy/sell counts separately for calculation
                 buys = db.session.query(func.count(models.Trade.id)).filter(
                     models.Trade.traded_issuer_ticker == stock.traded_issuer_ticker,
                     models.Trade.type == 'buy'
