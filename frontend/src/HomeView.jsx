@@ -15,6 +15,7 @@ import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 
 import CongressLeaderboard from './CongressLeaderboard';
 import StockLeaderboard from './StockLeaderboard';
+import { CongressOverall, StockOverall } from './OverallLeaderboards';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -55,7 +56,7 @@ export default function HomeView() {
     id: `${item.name.replace(/\s+/g, '_').toLowerCase()}_${idx}`,
   }));
 
-  // fetch trades
+  // ————————— Fetch Trades —————————
   useEffect(() => {
 
     if (tradesCache) {
@@ -217,32 +218,94 @@ export default function HomeView() {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 6, p: 4, alignItems: 'center' }}>
       {/* ─── Top Section: Overall Scores ─── */}
+      {/*<Box sx={{ width: '100%', textAlign: 'center' }}>*/}
+{/*        <Typography
+          variant="h4"
+          component="h2"
+          sx={{ fontWeight: 'bold', mb: 1, color: 'primary.main' }}
+        >
+          Market Pulse
+        </Typography>*/}
+{/*        <Typography
+          variant="subtitle1"
+          sx={{ mb: 3, fontStyle: 'italic', color: 'text.secondary' }}
+        >
+          Discover the overall buy/sell strength of stocks and performance scores of politicians, all in one snapshot.
+        </Typography>*/}
+{/*        <Box
+            sx={{
+              display: 'flex',
+              gap: 2,
+              alignItems: 'flex-start',
+              p: 2,
+            }}
+        >*/}
+          {/*<Paper elevation={2} sx={{ width: '50%', p: 2, borderRadius: 3 }}>*/}
+            {/* Politician Overall Score Leaderboard Placeholder */}
+            {/*<CongressOverall />*/}
+          {/*</Paper>*/}
+
+
+          {/*<Paper elevation={2} sx={{ flex: 1, p: 2, borderRadius: 3 }}>*/}
+            {/* Stock Buy/Sell Strength Leaderboard Placeholder */}
+            {/*<StockOverall />*/}
+          {/*</Paper>*/}
+        {/*</Box>*/}
+      {/*</Box>*/}
+
+      {/* ─── (New) Top Section: Metric Rankings ─── */}
       <Box sx={{ width: '100%', textAlign: 'center' }}>
         <Typography
           variant="h4"
           component="h2"
           sx={{ fontWeight: 'bold', mb: 1, color: 'primary.main' }}
         >
-          Market Pulse
+          Metric Leaderboards
         </Typography>
         <Typography
           variant="subtitle1"
           sx={{ mb: 3, fontStyle: 'italic', color: 'text.secondary' }}
         >
-          Discover the overall buy/sell strength of stocks and performance scores of politicians, all in one snapshot.
+          Rankings of politicians and stocks by specific metrics.
         </Typography>
-        <Grid container spacing={3} justifyContent="center">
-          <Grid item xs={12} md={6}>
-            <Paper elevation={1} sx={{ p: 2, height: 300 }}>
-              {/* Politician Overall Score Leaderboard Placeholder */}
+          <Box
+            sx={{
+              display: 'flex',
+              gap: 2,
+              alignItems: 'flex-start',
+              p: 2,
+            }}
+          >
+            {/* LEFT: Politician Metrics Leaderboard */}
+            <Paper elevation={2} sx={{ width: '50%', p: 2, borderRadius: 3 }}>
+              <Box sx={{ width: '100%' }}>
+                {politicianLoading
+                  ? <CircularProgress />
+                  : politicianError
+                    ? <Alert severity="error">{politicianError}</Alert>
+                    : <CongressLeaderboard
+                        data={politicianData}
+                        isLoading={politicianLoading}
+                        error={politicianError}
+                      />}
+              </Box>
             </Paper>
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <Paper elevation={1} sx={{ p: 2, height: 300 }}>
-              {/* Stock Buy/Sell Strength Leaderboard Placeholder */}
+
+            {/* RIGHT: Stock Metrics Leaderboard */}
+            <Paper elevation={2} sx={{ flex: 1, p: 2, borderRadius: 3 }}>
+              <Box sx={{ width: '100%' }}>
+                {stockLoading
+                  ? <CircularProgress />
+                  : stockError
+                    ? <Alert severity="error">{politicianError}</Alert>
+                    : <StockLeaderboard
+                        data={stockData}
+                        isLoading={stockLoading}
+                        error={stockError}
+                      />}
+              </Box>
             </Paper>
-          </Grid>
-        </Grid>
+          </Box>
       </Box>
 
       <Divider sx={{ width: '80%' }} />
@@ -301,60 +364,6 @@ export default function HomeView() {
 
       <Divider sx={{ width: '80%' }} />
 
-      {/* ─── Bottom Section: Metric Rankings ─── */}
-      <Box sx={{ width: '100%', textAlign: 'center' }}>
-        <Typography
-          variant="h4"
-          component="h2"
-          sx={{ fontWeight: 'bold', mb: 1, color: 'primary.main' }}
-        >
-          Focused Metrics
-        </Typography>
-        <Typography
-          variant="subtitle1"
-          sx={{ mb: 3, fontStyle: 'italic', color: 'text.secondary' }}
-        >
-          Dive deeper into rankings of politicians and stocks by specific metrics.
-        </Typography>
-          <Box
-            sx={{
-              display: 'flex',
-              gap: 2,
-              alignItems: 'flex-start',
-              p: 2,
-            }}
-          >
-            {/* LEFT: Politician Metrics Leaderboard */}
-            <Paper elevation={2} sx={{ width: '50%', p: 2, borderRadius: 3 }}>
-              <Box sx={{ width: '100%' }}>
-                {politicianLoading
-                  ? <CircularProgress />
-                  : politicianError
-                    ? <Alert severity="error">{politicianError}</Alert>
-                    : <CongressLeaderboard
-                        data={politicianData}
-                        isLoading={politicianLoading}
-                        error={politicianError}
-                      />}
-              </Box>
-            </Paper>
-
-            {/* RIGHT: Stock Metrics Leaderboard */}
-            <Paper elevation={2} sx={{ flex: 1, p: 2, borderRadius: 3 }}>
-              <Box sx={{ width: '100%' }}>
-                {stockLoading
-                  ? <CircularProgress />
-                  : stockError
-                    ? <Alert severity="error">{politicianError}</Alert>
-                    : <StockLeaderboard
-                        data={stockData}
-                        isLoading={stockLoading}
-                        error={stockError}
-                      />}
-              </Box>
-            </Paper>
-          </Box>
-      </Box>
     </Box>
   );
 }
