@@ -49,8 +49,8 @@ To do this, run: `docker compose --profile testing run testbackend bash`
 
 This will put you inside the backend service container. 
 From here, run the usual setup commands:
-+ flask db upgrade 
-+ python scripts/import_*.py
++ `flask db upgrade`
++ `python scripts/import_*.py`
 
 Then run `exit` 
 
