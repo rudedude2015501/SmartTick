@@ -6,7 +6,7 @@ class TestConfig:
     '''
     TESTING = True 
     SQLALCHEMY_DATABASE_URI = os.getenv(
-        "DATABASE_URL"
+        "DATABASE_URL",
         "postgresql://user:password@localhost:5432/testing_db"
     )
 
