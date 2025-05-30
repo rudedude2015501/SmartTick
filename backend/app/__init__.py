@@ -453,7 +453,18 @@ def create_app():
                 
                 spending = get_politician_total_spending(row.politician_name)
                 buy_percentage = (buy_count / row.trade_count * 100) if row.trade_count > 0 else 0
-                
+               
+               
+                # Trading profile attributes for each politician by aggregating their trades
+                # name - name of the politician
+                # party - political party affiliation
+                # total_trades - total trades executed by the politician
+                # buy_trades - total number of buy transactions
+                # sell_trades - total number of sell transactions
+                # buy_percentage - percentage of trade that were buys
+                # estimated_spending - dollar amount spent
+                # different_stocks - number of unique stocks traded by the politician
+                # last_trade_date - most recent trade/transaction
                 results.append({
                     'name': row.politician_name,
                     'party': row.politician_family or 'Unknown',
