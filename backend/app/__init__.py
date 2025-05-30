@@ -16,6 +16,7 @@ from .tiingo_client import get_daily_prices
 
 # local utility items 
 from app.utils import extract_key_metrics
+from .config import config
 
 
 # Shared extension objects
@@ -69,14 +70,14 @@ def size_to_numeric(size_str):
     return 0
 
 # Application Factory
-def create_app():
+def create_app(config_name=None):
     """Application Factory Function"""
     app = Flask(__name__)
     CORS(app)
 
-    # Configuration
-    app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
-    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    # load configuration environment 
+    config_name = config_name or os.getenv('FLASK_ENV', 'default')
+    app.config.from_object(config[config_name])
 
     # Initialize extensions
     db.init_app(app)
