@@ -64,10 +64,11 @@ services:
     environment:
       - FLASK_ENV=testing
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@testdb:5432/${POSTGRES_DB}_test
+      - FINNHUB_API_KEY=${FINNHUB_API_KEY}
+      - TIINGO_API_KEY=${TIINGO_API_KEY}
     depends_on:
       - testdb
-    #command:
-      #-
+    command: python -m pytest tests/ -v
     profiles:
       - testing
  

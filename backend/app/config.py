@@ -8,6 +8,7 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     FINNHUB_API_KEY = os.getenv("FINNHUB_API_KEY")
     TIINGO_API_KEY = os.getenv("TIINGO_API_KEY")
+    SECRET_KEY = os.getenv('SECRET_KEY', 'dev-secret-key')
 
 class DevConfig(Config):
     '''
@@ -28,6 +29,7 @@ class TestingConfig(Config):
 
     FINNHUB_API_KEY = "testing_key"
     TIINGO_API_KEY = "testing_key" 
+    SECRET_KEY = "testing_secret_key"
     WTF_CSRF_ENABLED = False
 
 
