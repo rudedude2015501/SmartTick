@@ -31,3 +31,28 @@ Note: If you're doing a fresh install, you can skip this step. However, if you a
 2. Delete the old node_modules volume and let Docker recreate it with the updated dependencies.
 
 Reason being when node_modules is mounted as a volume, it can become stale—meaning the volume persists even if the Docker image has changed. This can cause your container to miss newly added dependencies.
+
+## Testing
+
+To build testing containers and run testing services together: `docker compose --profile testing up --build`
++ We add the `--profile` flag so Docker can run the testing services independently from our development services
+
+### Frontend 
+To run the the frontend testing service independently: `docker compose --profile testing up testfrontend` 
++ For cleaner, easier to read output, run: `docker compose --profile testing run --rm testfrontend` 
+
+### Backend
+
+#### Set Up Instructions 
+To run tests for the backend, we must first populate the testing database.
+To do this, run: `docker compose --profile testing run testbackend bash` 
+
+This will put you inside the backend service container. 
+From here, run the usual setup commands:
++ flask db upgrade 
++ python scripts/import_*.py
+
+Then run `exit` 
+
+Now to run the backend testing service independently: `docker compose --profile testing up testbackend`
++ Again, for a cleaner output, run: `docker compose --profile testing run --rm testbackend` 
