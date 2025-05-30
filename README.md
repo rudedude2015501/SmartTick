@@ -10,13 +10,13 @@
 
 ## 🛠️ Setup Instructions
 
-1. Build containers and run services: docker-compose up --build
+1. Build containers and run services: `docker-compose up --build`
 
-2. Run database migrations: docker-compose exec backend flask db upgrade (not needed on subsequent reruns)
+2. Run database migrations: `docker-compose exec backend flask db upgrade` (not needed on subsequent reruns)
 
-3. Load trade data: docker-compose exec backend python scripts/import_trades.py (not needed on subsequent reruns)
+3. Load trade data: `docker-compose exec backend python scripts/import_trades.py` (not needed on subsequent reruns)
 
-4. Load stock profile data: docker-compose exec backend python scripts/import_profiles.py (not needed on subsequent reruns)
+4. Load stock profile data: `docker-compose exec backend python scripts/import_profiles.py` (not needed on subsequent reruns)
 
 ## ⚠️ Errors
 
@@ -26,13 +26,13 @@ We use bind mounts for source files to enable hot reloading, but we intentionall
 
 Note: If you're doing a fresh install, you can skip this step. However, if you already have a node_modules Docker volume from a previous build and new dependencies have been added since, you'll need to either:
 
-1. Manually install the new dependencies inside the container: docker-compose exec frontend npm install, or  
+1. Manually install the new dependencies inside the container: `docker-compose exec frontend npm install`, or  
 
 2. Delete the old node_modules volume and let Docker recreate it with the updated dependencies.
 
 Reason being when node_modules is mounted as a volume, it can become stale—meaning the volume persists even if the Docker image has changed. This can cause your container to miss newly added dependencies.
 
-## Testing
+## :mag_right: Testing
 
 To build testing containers and run testing services together: `docker compose --profile testing up --build`
 + We add the `--profile` flag so Docker can run the testing services independently from our development services
@@ -43,7 +43,7 @@ To run the the frontend testing service independently: `docker compose --profile
 
 ### Backend
 
-#### Set Up Instructions 
+#### :wrench: Set Up Instructions 
 To run tests for the backend, we must first populate the testing database.
 To do this, run: `docker compose --profile testing run testbackend bash` 
 
