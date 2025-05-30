@@ -110,7 +110,7 @@ function StockAnalysis({ symbol, historicalPriceData, trades }) {
       }
     };
 
-    // Start the calculations
+    // Calculations
     calcAllMetrics();
   }, [historicalPriceData, trades, symbol]);
 
