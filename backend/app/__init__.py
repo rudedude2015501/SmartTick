@@ -457,25 +457,16 @@ def create_app(config_name=None):
                
                
                 # Trading profile attributes for each politician by aggregating their trades
-                # name - name of the politician
-                # party - political party affiliation
-                # total_trades - total trades executed by the politician
-                # buy_trades - total number of buy transactions
-                # sell_trades - total number of sell transactions
-                # buy_percentage - percentage of trade that were buys
-                # estimated_spending - dollar amount spent
-                # different_stocks - number of unique stocks traded by the politician
-                # last_trade_date - most recent trade/transaction
                 results.append({
-                    'name': row.politician_name,
-                    'party': row.politician_family or 'Unknown',
-                    'total_trades': row.trade_count,
-                    'buy_trades': buy_count,
-                    'sell_trades': sell_count,
-                    'buy_percentage': round(buy_percentage, 1),
-                    'estimated_spending': spending,
-                    'different_stocks': row.stock_count,
-                    'last_trade_date': row.latest_trade.isoformat() if row.latest_trade else None
+                    'name': row.politician_name,    # name of the politician
+                    'party': row.politician_family or 'Unknown',    # political party affiliation     
+                    'total_trades': row.trade_count,    # total trades executed by the politician
+                    'buy_trades': buy_count,    # total number of buy transactions
+                    'sell_trades': sell_count,    # total number of sell transactions
+                    'buy_percentage': round(buy_percentage, 1),    # percentage of trade that were buys
+                    'estimated_spending': spending,    # dollar amount spent
+                    'different_stocks': row.stock_count,    # number of unique stocks traded by the politician
+                    'last_trade_date': row.latest_trade.isoformat() if row.latest_trade else None    # most recent
                 })
 
             return jsonify({
@@ -521,21 +512,14 @@ def create_app(config_name=None):
                 buy_ratio = (buys / stock.total_trades * 100) if stock.total_trades > 0 else 0
                 
                 # Stock trading summary by aggregating congressional trading data
-                # symbol - like AAPL, TSLA
-                # name - company name like Tesla Inc.
-                # trade_count - number of trades for a specific stock
-                # politician_count - number of unique politicians who traded the stock
-                # buy_count - total number of buy transactions
-                # sell_count - total number of sell transactions
-                # buy_ratio - % of trades that were buys
                 stocks.append({
-                    'symbol': stock.traded_issuer_ticker,
-                    'name': stock.traded_issuer_name,
-                    'trade_count': stock.total_trades,
-                    'politician_count': stock.politician_count,
-                    'buy_count': buys,
-                    'sell_count': sells,
-                    'buy_ratio': round(buy_ratio, 1)
+                    'symbol': stock.traded_issuer_ticker,    # like CSCO, ORCL
+                    'name': stock.traded_issuer_name,    # company name
+                    'trade_count': stock.total_trades,    # number of trades for a specific stock
+                    'politician_count': stock.politician_count,    # number of unique politicians who traded the stock
+                    'buy_count': buys,    # total number of buy transactions
+                    'sell_count': sells,    # total number of sell transactions
+                    'buy_ratio': round(buy_ratio, 1)    # % of trades that were buys
                 })
 
             return jsonify({
