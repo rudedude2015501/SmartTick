@@ -511,13 +511,6 @@ def create_app():
                 buy_ratio = (buys / stock.total_trades * 100) if stock.total_trades > 0 else 0
                 
                 # Stock trading summary by aggregating congressional trading data
-                # symbol - like AAPL, TSLA
-                # name - company name like Tesla Inc.
-                # trade_count - number of trades for a specific stock
-                # politician_count - number of unique politicians who traded the stock
-                # buy_count - total number of buy transactions
-                # sell_count - total number of sell transactions
-                # buy_ratio - % of trades that were buys
                 stocks.append({
                     'symbol': stock.traded_issuer_ticker,    # like CSCO, ORCL
                     'name': stock.traded_issuer_name,    # company name
