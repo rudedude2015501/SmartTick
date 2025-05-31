@@ -22,6 +22,8 @@ const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 // Simple module-level cache
 let tradesCache = null;
+let politiciansCache = null;
+let stocksCache = null;
 
 export default function HomeView() {
   // ——————————— Trades state ———————————
@@ -57,6 +59,8 @@ export default function HomeView() {
 
   // ————————— Fetch Trades —————————
   useEffect(() => {
+    setIsLoading(true);
+    setError(null);
 
     if (tradesCache) {
       setAllTrades(tradesCache);
@@ -88,12 +92,20 @@ export default function HomeView() {
     setPoliticianLoading(true);
     setPoliticianError(null);
 
+    if (politiciansCache) {
+      setPoliticianCount(politiciansCache.count);
+      setPoliticianData(politiciansCache.data);
+      setPoliticianLoading(false);
+      return;
+    }
+
     const fetchPoliticians = async () => {
       try {
         const res = await fetch(`${apiUrl}/api/politicians/stats`);
         if (!res.ok) throw new Error(res.statusText);
         const { count, data: results } = await res.json();
         const dataWithIds = assignUniqueIds(results);
+        politiciansCache = { count, data: dataWithIds };
         setPoliticianCount(count);
         setPoliticianData(dataWithIds);
       } catch (err) {
@@ -111,13 +123,20 @@ export default function HomeView() {
     setStockLoading(true);
     setStockError(null);
 
+    if (stocksCache) {
+      setStockCount(stocksCache.count);
+      setStockData(stocksCache.data);
+      setStockLoading(false);
+      return;
+    }
+
     const fetchStocks = async () => {
       try {
         const res = await fetch(`${apiUrl}/api/stocks/popular`);
         if (!res.ok) throw new Error(res.statusText);
         const { count, stocks } = await res.json();
         const dataWithIds = assignUniqueIds(stocks);
-        console.log(count);
+        stocksCache = { count, data: dataWithIds };
         setStockCount(count);
         setStockData(dataWithIds);
       } catch (err) {
