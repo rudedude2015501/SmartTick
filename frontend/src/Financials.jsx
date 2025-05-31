@@ -3,8 +3,8 @@ import { Box, Typography, Tooltip, useTheme } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info';
 
 /**
- * Static definitions for each metric (label, description, mock value).
- * You can replace the `value` fields with real data when you wire this up.
+ * Static definitions for each metric (label, description, value).
+ * Metrics are pre-filled with sample values but are overwritten on function call.
  */
 export const metricData = {
   marketPerformance: [
