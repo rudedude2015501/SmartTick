@@ -236,7 +236,61 @@ export default function HomeView() {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 6, p: 4, alignItems: 'center' }}>
 
-      {/* ─── Top Section: Metric Rankings ─── */}
+      {/* ─── Top Section: Recent Trades ─── */}
+      <Box sx={{ width: '66%', textAlign: 'center' }}>
+        <Typography
+          variant="h4"
+          component="h2"
+          sx={{ fontWeight: 'bold', mb: 1, color: 'primary.main' }}
+        >
+          Recent Trades
+        </Typography>
+        <Typography
+          variant="subtitle1"
+          sx={{ mb: 3, fontStyle: 'italic', color: 'text.secondary' }}
+        >
+          An up-to-date list of the most recent trades made by politicians.
+        </Typography>
+        <Paper elevation={2} sx={{ flex: 1, p: 2, borderRadius: 3 }}>
+          <Box sx={{ flex: 1 }}>
+            {isLoading && (
+              <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+                <CircularProgress />
+              </Box>
+            )}
+            {error && <Alert severity="error">{error}</Alert>}
+            {!isLoading && !error && (
+              allTrades.length === 0 ? (
+                <Typography
+                  variant="h6"
+                  align="center"
+                  sx={{ color: 'text.secondary', mt: 4 }}
+                >
+                  No recent trades found.
+                </Typography>
+              ) : (
+                <>
+
+                  <Box sx={{ width: '100%', height: 600 }}>
+                    <AgGridReact
+                      rowData={allTrades}
+                      columnDefs={columnDefs}
+                      pagination
+                      paginationPageSize={20}
+                      suppressCellFocus
+                      theme={isDarkMode ? darkTheme : lightTheme}
+                    />
+                  </Box>
+                </>
+              )
+            )}
+          </Box>
+        </Paper>
+      </Box>
+
+      <Divider sx={{ width: '80%' }} />
+
+      {/* ─── Bottom Section: Metric Rankings ─── */}
       <Box sx={{ width: '100%', textAlign: 'center' }}>
         <Typography
           variant="h4"
@@ -292,62 +346,6 @@ export default function HomeView() {
             </Paper>
           </Box>
       </Box>
-
-      <Divider sx={{ width: '80%' }} />
-
-      {/* ─── Bottom Section: Recent Trades ─── */}
-      <Box sx={{ width: '100%', textAlign: 'center' }}>
-        <Typography
-          variant="h4"
-          component="h2"
-          sx={{ fontWeight: 'bold', mb: 1, color: 'primary.main' }}
-        >
-          Recent Trades
-        </Typography>
-        <Typography
-          variant="subtitle1"
-          sx={{ mb: 3, fontStyle: 'italic', color: 'text.secondary' }}
-        >
-          An up-to-date list of the most recent trades made by politicians.
-        </Typography>
-        <Paper elevation={2} sx={{ flex: 1, p: 2, borderRadius: 3 }}>
-          <Box sx={{ flex: 1 }}>
-            {isLoading && (
-              <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
-                <CircularProgress />
-              </Box>
-            )}
-            {error && <Alert severity="error">{error}</Alert>}
-            {!isLoading && !error && (
-              allTrades.length === 0 ? (
-                <Typography
-                  variant="h6"
-                  align="center"
-                  sx={{ color: 'text.secondary', mt: 4 }}
-                >
-                  No recent trades found.
-                </Typography>
-              ) : (
-                <>
-
-                  <Box sx={{ width: '100%', height: 600 }}>
-                    <AgGridReact
-                      rowData={allTrades}
-                      columnDefs={columnDefs}
-                      pagination
-                      paginationPageSize={20}
-                      suppressCellFocus
-                      theme={isDarkMode ? darkTheme : lightTheme}
-                    />
-                  </Box>
-                </>
-              )
-            )}
-          </Box>
-        </Paper>
-      </Box>
-
-      <Divider sx={{ width: '80%' }} />
 
     </Box>
   );
