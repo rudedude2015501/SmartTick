@@ -456,15 +456,6 @@ def create_app():
                
                
                 # Trading profile attributes for each politician by aggregating their trades
-                # name - name of the politician
-                # party - political party affiliation
-                # total_trades - total trades executed by the politician
-                # buy_trades - total number of buy transactions
-                # sell_trades - total number of sell transactions
-                # buy_percentage - percentage of trade that were buys
-                # estimated_spending - dollar amount spent
-                # different_stocks - number of unique stocks traded by the politician
-                # last_trade_date - most recent trade/transaction
                 results.append({
                     'name': row.politician_name,    # name of the politician
                     'party': row.politician_family or 'Unknown',    # political party affiliation     
