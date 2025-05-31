@@ -276,15 +276,11 @@ def create_app():
     @app.route('/api/trades', methods=["GET"])
     def get_recent_trades():
         """
-        Fetches trade data from the Trade table, sorted by trade date in descending order.
-        Allows specifying a limit for the number of trades returned via a query parameter.
+        Fetches all trade data from the Trade table, sorted by trade date in descending order.
         """
         try:
-            # Get the limit from the query parameters, default to 50 if not provided
-            limit = request.args.get('limit', default=50, type=int)
-
-            # Query the database for trades and sort by date (descending), applying the limit
-            trades = db.session.query(models.Trade).join(models.PoliticianImg, models.Trade.politician_name == models.PoliticianImg.politician_name,isouter=True).order_by(models.Trade.traded.desc()).limit(limit).all()
+            # Query the database for trades and sort by date (descending), no join, no limit
+            trades = db.session.query(models.Trade).order_by(models.Trade.traded.desc()).all()
 
             if not trades:
                 return jsonify({"error": "No trade data found"}), 404
@@ -406,5 +402,147 @@ def create_app():
         except Exception as e:
             app.logger.error(f"failed to fetch images: {e}", exc_info=True)
             return jsonify({"error": "an internal server error occured"}), 500
+
+    def get_politician_total_spending(politician_name):
+        trades = db.session.query(models.Trade.size).filter(
+            models.Trade.politician_name == politician_name,
+            models.Trade.size.isnot(None)
+        ).all()
+        
+        total = 0
+        for trade in trades:
+            if trade.size:
+                amount = size_to_numeric(trade.size)
+                total += amount
+        
+        return total
+
+    @app.route('/api/politicians/stats', methods=["GET"])
+    def get_politician_stats():
+        try:
+            limit = request.args.get('limit', 500, type=int)
+            min_trades = request.args.get('min_trades', 1, type=int)
+        
+            politician_query = db.session.query(
+                models.Trade.politician_name,
+                models.Trade.politician_family,
+                func.count(models.Trade.id).label('trade_count'),
+                func.count(func.distinct(models.Trade.traded_issuer_ticker)).label('stock_count'),
+                func.max(models.Trade.traded).label('latest_trade')
+            ).filter(
+                models.Trade.politician_name.isnot(None)
+            ).group_by(
+                models.Trade.politician_name, 
+                models.Trade.politician_family
+            ).having(
+                func.count(models.Trade.id) >= min_trades
+            ).limit(limit).all()
+
+            results = []
+            for row in politician_query:
+                # Get buy/sell counts separately calculation of metrics
+                buy_count = db.session.query(func.count(models.Trade.id)).filter(
+                    models.Trade.politician_name == row.politician_name,
+                    models.Trade.type == 'buy'
+                ).scalar() or 0
+                
+                sell_count = db.session.query(func.count(models.Trade.id)).filter(
+                    models.Trade.politician_name == row.politician_name,
+                    models.Trade.type == 'sell'
+                ).scalar() or 0
+                
+                spending = get_politician_total_spending(row.politician_name)
+                buy_percentage = (buy_count / row.trade_count * 100) if row.trade_count > 0 else 0
+               
+               
+                # Trading profile attributes for each politician by aggregating their trades
+                # name - name of the politician
+                # party - political party affiliation
+                # total_trades - total trades executed by the politician
+                # buy_trades - total number of buy transactions
+                # sell_trades - total number of sell transactions
+                # buy_percentage - percentage of trade that were buys
+                # estimated_spending - dollar amount spent
+                # different_stocks - number of unique stocks traded by the politician
+                # last_trade_date - most recent trade/transaction
+                results.append({
+                    'name': row.politician_name,
+                    'party': row.politician_family or 'Unknown',
+                    'total_trades': row.trade_count,
+                    'buy_trades': buy_count,
+                    'sell_trades': sell_count,
+                    'buy_percentage': round(buy_percentage, 1),
+                    'estimated_spending': spending,
+                    'different_stocks': row.stock_count,
+                    'last_trade_date': row.latest_trade.isoformat() if row.latest_trade else None
+                })
+
+            return jsonify({
+                'count': len(results),
+                'data': results
+            })
+
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
+
+    @app.route('/api/stocks/popular', methods=["GET"])
+    def get_popular_stocks():
+        try:
+            limit = request.args.get('limit', 500, type=int)
+            
+            stock_stats = db.session.query(
+                models.Trade.traded_issuer_ticker,
+                models.Trade.traded_issuer_name,
+                func.count(models.Trade.id).label('total_trades'),
+                func.count(func.distinct(models.Trade.politician_name)).label('politician_count')
+            ).filter(
+                models.Trade.traded_issuer_ticker.isnot(None)
+            ).group_by(
+                models.Trade.traded_issuer_ticker,
+                models.Trade.traded_issuer_name
+            ).order_by(
+                func.count(models.Trade.id).desc()
+            ).limit(limit).all()
+
+            stocks = []
+            for stock in stock_stats:
+                # Get buy/sell counts separately for calculation
+                buys = db.session.query(func.count(models.Trade.id)).filter(
+                    models.Trade.traded_issuer_ticker == stock.traded_issuer_ticker,
+                    models.Trade.type == 'buy'
+                ).scalar() or 0
+                
+                sells = db.session.query(func.count(models.Trade.id)).filter(
+                    models.Trade.traded_issuer_ticker == stock.traded_issuer_ticker,
+                    models.Trade.type == 'sell'
+                ).scalar() or 0
+                
+                buy_ratio = (buys / stock.total_trades * 100) if stock.total_trades > 0 else 0
+                
+                # Stock trading summary by aggregating congressional trading data
+                # symbol - like AAPL, TSLA
+                # name - company name like Tesla Inc.
+                # trade_count - number of trades for a specific stock
+                # politician_count - number of unique politicians who traded the stock
+                # buy_count - total number of buy transactions
+                # sell_count - total number of sell transactions
+                # buy_ratio - % of trades that were buys
+                stocks.append({
+                    'symbol': stock.traded_issuer_ticker,
+                    'name': stock.traded_issuer_name,
+                    'trade_count': stock.total_trades,
+                    'politician_count': stock.politician_count,
+                    'buy_count': buys,
+                    'sell_count': sells,
+                    'buy_ratio': round(buy_ratio, 1)
+                })
+
+            return jsonify({
+                'count': len(stocks),
+                'stocks': stocks
+            })
+
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
 
     return app

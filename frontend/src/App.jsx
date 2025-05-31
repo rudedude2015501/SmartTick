@@ -343,15 +343,22 @@ function App() {
       {/* Offset content below fixed AppBar */}
       <Toolbar />
       <Box sx={{ minHeight: 'calc(100vh - 64px)', py: 4, px: 2 }}>
-        <Container maxWidth="md">
-          {viewMode === VIEW_HOME ? (
+        {/*<Container maxWidth="md">*/}
+        {viewMode === VIEW_HOME ? (
+          // full-width wrapper instead of Container
+          <Box sx={{ px: 2 }}>
             <HomeView />
-          ) : viewMode === VIEW_STOCK ? (
-            <StockView searchSymbol={searchedTerm} />
-          ) : (
-            <CongressView searchTerm={searchedTerm} />
-          )}
-        </Container>
+          </Box>
+        ) : (
+          <Container maxWidth="md">
+            {viewMode === VIEW_STOCK ? (
+              <StockView searchSymbol={searchedTerm} />
+            ) : (
+              <CongressView searchTerm={searchedTerm} />
+            )}
+          </Container>
+        )}
+        {/*</Container>*/}
       </Box>
 
       {/* Dark mode toggle button */}
