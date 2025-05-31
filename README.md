@@ -44,6 +44,7 @@ To build testing containers and run testing services together: `docker compose -
 ### Frontend 
 To run the the frontend testing service independently: `docker compose --profile testing up testfrontend` 
 + For cleaner, easier to read output, run: `docker compose --profile testing run --rm testfrontend` 
++ To run with coverage tests, append `coverage` to any of the above commands
 
 ### Backend
 
@@ -60,3 +61,4 @@ Then run `exit`
 
 Now to run the backend testing service independently: `docker compose --profile testing up testbackend`
 + Again, for a cleaner output, run: `docker compose --profile testing run --rm testbackend` 
++ To run with coverage tests, append `coverage` to any of the above commands

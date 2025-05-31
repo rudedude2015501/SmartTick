@@ -71,3 +71,6 @@ frontend/.vite/
 frontend/.env
 frontend/.env.*
 
+# coverage reports
+coverage/ 
+.coverage
