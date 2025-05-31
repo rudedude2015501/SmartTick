@@ -1,6 +1,7 @@
 # Flask and extensions
 Flask==2.3.2
 Flask-CORS==4.0.0         # For frontend-backend communication
+Werkzeug==2.3.7           
 
 # Database
 Flask-SQLAlchemy==3.0.3   # ORM for PostgreSQL
