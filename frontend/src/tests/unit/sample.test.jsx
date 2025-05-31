@@ -17,6 +17,6 @@ describe('Sample Integration Test', () => {
 
         render(<HomeView />)
 
-        expect(screen.getByRole('progressbar')).toBeInTheDocument()
+        expect(screen.getByText('Recent Trades')).toBeInTheDocument()
     })
 })
