@@ -519,13 +519,13 @@ def create_app():
                 # sell_count - total number of sell transactions
                 # buy_ratio - % of trades that were buys
                 stocks.append({
-                    'symbol': stock.traded_issuer_ticker,
-                    'name': stock.traded_issuer_name,
-                    'trade_count': stock.total_trades,
-                    'politician_count': stock.politician_count,
-                    'buy_count': buys,
-                    'sell_count': sells,
-                    'buy_ratio': round(buy_ratio, 1)
+                    'symbol': stock.traded_issuer_ticker,    # like CSCO, ORCL
+                    'name': stock.traded_issuer_name,    # company name
+                    'trade_count': stock.total_trades,    # number of trades for a specific stock
+                    'politician_count': stock.politician_count,    # number of unique politicians who traded the stock
+                    'buy_count': buys,    # total number of buy transactions
+                    'sell_count': sells,    # total number of sell transactions
+                    'buy_ratio': round(buy_ratio, 1)    # % of trades that were buys
                 })
 
             return jsonify({
