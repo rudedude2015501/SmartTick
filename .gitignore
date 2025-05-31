@@ -43,6 +43,8 @@ frontend/build/
 .yarn-integrity
 .pnp.*
 .cache/
+.pytest_cache/
+htmlcov/
 
 # Logs
 npm-debug.log*
