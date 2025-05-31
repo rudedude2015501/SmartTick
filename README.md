@@ -18,8 +18,6 @@
 
 4. Load stock profile data: `docker-compose exec backend python scripts/import_profiles.py` (not needed on subsequent reruns)
 
-<br>
-
 5. Load politician profile data: docker-compose exec backend python scripts/import_images.py (not needed on subsequent reruns)
    
 ## ⚠️ Errors
@@ -40,11 +38,8 @@ Reason being when node_modules is mounted as a volume, it can become stale—mea
 
 ## :mag_right: Testing
 
-To build testing containers and run testing services together: `docker compose --profile testing up --build`
-+ We add the `--profile` flag so Docker can run the testing services independently from our development services
-
 ### Frontend 
-To run the the frontend testing service independently: `docker compose --profile testing up testfrontend` 
+To run the the frontend testing service: `docker compose --profile testing up testfrontend` 
 + For cleaner, easier to read output, run: `docker compose --profile testing run --rm testfrontend` 
    + To run with coverage tests, append `coverage` to the command above 
 
