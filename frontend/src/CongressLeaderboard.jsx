@@ -127,7 +127,7 @@ export default function CongressLeaderboard({
     {
       field: 'metric',
       headerName: metricOptions.find(m => m.value === selectedMetric).label,
-      width: 160,
+      width: 180,
       sortable: false,
       headerAlign: 'center',
       align: 'center',
