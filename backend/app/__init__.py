@@ -466,15 +466,15 @@ def create_app():
                 # different_stocks - number of unique stocks traded by the politician
                 # last_trade_date - most recent trade/transaction
                 results.append({
-                    'name': row.politician_name,
-                    'party': row.politician_family or 'Unknown',
-                    'total_trades': row.trade_count,
-                    'buy_trades': buy_count,
-                    'sell_trades': sell_count,
-                    'buy_percentage': round(buy_percentage, 1),
-                    'estimated_spending': spending,
-                    'different_stocks': row.stock_count,
-                    'last_trade_date': row.latest_trade.isoformat() if row.latest_trade else None
+                    'name': row.politician_name,    # name of the politician
+                    'party': row.politician_family or 'Unknown',    # political party affiliation     
+                    'total_trades': row.trade_count,    # total trades executed by the politician
+                    'buy_trades': buy_count,    # total number of buy transactions
+                    'sell_trades': sell_count,    # total number of sell transactions
+                    'buy_percentage': round(buy_percentage, 1),    # percentage of trade that were buys
+                    'estimated_spending': spending,    # dollar amount spent
+                    'different_stocks': row.stock_count,    # number of unique stocks traded by the politician
+                    'last_trade_date': row.latest_trade.isoformat() if row.latest_trade else None    # most recent
                 })
 
             return jsonify({
