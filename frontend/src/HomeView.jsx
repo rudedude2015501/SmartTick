@@ -238,10 +238,12 @@ export default function HomeView() {
               gap: 2,
               alignItems: 'flex-start',
               p: 2,
+              width: '100%',
+              mx: 'auto'
             }}
           >
             {/* LEFT: Politician Metrics Leaderboard */}
-            <Paper elevation={2} sx={{ width: '50%', p: 2, borderRadius: 3 }}>
+            <Paper elevation={2} sx={{ flex: 1, minWidth: 100, p: 2, borderRadius: 3 }}>
               <Box sx={{ width: '100%' }}>
                 {politicianLoading
                   ? <CircularProgress />
@@ -256,12 +258,12 @@ export default function HomeView() {
             </Paper>
 
             {/* RIGHT: Stock Metrics Leaderboard */}
-            <Paper elevation={2} sx={{ flex: 1, p: 2, borderRadius: 3 }}>
+            <Paper elevation={2} sx={{ flex: 1, minWidth: 100, p: 2, borderRadius: 3 }}>
               <Box sx={{ width: '100%' }}>
                 {stockLoading
                   ? <CircularProgress />
                   : stockError
-                    ? <Alert severity="error">{politicianError}</Alert>
+                    ? <Alert severity="error">{stockError}</Alert>
                     : <StockLeaderboard
                         data={stockData}
                         isLoading={stockLoading}
