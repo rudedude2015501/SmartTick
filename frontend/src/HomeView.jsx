@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useTheme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
@@ -13,28 +13,36 @@ ModuleRegistry.registerModules([ AllCommunityModule ]);
 // Get API URL from environment variable
 const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
+// Simple module-level cache
+let tradesCache = null;
+
 function HomeView() {
   const [allTrades, setAllTrades] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === 'dark';
 
   const lightTheme = themeQuartz;
   const darkTheme = themeQuartz.withPart(colorSchemeDark);
+  const fetchTimeout = useRef();
 
   // Fetch the trades on component mount
   useEffect(() => {
-    const fetchTrades = async () => {
-      setIsLoading(true);
-      setError(null);
+    if (tradesCache) {
+      setAllTrades(tradesCache);
+      setIsLoading(false);
+      return;
+    }
 
+    const fetchTrades = async () => {
       try {
-        const response = await fetch(`${apiUrl}/api/trades?limit=1000000`);
+        const response = await fetch(`${apiUrl}/api/trades`);
         if (!response.ok) {
           throw new Error(`Error: ${response.statusText}`);
         }
         const data = await response.json();
+        tradesCache = data;
         setAllTrades(data);
       } catch (err) {
         setError(err.message);
@@ -42,7 +50,6 @@ function HomeView() {
         setIsLoading(false);
       }
     };
-
     fetchTrades();
   }, []);
 

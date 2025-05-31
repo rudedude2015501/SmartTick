@@ -25,7 +25,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import TradeChart from './Chart'; // For politician trade summary
 import HistoricalPriceChart from './HistoricalPriceChart'; // For Tiingo stock price history
 
-// Adding StockAnalysis.jsx, with analysis functionality
+// StockAnalysis.jsx module, this moduel with have functions to analyze the stock
 import StockAnalysis from './StockAnalysis';
 
 // Adding Financials.jsx to format financial information
@@ -407,9 +407,9 @@ function StockView({ searchSymbol }) {
               ) : (
                 <Alert severity="info">
                   {historicalPriceData.length === 0 && trades.length === 0 ? 
-                    "Both historical price data and congressional trade data are required for technical analysis." :
+                    "Both historical price data and congressional trades are required for technical analysis." :
                     historicalPriceData.length === 0 ? 
-                    "Historical price data is missing. Unable to perform technical analysis." :
+                    "Historical price data is missing. Hence, unable to perform technical analysis." :
                     "No congressional trade data available for sentiment analysis."}
                 </Alert>
               )

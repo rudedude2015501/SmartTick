@@ -20,6 +20,8 @@
 
 <br>
 
+5. Load politician profile data: docker-compose exec backend python scripts/import_images.py (not needed on subsequent reruns)
+   
 ## ⚠️ Errors
 
 ### Frontend dependencies out of sync (`node_modules` volume)

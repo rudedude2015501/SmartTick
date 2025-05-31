@@ -32,9 +32,9 @@ function StockAnalysis({ symbol, historicalPriceData, trades }) {
     if (!historicalPriceData || historicalPriceData.length < 10 || !trades || trades.length === 0) {
       setMetrics(null);
       if (historicalPriceData && historicalPriceData.length < 10) {
-        setError("Not enough historical price data. Need at least 10 days of data.");
+        setError("There is not enough historical price data. Need at least 10 days of data.");
       } else if (!trades || trades.length === 0) {
-        setError("No congressional trade data available for sentiment analysis.");
+        setError("There is no congressional trade data available for sentiment analysis.");
       }
       return;
     }
@@ -73,7 +73,7 @@ function StockAnalysis({ symbol, historicalPriceData, trades }) {
           
           // Additional indicators using Tiingo volume data
           // From Investopedia: The volume-weighted average price (VWAP) is a technical indicator that calculates a security's average price for the day, weighted by trading volume, to analyze price trends and liquidity.
-          // From Investopedia: On-balance volume (OBV), a momentum indicator that measures positive and negative volume flow
+          // On-balance volume (OBV), a momentum indicator that measures positive and negative volume flow
           volumeIndicators: {
             obv: calcOBV(closePrices, volumes),
             vwap: calcVWAP(closePrices, highs, lows, volumes, 14)
@@ -88,7 +88,7 @@ function StockAnalysis({ symbol, historicalPriceData, trades }) {
             annualizedReturn: calcAnnualizedReturn(sortedPriceData),
           },
           
-          // Volume stats enhanced with Tiingo data
+          // Volume statistics enhanced with Tiingo data
           volumeMetrics: {
             avgVolume: calcAverageVolume(volumes, 30),
             volumeTrend: calcVolumeTrend(volumes),
