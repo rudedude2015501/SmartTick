@@ -18,6 +18,8 @@
 
 4. Load stock profile data: `docker-compose exec backend python scripts/import_profiles.py` (not needed on subsequent reruns)
 
+<br>
+
 ## ⚠️ Errors
 
 ### Frontend dependencies out of sync (`node_modules` volume)
@@ -31,6 +33,8 @@ Note: If you're doing a fresh install, you can skip this step. However, if you a
 2. Delete the old node_modules volume and let Docker recreate it with the updated dependencies.
 
 Reason being when node_modules is mounted as a volume, it can become stale—meaning the volume persists even if the Docker image has changed. This can cause your container to miss newly added dependencies.
+
+<br>
 
 ## :mag_right: Testing
 

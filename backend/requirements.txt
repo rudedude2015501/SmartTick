@@ -10,6 +10,8 @@ psycopg2-binary==2.9.6    # PostgreSQL adapter
 # api development 
 python-dotenv==1.0.0        # Environment variables
 requests==2.31.0            # For fetching external API data
+beautifulsoup4==4.12.3      # For HTML parsing
+html5lib==1.1               # HTML parser for BeautifulSoup
 finnhub-python==2.4.0       # Finnhub API Client
 tiingo==0.16.1	  	        # Tiingo API Client
 
