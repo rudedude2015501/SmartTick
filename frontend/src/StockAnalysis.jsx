@@ -72,8 +72,11 @@ function StockAnalysis({ symbol, historicalPriceData, trades }) {
           rsi: calcRSI(closePrices),
           
           // Additional indicators using Tiingo volume data
-          // From Investopedia: The volume-weighted average price (VWAP) is a technical indicator that calculates a security's average price for the day, weighted by trading volume, to analyze price trends and liquidity.
-          // On-balance volume (OBV), a momentum indicator that measures positive and negative volume flow
+          // From Investopedia: The volume-weighted average price (VWAP) is a technical indicator that 
+	  // calculates a security's average price for the day, weighted by trading volume, to analyze 
+	  // price trends and liquidity.
+          
+	  // On-balance volume (OBV), a momentum indicator that measures positive and negative volume flow
           volumeIndicators: {
             obv: calcOBV(closePrices, volumes),
             vwap: calcVWAP(closePrices, highs, lows, volumes, 14)
@@ -107,7 +110,7 @@ function StockAnalysis({ symbol, historicalPriceData, trades }) {
       }
     };
 
-    // Start the calculations
+    // Calculations
     calcAllMetrics();
   }, [historicalPriceData, trades, symbol]);
 
@@ -189,7 +192,7 @@ function StockAnalysis({ symbol, historicalPriceData, trades }) {
     return parseFloat((100 - (100 / (1 + rs))).toFixed(2));
   };
 
-  // On Balance Volume calculation
+  // On Balance Volume calculations
   const calcOBV = (prices, volumes) => {
     if (prices.length < 2 || volumes.length < 2) return null;
     
@@ -228,7 +231,7 @@ function StockAnalysis({ symbol, historicalPriceData, trades }) {
   const calcVWAP = (closes, highs, lows, volumes, period = 14) => {
     if (closes.length < period || volumes.length < period) return null;
     
-    // Typical price = (high + low + close) / 3 ***as defined in investopedia
+    // Typical price = (high + low + close) / 3, as defined in investopedia
     const typicalPrices = [];
     for (let i = 0; i < closes.length; i++) {
       typicalPrices.push((highs[i] + lows[i] + closes[i]) / 3);

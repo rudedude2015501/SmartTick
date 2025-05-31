@@ -421,7 +421,7 @@ def create_app(config_name=None):
     @app.route('/api/politicians/stats', methods=["GET"])
     def get_politician_stats():
         try:
-            limit = request.args.get('limit', 100, type=int)
+            limit = request.args.get('limit', 500, type=int)
             min_trades = request.args.get('min_trades', 1, type=int)
         
             politician_query = db.session.query(
@@ -441,7 +441,7 @@ def create_app(config_name=None):
 
             results = []
             for row in politician_query:
-                # Get buy/sell counts separately
+                # Get buy/sell counts separately calculation of metrics
                 buy_count = db.session.query(func.count(models.Trade.id)).filter(
                     models.Trade.politician_name == row.politician_name,
                     models.Trade.type == 'buy'
@@ -454,7 +454,18 @@ def create_app(config_name=None):
                 
                 spending = get_politician_total_spending(row.politician_name)
                 buy_percentage = (buy_count / row.trade_count * 100) if row.trade_count > 0 else 0
-                
+               
+               
+                # Trading profile attributes for each politician by aggregating their trades
+                # name - name of the politician
+                # party - political party affiliation
+                # total_trades - total trades executed by the politician
+                # buy_trades - total number of buy transactions
+                # sell_trades - total number of sell transactions
+                # buy_percentage - percentage of trade that were buys
+                # estimated_spending - dollar amount spent
+                # different_stocks - number of unique stocks traded by the politician
+                # last_trade_date - most recent trade/transaction
                 results.append({
                     'name': row.politician_name,
                     'party': row.politician_family or 'Unknown',
@@ -478,7 +489,7 @@ def create_app(config_name=None):
     @app.route('/api/stocks/popular', methods=["GET"])
     def get_popular_stocks():
         try:
-            limit = request.args.get('limit', 50, type=int)
+            limit = request.args.get('limit', 500, type=int)
             
             stock_stats = db.session.query(
                 models.Trade.traded_issuer_ticker,
@@ -496,7 +507,7 @@ def create_app(config_name=None):
 
             stocks = []
             for stock in stock_stats:
-                # Get buy/sell counts separately
+                # Get buy/sell counts separately for calculation
                 buys = db.session.query(func.count(models.Trade.id)).filter(
                     models.Trade.traded_issuer_ticker == stock.traded_issuer_ticker,
                     models.Trade.type == 'buy'
@@ -509,6 +520,14 @@ def create_app(config_name=None):
                 
                 buy_ratio = (buys / stock.total_trades * 100) if stock.total_trades > 0 else 0
                 
+                # Stock trading summary by aggregating congressional trading data
+                # symbol - like AAPL, TSLA
+                # name - company name like Tesla Inc.
+                # trade_count - number of trades for a specific stock
+                # politician_count - number of unique politicians who traded the stock
+                # buy_count - total number of buy transactions
+                # sell_count - total number of sell transactions
+                # buy_ratio - % of trades that were buys
                 stocks.append({
                     'symbol': stock.traded_issuer_ticker,
                     'name': stock.traded_issuer_name,
