@@ -1,6 +1,7 @@
 # Flask and extensions
 Flask==2.3.2
 Flask-CORS==4.0.0         # For frontend-backend communication
+Werkzeug==2.3.7           
 
 # Database
 Flask-SQLAlchemy==3.0.3   # ORM for PostgreSQL
@@ -22,3 +23,10 @@ python-dateutil==2.8.2    # For date handling
 
 # WebSocket support
 websocket-client==1.6.2   # For real-time data streaming
+
+# testing dependencies 
+pytest==8.3.5           # testing framework 
+pytest-flask==1.3.0     # flask specific extensions
+pytest-cov==6.1.1       # coverage report
+factory-boy==3.3.3      # test data factories
+responses==0.25.7       # mock HTTP requests 

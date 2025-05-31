@@ -9,13 +9,14 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
 from flask_cors import CORS
-from sqlalchemy import func
+from sqlalchemy import func, case, cast, Float
 
 from .finnhub_client import get_profile, get_quote_data, get_financials
 from .tiingo_client import get_daily_prices
 
 # local utility items 
 from app.utils import extract_key_metrics
+from .config import config
 
 
 # Shared extension objects
@@ -69,14 +70,14 @@ def size_to_numeric(size_str):
     return 0
 
 # Application Factory
-def create_app():
+def create_app(config_name=None):
     """Application Factory Function"""
     app = Flask(__name__)
     CORS(app)
 
-    # Configuration
-    app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
-    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    # load configuration environment 
+    config_name = config_name or os.getenv('FLASK_ENV', 'default')
+    app.config.from_object(config[config_name])
 
     # Initialize extensions
     db.init_app(app)
@@ -422,13 +423,16 @@ def create_app():
         try:
             limit = request.args.get('limit', 500, type=int)
             min_trades = request.args.get('min_trades', 1, type=int)
-        
+
+            # Main stats query (as before)
             politician_query = db.session.query(
                 models.Trade.politician_name,
                 models.Trade.politician_family,
                 func.count(models.Trade.id).label('trade_count'),
                 func.count(func.distinct(models.Trade.traded_issuer_ticker)).label('stock_count'),
-                func.max(models.Trade.traded).label('latest_trade')
+                func.max(models.Trade.traded).label('latest_trade'),
+                func.sum(case((models.Trade.type == 'buy', 1), else_=0)).label('buy_count'),
+                func.sum(case((models.Trade.type == 'sell', 1), else_=0)).label('sell_count')
             ).filter(
                 models.Trade.politician_name.isnot(None)
             ).group_by(
@@ -438,34 +442,38 @@ def create_app():
                 func.count(models.Trade.id) >= min_trades
             ).limit(limit).all()
 
+            # --- Optimization: Fetch all relevant trades in one query ---
+            pol_names = [row.politician_name for row in politician_query]
+            all_trades = db.session.query(
+                models.Trade.politician_name,
+                models.Trade.size
+            ).filter(
+                models.Trade.politician_name.in_(pol_names),
+                models.Trade.size.isnot(None)
+            ).all()
+
+            # Aggregate spending per politician in Python
+            spending_map = {}
+            for pol_name, size in all_trades:
+                if pol_name not in spending_map:
+                    spending_map[pol_name] = 0
+                if size:
+                    spending_map[pol_name] += size_to_numeric(size)
+
             results = []
             for row in politician_query:
-                # Get buy/sell counts separately calculation of metrics
-                buy_count = db.session.query(func.count(models.Trade.id)).filter(
-                    models.Trade.politician_name == row.politician_name,
-                    models.Trade.type == 'buy'
-                ).scalar() or 0
-                
-                sell_count = db.session.query(func.count(models.Trade.id)).filter(
-                    models.Trade.politician_name == row.politician_name,
-                    models.Trade.type == 'sell'
-                ).scalar() or 0
-                
-                spending = get_politician_total_spending(row.politician_name)
-                buy_percentage = (buy_count / row.trade_count * 100) if row.trade_count > 0 else 0
-               
-               
-                # Trading profile attributes for each politician by aggregating their trades
+                buy_percentage = (row.buy_count / row.trade_count * 100) if row.trade_count > 0 else 0
+                estimated_spending = spending_map.get(row.politician_name, 0)
                 results.append({
-                    'name': row.politician_name,    # name of the politician
-                    'party': row.politician_family or 'Unknown',    # political party affiliation     
-                    'total_trades': row.trade_count,    # total trades executed by the politician
-                    'buy_trades': buy_count,    # total number of buy transactions
-                    'sell_trades': sell_count,    # total number of sell transactions
-                    'buy_percentage': round(buy_percentage, 1),    # percentage of trade that were buys
-                    'estimated_spending': spending,    # dollar amount spent
-                    'different_stocks': row.stock_count,    # number of unique stocks traded by the politician
-                    'last_trade_date': row.latest_trade.isoformat() if row.latest_trade else None    # most recent
+                    'name': row.politician_name,
+                    'party': row.politician_family or 'Unknown',
+                    'total_trades': row.trade_count,
+                    'buy_trades': row.buy_count,
+                    'sell_trades': row.sell_count,
+                    'buy_percentage': round(buy_percentage, 1),
+                    'estimated_spending': estimated_spending,
+                    'different_stocks': row.stock_count,
+                    'last_trade_date': row.latest_trade.isoformat() if row.latest_trade else None
                 })
 
             return jsonify({
@@ -480,12 +488,14 @@ def create_app():
     def get_popular_stocks():
         try:
             limit = request.args.get('limit', 500, type=int)
-            
+
             stock_stats = db.session.query(
                 models.Trade.traded_issuer_ticker,
                 models.Trade.traded_issuer_name,
                 func.count(models.Trade.id).label('total_trades'),
-                func.count(func.distinct(models.Trade.politician_name)).label('politician_count')
+                func.count(func.distinct(models.Trade.politician_name)).label('politician_count'),
+                func.sum(case((models.Trade.type == 'buy', 1), else_=0)).label('buy_count'),
+                func.sum(case((models.Trade.type == 'sell', 1), else_=0)).label('sell_count')
             ).filter(
                 models.Trade.traded_issuer_ticker.isnot(None)
             ).group_by(
@@ -497,28 +507,15 @@ def create_app():
 
             stocks = []
             for stock in stock_stats:
-                # Get buy/sell counts separately for calculation
-                buys = db.session.query(func.count(models.Trade.id)).filter(
-                    models.Trade.traded_issuer_ticker == stock.traded_issuer_ticker,
-                    models.Trade.type == 'buy'
-                ).scalar() or 0
-                
-                sells = db.session.query(func.count(models.Trade.id)).filter(
-                    models.Trade.traded_issuer_ticker == stock.traded_issuer_ticker,
-                    models.Trade.type == 'sell'
-                ).scalar() or 0
-                
-                buy_ratio = (buys / stock.total_trades * 100) if stock.total_trades > 0 else 0
-                
-                # Stock trading summary by aggregating congressional trading data
+                buy_ratio = (stock.buy_count / stock.total_trades * 100) if stock.total_trades > 0 else 0
                 stocks.append({
-                    'symbol': stock.traded_issuer_ticker,    # like CSCO, ORCL
-                    'name': stock.traded_issuer_name,    # company name
-                    'trade_count': stock.total_trades,    # number of trades for a specific stock
-                    'politician_count': stock.politician_count,    # number of unique politicians who traded the stock
-                    'buy_count': buys,    # total number of buy transactions
-                    'sell_count': sells,    # total number of sell transactions
-                    'buy_ratio': round(buy_ratio, 1)    # % of trades that were buys
+                    'symbol': stock.traded_issuer_ticker,
+                    'name': stock.traded_issuer_name,
+                    'trade_count': stock.total_trades,
+                    'politician_count': stock.politician_count,
+                    'buy_count': stock.buy_count,
+                    'sell_count': stock.sell_count,
+                    'buy_ratio': round(buy_ratio, 1)
                 })
 
             return jsonify({
