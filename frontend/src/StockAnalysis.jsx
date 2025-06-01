@@ -573,10 +573,16 @@ function StockAnalysis({ symbol, historicalPriceData, trades }) {
         </Paper>
         
         {/* Main Content Grid */}
-        <Box sx={{ px: 2, pb: 2 }}>
-          <Grid container spacing={2}>
+        <Box sx={{ px: 3, pb: 2 }}>
+          <Grid container spacing={3}>
             {/* Left Column */}
-            <Grid item xs={12} md={6}>
+            <Grid
+              item
+              xs={12}
+              md={6}
+              sx={{ flexBasis: { md: '48%' } }}
+            >
+
               {/* Technical Indicators */}
               <Paper sx={{ borderRadius: 0 }}>
                 <Typography sx={{ p: 1.5, borderBottom: `1px solid ${theme.palette.divider}`, fontWeight: 500 }}>
@@ -726,7 +732,12 @@ function StockAnalysis({ symbol, historicalPriceData, trades }) {
             </Grid>
             
             {/* Right Column */}
-            <Grid item xs={12} md={6}>
+            <Grid
+              item
+              xs={12}
+              md={6}
+              sx={{ flexBasis: { md: '48%' } }}
+            >
               {/* VWAP and Price Data */}
               <Paper sx={{ mb: 2, borderRadius: 0 }}>
                 <Typography sx={{ p: 1.5, borderBottom: `1px solid ${theme.palette.divider}`, fontWeight: 500 }}>
