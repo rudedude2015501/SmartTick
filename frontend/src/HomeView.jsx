@@ -25,7 +25,7 @@ let tradesCache = null;
 let politiciansCache = null;
 let stocksCache = null;
 
-export default function HomeView() {
+export default function HomeView({ onPoliticianClick }) {
   // ——————————— Trades state ———————————
   const [allTrades, setAllTrades] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -157,7 +157,30 @@ export default function HomeView() {
       field: 'politician_name',
       flex: 1,
       sortable: true,
-      filter: true
+      filter: true,
+      cellRenderer: params => {
+        const name = params.value;
+        return (
+          <span
+            style={{ color: '#1976d2', cursor: 'pointer' }}
+            onClick={e => {
+              e.stopPropagation();
+              if (onPoliticianClick) onPoliticianClick(name);
+            }}
+            tabIndex={0}
+            onKeyDown={e => {
+              if ((e.key === 'Enter' || e.key === ' ') && onPoliticianClick) {
+                e.preventDefault();
+                onPoliticianClick(name);
+              }
+            }}
+            role="button"
+            aria-label={`View ${name} in Congress view`}
+          >
+            {name}
+          </span>
+        );
+      }
     },
     {
       headerName: 'Stock',
@@ -229,7 +252,7 @@ export default function HomeView() {
         return parsePrice(a) - parsePrice(b);
       }
     },
-  ], []);
+  ], [onPoliticianClick]);
 
 
   // NEW DESIGN

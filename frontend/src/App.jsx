@@ -234,6 +234,15 @@ function App() {
       ? 'Enter Ticker Symbol...'
       : 'Enter Politician Name...';
 
+  // Handler for clicking a politician in HomeView
+  const handlePoliticianClick = (name) => {
+    setViewMode(VIEW_CONGRESS);
+    setSearchTerm(name);
+    setSearchedTerm(name);
+    setOpen(false);
+    setOptions([]);
+  };
+
   // Render
   return (
     <ThemeProvider theme={theme}>
@@ -347,7 +356,7 @@ function App() {
         {viewMode === VIEW_HOME ? (
           // full-width wrapper instead of Container
           <Box sx={{ px: 2 }}>
-            <HomeView />
+            <HomeView onPoliticianClick={handlePoliticianClick} />
           </Box>
         ) : (
           <Container maxWidth="md">
