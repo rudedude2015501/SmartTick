@@ -526,4 +526,88 @@ def create_app(config_name=None):
         except Exception as e:
             return jsonify({'error': str(e)}), 500
 
+    @app.route('/api/politicians/<name>/latest-trade', methods=["GET"])
+    def get_politician_latest_trade(name):
+        """
+        Returns the most recent trade for the given politician.
+        """
+        if not name or len(name) < 1:
+            return jsonify({"error": "Politician name is required."}), 400
+
+        try:
+            trade = db.session.query(models.Trade).filter(
+                models.Trade.politician_name == name
+            ).order_by(models.Trade.traded.desc()).first()
+            if not trade:
+                return jsonify({"error": "No trades found for this politician."}), 404
+            return jsonify(trade.to_dict())
+        except Exception as e:
+            app.logger.error(f"Failed to fetch latest trade for {name}: {e}", exc_info=True)
+            return jsonify({"error": "An internal server error occurred"}), 500
+
+    @app.route('/api/politicians/<name>/biggest-trade', methods=["GET"])
+    def get_politician_biggest_trade(name):
+        """
+        Returns the trade with the largest size for the given politician.
+        """
+        if not name or len(name) < 1:
+            return jsonify({"error": "Politician name is required."}), 400
+
+        try:
+            trades = db.session.query(models.Trade).filter(
+                models.Trade.politician_name == name,
+                models.Trade.size.isnot(None)
+            ).all()
+            if not trades:
+                return jsonify({"error": "No trades found for this politician."}), 404
+
+            # Find the trade with the largest numeric size
+            biggest_trade = max(
+                trades,
+                key=lambda t: size_to_numeric(t.size) if t.size else 0
+            )
+            return jsonify(biggest_trade.to_dict())
+        except Exception as e:
+            app.logger.error(f"Failed to fetch biggest trade for {name}: {e}", exc_info=True)
+            return jsonify({"error": "An internal server error occurred"}), 500
+
+    @app.route('/api/politicians/<name>/stats', methods=["GET"])
+    def get_single_politician_stats(name):
+        """
+        Returns stats for a single searched politician.
+        """
+        if not name or len(name) < 1:
+            return jsonify({"error": "Politician name is required."}), 400
+
+        try:
+            row = db.session.query(
+                models.Trade.politician_name,
+                func.count(models.Trade.id).label('trade_count')
+            ).filter(
+                models.Trade.politician_name == name
+            ).group_by(
+                models.Trade.politician_name
+            ).first()
+
+            if not row:
+                return jsonify({"error": "No stats found for this politician."}), 404
+
+            # Calculate estimated spending for this politician
+            trades = db.session.query(models.Trade.size).filter(
+                models.Trade.politician_name == name,
+                models.Trade.size.isnot(None)
+            ).all()
+            estimated_spending = sum(size_to_numeric(t.size) for t in trades if t.size)
+
+            result = {
+                'name': row.politician_name,
+                'total_trades': row.trade_count,
+                'estimated_spending': estimated_spending
+            }
+
+            return jsonify(result)
+
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
+
     return app
