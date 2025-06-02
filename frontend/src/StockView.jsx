@@ -434,7 +434,7 @@ function StockView({ searchSymbol }) {
             {tradesError && <Alert severity="error">{tradesError}</Alert>}
             {!isLoadingTrades && trades.length === 0 && !tradesError && (<Typography sx={{ color: 'text.secondary', mt: 2 }}>No recent politician trades found for this stock.</Typography>)}
             {!isLoadingTrades && trades.length > 0 && (
-              <TableContainer component={Paper} sx={{ mt: 2, maxHeight: 400 }}>
+              <TableContainer component={Paper} sx={{ maxHeight: 400 }}>
                 <Table stickyHeader>
                   <TableHead>
                     <TableRow>
