@@ -196,13 +196,13 @@ function CongressView({ searchTerm }) {
             >
               <Box sx={{ textAlign: 'center', flex: 1 }}>
                 <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                  Total Trades <span style={{ fontWeight: 400, fontSize: 13 }}>(past 3 years)</span>
+                  Total Trades <span style={{ fontWeight: 100, fontSize: 13}}>(past 3 years)</span>
                 </Typography>
                 <Typography variant="h6">{stats.total_trades}</Typography>
               </Box>
               <Box sx={{ textAlign: 'center', flex: 1 }}>
                 <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                  Est. Spending <span style={{ fontWeight: 400, fontSize: 13 }}>(past 3 years)</span>
+                  Est. Spending <span style={{ fontWeight: 100, fontSize: 13}}>(past 3 years)</span>
                 </Typography>
                 <Typography variant="h6">
                   ${stats.estimated_spending.toLocaleString()}
