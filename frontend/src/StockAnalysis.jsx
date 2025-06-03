@@ -576,9 +576,6 @@ function StockAnalysis({ symbol, historicalPriceData, trades }) {
           <Grid container spacing={3}>
             {/* Left Column */}
             <Grid
-              item
-              xs={12}
-              md={6}
               sx={{ flexBasis: { md: '48%' } }}
             >
 
@@ -732,9 +729,6 @@ function StockAnalysis({ symbol, historicalPriceData, trades }) {
             
             {/* Right Column */}
             <Grid
-              item
-              xs={12}
-              md={6}
               sx={{ flexBasis: { md: '48%' } }}
             >
               {/* VWAP and Price Data */}
