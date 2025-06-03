@@ -6,11 +6,15 @@ import PersonIcon from '@mui/icons-material/Person';
 import CircularProgress from '@mui/material/CircularProgress';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
+import { useTheme } from '@mui/material/styles';
 
 // Get API URL from environment variable
 const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 function TradeCard({ trade, label, color, active }) {
+  const theme = useTheme();
+  const isDarkMode = theme.palette.mode === 'dark';
+
   return (
     <Card
       variant="outlined"
@@ -21,11 +25,12 @@ function TradeCard({ trade, label, color, active }) {
         borderRadius: 3,
         minWidth: 0,
         opacity: active ? 1 : 0.7,
-        borderColor: active ? color + '.light' : 'grey.300',
+        border: '2px solid',
+        borderColor: isDarkMode ? '#fff' : (active ? `${color}.light` : 'grey.300'),
         transition: 'box-shadow 0.25s cubic-bezier(.4,2,.6,1), border-color 0.2s, transform 0.25s cubic-bezier(.4,2,.6,1)',
         '&:hover': {
           boxShadow: 12,
-          borderColor: color + '.main',
+          borderColor: isDarkMode ? '#fff' : `${color}.main`,
           transform: 'translateY(-8px) scale(1.04)'
         },
         p: 0,
@@ -38,7 +43,7 @@ function TradeCard({ trade, label, color, active }) {
           position: 'absolute',
           top: 10,
           right: 14,
-          bgcolor: color + '.main',
+          bgcolor: isDarkMode ? '#111' : color + '.main',
           color: color + '.contrastText',
           px: 1.2,
           py: 0.3,
@@ -58,7 +63,14 @@ function TradeCard({ trade, label, color, active }) {
             <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5 }}>
               {trade.traded}
             </Typography>
-            <Typography variant="subtitle1" sx={{ fontWeight: 700, color: color + '.main', mb: 0.5 }}>
+            <Typography
+              variant="subtitle1"
+              sx={{
+                fontWeight: 700,
+                color: isDarkMode ? '#fff' : color + '.main',
+                mb: 0.5
+              }}
+            >
               {trade.traded_issuer_ticker}
             </Typography>
             <Typography
@@ -97,6 +109,8 @@ function CongressView({ searchTerm }) {
   const [latestTrade, setLatestTrade] = useState(null);
   const [biggestTrade, setBiggestTrade] = useState(null);
   const [stats, setStats] = useState(null);
+  const theme = useTheme();
+  const isDarkMode = theme.palette.mode === 'dark';
 
   useEffect(() => {
     if (!searchTerm) {
@@ -161,7 +175,7 @@ function CongressView({ searchTerm }) {
               bgcolor: 'primary.light',
               boxShadow: 3,
               border: '3px solid',
-              borderColor: 'primary.main',
+              borderColor: isDarkMode ? '#fff' : 'primary.main',
               mb: 1
             }}
             src={profileData[0]}

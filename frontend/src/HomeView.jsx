@@ -280,7 +280,11 @@ export default function HomeView({ onPoliticianClick }) {
         <Typography
           variant="h4"
           component="h2"
-          sx={{ fontWeight: 'bold', mb: 1, color: 'primary.main' }}
+          sx={{
+            fontWeight: 'bold',
+            mb: 1,
+            color: isDarkMode ? '#fff' : 'primary.main'
+          }}
         >
           Recent Trades
         </Typography>
@@ -334,7 +338,11 @@ export default function HomeView({ onPoliticianClick }) {
         <Typography
           variant="h4"
           component="h2"
-          sx={{ fontWeight: 'bold', mb: 1, color: 'primary.main' }}
+          sx={{
+            fontWeight: 'bold',
+            mb: 1,
+            color: isDarkMode ? '#fff' : 'primary.main'
+          }}
         >
           Metric Leaderboards
         </Typography>
