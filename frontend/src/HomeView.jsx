@@ -160,9 +160,10 @@ export default function HomeView({ onPoliticianClick }) {
       filter: true,
       cellRenderer: params => {
         const name = params.value;
+        const img = params.data.img;
         return (
           <span
-            style={{ color: '#1976d2', cursor: 'pointer' }}
+            style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#1976d2', cursor: 'pointer' }}
             onClick={e => {
               e.stopPropagation();
               if (onPoliticianClick) onPoliticianClick(name);
@@ -177,6 +178,21 @@ export default function HomeView({ onPoliticianClick }) {
             role="button"
             aria-label={`View ${name} in Congress view`}
           >
+            {img && (
+              <img
+                src={img}
+                alt={name}
+                style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: '50%',
+                  objectFit: 'cover',
+                  marginRight: 8,
+                  border: '1px solid #ccc',
+                  background: '#fff'
+                }}
+              />
+            )}
             {name}
           </span>
         );

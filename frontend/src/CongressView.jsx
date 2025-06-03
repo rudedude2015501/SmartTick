@@ -115,7 +115,7 @@ function CongressView({ searchTerm }) {
     fetch(`${apiUrl}/api/pol/image?name=${encodeURIComponent(searchTerm)}`)
       .then(res => res.json())
       .then(data => {
-        const imgUrl = data.img ? `https://www.capitoltrades.com${data.img}` : null;
+        const imgUrl = data.img || null;
         setProfileData([imgUrl, data.politician_name || '', data.politician_family || '']);
         setIsLoading(false);
       })

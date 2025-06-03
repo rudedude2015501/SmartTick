@@ -11,6 +11,7 @@ from flask_migrate import Migrate
 from flask_cors import CORS
 from sqlalchemy import func, case, cast, Float
 
+# Api client imports
 from .finnhub_client import get_profile, get_quote_data, get_financials
 from .tiingo_client import get_daily_prices
 
@@ -177,7 +178,7 @@ def create_app(config_name=None):
             models.Trade.type,
             models.Trade.size
         ).filter(
-            models.Trade.traded_issuer_ticker.ilike(f"%{base_symbol}%"),  # Match the symbol
+            models.Trade.traded_issuer_ticker.ilike(f"%{base_symbol}%"),
             models.Trade.traded.isnot(None)
         ).order_by(models.Trade.traded).all()
 
@@ -265,7 +266,6 @@ def create_app(config_name=None):
             if not trades:
                 return jsonify({"error": f"No trade data found for symbol {symbol}"}), 404
 
-            # Convert the trade data to a list of dictionaries
             trades_data = [trade.to_dict() for trade in trades]
 
             return jsonify(trades_data)
@@ -278,16 +278,29 @@ def create_app(config_name=None):
     def get_recent_trades():
         """
         Fetches all trade data from the Trade table, sorted by trade date in descending order.
+        Includes politician image if available.
         """
         try:
-            # Query the database for trades and sort by date (descending), no join, no limit
-            trades = db.session.query(models.Trade).order_by(models.Trade.traded.desc()).all()
+            # Outer join Trade with PoliticianImg on politician_name
+            trades = db.session.query(
+                models.Trade,
+                models.PoliticianImg.img
+            ).outerjoin(
+                models.PoliticianImg,
+                models.Trade.politician_name == models.PoliticianImg.politician_name
+            ).order_by(models.Trade.traded.desc()).all()
 
             if not trades:
                 return jsonify({"error": "No trade data found"}), 404
 
-            # Convert the trade data to a list of dictionaries
-            trades_data = [trade.to_dict() for trade in trades]
+            trades_data = []
+            for trade, img in trades:
+                trade_dict = trade.to_dict()
+                if img:
+                    trade_dict['img'] = f"https://www.capitoltrades.com{img}"
+                else:
+                    trade_dict['img'] = None
+                trades_data.append(trade_dict)
 
             return jsonify(trades_data)
         except Exception as e:
@@ -301,7 +314,6 @@ def create_app(config_name=None):
         GET /api/prices/AAPL?start=2024-01-01&end=2024-02-01
         returns Tiingo daily OHLC data between those dates
         """
-        # grab and validate query params
         start_date = request.args.get("start")
         end_date   = request.args.get("end")
         if not start_date or not end_date:
@@ -331,7 +343,6 @@ def create_app(config_name=None):
             return jsonify([])
 
         try:
-            # search for stocks where symbol starts with input
             stocks = db.session.query(models.Stock).filter(
                 db.or_(
                     models.Stock.symbol.ilike(f"{query}%"),
@@ -339,7 +350,6 @@ def create_app(config_name=None):
                 )
             ).limit(10).all()
 
-            # format results 
             results = [
                 {
                     'symbol': stock.symbol,
@@ -399,7 +409,10 @@ def create_app(config_name=None):
             ).first()
             if not image:
                 return jsonify({"error": "No Image data found"}), 404
-            return jsonify(image.to_dict())
+            img_dict = image.to_dict()
+            if img_dict.get("img"):
+                img_dict["img"] = f"https://www.capitoltrades.com{img_dict['img']}"
+            return jsonify(img_dict)
         except Exception as e:
             app.logger.error(f"failed to fetch images: {e}", exc_info=True)
             return jsonify({"error": "an internal server error occured"}), 500
@@ -424,7 +437,6 @@ def create_app(config_name=None):
             limit = request.args.get('limit', 500, type=int)
             min_trades = request.args.get('min_trades', 1, type=int)
 
-            # Main stats query (as before)
             politician_query = db.session.query(
                 models.Trade.politician_name,
                 models.Trade.politician_family,
@@ -452,7 +464,6 @@ def create_app(config_name=None):
                 models.Trade.size.isnot(None)
             ).all()
 
-            # Aggregate spending per politician in Python
             spending_map = {}
             for pol_name, size in all_trades:
                 if pol_name not in spending_map:
