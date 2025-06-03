@@ -134,7 +134,6 @@ function CongressView({ searchTerm }) {
       .then(data => setBiggestTrade(data && !data.error ? data : null))
       .catch(() => setBiggestTrade(null));
 
-    // Fetch stats for the past 3 years
     fetch(`${apiUrl}/api/politicians/${encodeURIComponent(searchTerm)}/stats`)
       .then(res => res.ok ? res.json() : null)
       .then(data => setStats(data && !data.error ? data : null))

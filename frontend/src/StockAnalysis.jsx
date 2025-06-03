@@ -1,5 +1,4 @@
 // Stock analysis using Tiingo and politician trading data
-// Based on Investopedia metrics and my own additions for congressional trading
 
 import { useState, useEffect } from 'react';
 import { useTheme } from '@mui/material/styles';

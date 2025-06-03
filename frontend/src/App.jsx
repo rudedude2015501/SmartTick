@@ -101,7 +101,7 @@ function App() {
     }), [darkMode]
   );
 
-  // Debounced fetch for autocomplete (keep only one)
+  // Debounced fetch for autocomplete
   const debouncedFetch = useCallback(
     debounce((value, endpoint) => {
       fetchData(value, endpoint);
@@ -282,7 +282,6 @@ function App() {
                 <AccountBalanceIcon sx={{ mr: 1 }} />Congress
               </ToggleButton>
             </ToggleButtonGroup>
-            {/* Only render search bar if not in HOME view */}
             {viewMode !== VIEW_HOME && (
               <Search>
                 <SearchIconWrapper>

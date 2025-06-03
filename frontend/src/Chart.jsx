@@ -1,4 +1,3 @@
-// SmartTick/frontend/src/Chart.jsx
 import React, { useMemo } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useTheme } from '@mui/material/styles';
