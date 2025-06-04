@@ -12,6 +12,8 @@ import {
 import { AgGridReact } from 'ag-grid-react';
 import { themeQuartz, colorSchemeDark } from 'ag-grid-community';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
+import PersonIcon from '@mui/icons-material/Person';
+import Avatar from '@mui/material/Avatar';
 
 import CongressLeaderboard from './CongressLeaderboard';
 import StockLeaderboard from './StockLeaderboard';
@@ -178,22 +180,25 @@ export default function HomeView({ onPoliticianClick, onStockClick }) {
             role="button"
             aria-label={`View ${name} in Congress view`}
           >
-            {img && (
-              <img
-                src={img}
-                alt={name}
-                style={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: '50%',
-                  objectFit: 'cover',
-                  marginRight: 8,
-                  border: '1px solid #ccc',
-                  background: '#fff'
-                }}
-              />
-            )}
-            {name}
+            <Avatar
+              sx={{
+                width: 32,
+                height: 32,
+              }}
+              src={img}
+            >
+              <PersonIcon sx={{ fontSize: 24, color: '#888' }} />
+            </Avatar>
+            <span
+              style={{
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+              title={name}
+            >
+              {name}
+            </span>
           </span>
         );
       }
