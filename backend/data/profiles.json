@@ -300,21 +300,6 @@
     "weburl": "https://abc.xyz/"
   },
   {
-    "symbol": "GOOGL",
-    "name": "Alphabet Inc",
-    "exchange": "NASDAQ NMS - GLOBAL MARKET",
-    "industry": "Media",
-    "currency": "USD",
-    "country": "US",
-    "estimate_currency": "USD",
-    "ipo": "2004-08-19",
-    "logo": "https://static2.finnhub.io/file/publicdatany/finnhubimage/stock_logo/GOOG.png",
-    "market_capitalization": 2023785.9871969777,
-    "phone": "16502530000",
-    "shares_outstanding": 12135,
-    "weburl": "https://abc.xyz/"
-  },
-  {
     "symbol": "MO",
     "name": "Altria Group Inc",
     "exchange": "NEW YORK STOCK EXCHANGE, INC.",
@@ -3045,21 +3030,6 @@
     "weburl": "https://www.foxcorporation.com/"
   },
   {
-    "symbol": "FOXA",
-    "name": "Fox Corp",
-    "exchange": "NASDAQ NMS - GLOBAL MARKET",
-    "industry": "Media",
-    "currency": "USD",
-    "country": "US",
-    "estimate_currency": "USD",
-    "ipo": "2019-02-27",
-    "logo": "https://static2.finnhub.io/file/publicdatany/finnhubimage/stock_logo/FOXA.png",
-    "market_capitalization": 23773.614913751542,
-    "phone": "12128527000",
-    "shares_outstanding": 449.62,
-    "weburl": "https://www.foxcorporation.com/"
-  },
-  {
     "symbol": "BEN",
     "name": "Franklin Resources Inc",
     "exchange": "NEW YORK STOCK EXCHANGE, INC.",
@@ -5038,21 +5008,6 @@
     "phone": "13038637414",
     "shares_outstanding": 1113,
     "weburl": "https://newmont.com/"
-  },
-  {
-    "symbol": "NWSA",
-    "name": "News Corp",
-    "exchange": "NASDAQ NMS - GLOBAL MARKET",
-    "industry": "Media",
-    "currency": "USD",
-    "country": "US",
-    "estimate_currency": "USD",
-    "ipo": "2013-06-19",
-    "logo": "https://static2.finnhub.io/file/publicdatany/finnhubimage/stock_logo/NWSA.png",
-    "market_capitalization": 16644.24049342593,
-    "phone": "12124163400",
-    "shares_outstanding": 566.11,
-    "weburl": "https://newscorp.com/"
   },
   {
     "symbol": "NWSA",
