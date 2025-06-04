@@ -36,7 +36,7 @@ const mockPopularStocks = {
   stocks: [],
 };
 
-describe('Scenario 1 testing:', () => {
+describe('Scenario 1 testing: Recent Politician Trades Table', () => {
   const mockFetch = vi.fn();
   
   beforeAll(() => {
