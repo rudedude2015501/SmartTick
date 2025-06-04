@@ -184,6 +184,7 @@ export default function HomeView({ onPoliticianClick, onStockClick }) {
               sx={{
                 width: 32,
                 height: 32,
+                backgroundColor: 'white',
               }}
               src={img}
             >
