@@ -25,7 +25,7 @@ let tradesCache = null;
 let politiciansCache = null;
 let stocksCache = null;
 
-export default function HomeView({ onPoliticianClick }) {
+export default function HomeView({ onPoliticianClick, onStockClick }) {
   // ——————————— Trades state ———————————
   const [allTrades, setAllTrades] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -203,7 +203,45 @@ export default function HomeView({ onPoliticianClick }) {
       field: 'traded_issuer_ticker',
       flex: 1,
       sortable: true,
-      filter: true
+      filter: true,
+      cellRenderer: params => {
+        const ticker = params.value;
+        // Not clickable if N/A or starts with $
+        const isClickable = ticker && ticker !== 'N/A' && !(typeof ticker === 'string' && ticker.trim().startsWith('$'));
+        return (
+          <span
+            style={{
+              color: isClickable ? '#1976d2' : undefined,
+              cursor: isClickable ? 'pointer' : 'default'
+            }}
+            onClick={e => {
+              if (!isClickable) return;
+              e.stopPropagation();
+              let symbol = ticker;
+              if (typeof symbol === 'string' && symbol.includes(':')) {
+                symbol = symbol.split(':')[0];
+              }
+              if (onStockClick) onStockClick(symbol);
+            }}
+            tabIndex={isClickable ? 0 : -1}
+            onKeyDown={e => {
+              if (!isClickable) return;
+              if ((e.key === 'Enter' || e.key === ' ')) {
+                e.preventDefault();
+                let symbol = ticker;
+                if (typeof symbol === 'string' && symbol.includes(':')) {
+                  symbol = symbol.split(':')[0];
+                }
+                if (onStockClick) onStockClick(symbol);
+              }
+            }}
+            role={isClickable ? 'button' : undefined}
+            aria-label={isClickable ? `View ${ticker} in Stock view` : undefined}
+          >
+            {ticker}
+          </span>
+        );
+      }
     },
     {
       headerName: 'Trade Type',
@@ -268,7 +306,7 @@ export default function HomeView({ onPoliticianClick }) {
         return parsePrice(a) - parsePrice(b);
       }
     },
-  ], [onPoliticianClick]);
+  ], [onPoliticianClick, onStockClick]);
 
 
   // NEW DESIGN
