@@ -3,7 +3,7 @@ import HomeView from '../../HomeView.jsx'
 
 globalThis.fetch = vi.fn()  // mock api call to avoid real requests 
 
-describe('Sample Integration Test', () => {
+describe('Sample Unit Test', () => {
     beforeEach(() => {
         fetch.mockClear()
     })
