@@ -295,7 +295,7 @@ function App() {
                   onKeyDown={handleKeyDown}
                 />
                 <Popper
-                  open={open}
+                  open={open && options.length > 0}
                   anchorEl={anchorEl}
                   placement="bottom-start"
                   style={{ zIndex: 1301, width: anchorEl ? anchorEl.clientWidth : null }}
@@ -333,11 +333,7 @@ function App() {
                               )}
                             </MenuItem>
                           ))
-                        ) : (
-                          <MenuItem disabled>
-                            {`No ${(viewMode === VIEW_STOCK) ? 'stocks' : 'politicians'} found`}
-                          </MenuItem>
-                        )}
+                        ) : null}
                       </MenuList>
                     </ClickAwayListener>
                   </Paper>

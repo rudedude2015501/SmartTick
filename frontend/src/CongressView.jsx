@@ -11,9 +11,17 @@ import { useTheme } from '@mui/material/styles';
 // Get API URL from environment variable
 const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
-function TradeCard({ trade, label, color, active }) {
+function TradeCard({ trade, label, color, active, loading }) {
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === 'dark';
+
+  if (loading) {
+    return (
+      <Box sx={{ flex: 1, minWidth: 0, display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 120 }}>
+        <CircularProgress size={28} />
+      </Box>
+    );
+  }
 
   return (
     <Card
@@ -108,6 +116,8 @@ function CongressView({ searchTerm }) {
   const [isLoading, setIsLoading] = useState(false);
   const [latestTrade, setLatestTrade] = useState(null);
   const [biggestTrade, setBiggestTrade] = useState(null);
+  const [latestTradeLoading, setLatestTradeLoading] = useState(false);
+  const [biggestTradeLoading, setBiggestTradeLoading] = useState(false);
   const [stats, setStats] = useState(null);
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === 'dark';
@@ -118,6 +128,8 @@ function CongressView({ searchTerm }) {
       setLatestTrade(null);
       setBiggestTrade(null);
       setStats(null);
+      setLatestTradeLoading(false);
+      setBiggestTradeLoading(false);
       return;
     }
     setIsLoading(true);
@@ -125,6 +137,8 @@ function CongressView({ searchTerm }) {
     setLatestTrade(null);
     setBiggestTrade(null);
     setStats(null);
+    setLatestTradeLoading(true);
+    setBiggestTradeLoading(true);
 
     fetch(`${apiUrl}/api/pol/image?name=${encodeURIComponent(searchTerm)}`)
       .then(res => res.json())
@@ -140,13 +154,25 @@ function CongressView({ searchTerm }) {
 
     fetch(`${apiUrl}/api/politicians/${encodeURIComponent(searchTerm)}/latest-trade`)
       .then(res => res.ok ? res.json() : null)
-      .then(data => setLatestTrade(data && !data.error ? data : null))
-      .catch(() => setLatestTrade(null));
+      .then(data => {
+        setLatestTrade(data && !data.error ? data : null);
+        setLatestTradeLoading(false);
+      })
+      .catch(() => {
+        setLatestTrade(null);
+        setLatestTradeLoading(false);
+      });
 
     fetch(`${apiUrl}/api/politicians/${encodeURIComponent(searchTerm)}/biggest-trade`)
       .then(res => res.ok ? res.json() : null)
-      .then(data => setBiggestTrade(data && !data.error ? data : null))
-      .catch(() => setBiggestTrade(null));
+      .then(data => {
+        setBiggestTrade(data && !data.error ? data : null);
+        setBiggestTradeLoading(false);
+      })
+      .catch(() => {
+        setBiggestTrade(null);
+        setBiggestTradeLoading(false);
+      });
 
     fetch(`${apiUrl}/api/politicians/${encodeURIComponent(searchTerm)}/stats`)
       .then(res => res.ok ? res.json() : null)
@@ -234,8 +260,8 @@ function CongressView({ searchTerm }) {
               justifyContent: 'center'
             }}
           >
-            <TradeCard trade={latestTrade} label="Most Recent" color="primary" active={!!latestTrade} />
-            <TradeCard trade={biggestTrade} label="Biggest Trade" color="primary" active={!!biggestTrade} />
+            <TradeCard trade={latestTrade} label="Most Recent" color="primary" active={!!latestTrade} loading={latestTradeLoading} />
+            <TradeCard trade={biggestTrade} label="Biggest Trade" color="primary" active={!!biggestTrade} loading={biggestTradeLoading} />
           </Box>
         </>
       )}

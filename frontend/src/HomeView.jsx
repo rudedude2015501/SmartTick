@@ -12,6 +12,8 @@ import {
 import { AgGridReact } from 'ag-grid-react';
 import { themeQuartz, colorSchemeDark } from 'ag-grid-community';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
+import PersonIcon from '@mui/icons-material/Person';
+import Avatar from '@mui/material/Avatar';
 
 import CongressLeaderboard from './CongressLeaderboard';
 import StockLeaderboard from './StockLeaderboard';
@@ -25,7 +27,7 @@ let tradesCache = null;
 let politiciansCache = null;
 let stocksCache = null;
 
-export default function HomeView({ onPoliticianClick }) {
+export default function HomeView({ onPoliticianClick, onStockClick }) {
   // ——————————— Trades state ———————————
   const [allTrades, setAllTrades] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -178,22 +180,26 @@ export default function HomeView({ onPoliticianClick }) {
             role="button"
             aria-label={`View ${name} in Congress view`}
           >
-            {img && (
-              <img
-                src={img}
-                alt={name}
-                style={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: '50%',
-                  objectFit: 'cover',
-                  marginRight: 8,
-                  border: '1px solid #ccc',
-                  background: '#fff'
-                }}
-              />
-            )}
-            {name}
+            <Avatar
+              sx={{
+                width: 32,
+                height: 32,
+                backgroundColor: 'white',
+              }}
+              src={img}
+            >
+              <PersonIcon sx={{ fontSize: 24, color: '#888' }} />
+            </Avatar>
+            <span
+              style={{
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+              title={name}
+            >
+              {name}
+            </span>
           </span>
         );
       }
@@ -203,7 +209,45 @@ export default function HomeView({ onPoliticianClick }) {
       field: 'traded_issuer_ticker',
       flex: 1,
       sortable: true,
-      filter: true
+      filter: true,
+      cellRenderer: params => {
+        const ticker = params.value;
+        // Not clickable if N/A or starts with $
+        const isClickable = ticker && ticker !== 'N/A' && !(typeof ticker === 'string' && ticker.trim().startsWith('$'));
+        return (
+          <span
+            style={{
+              color: isClickable ? '#1976d2' : undefined,
+              cursor: isClickable ? 'pointer' : 'default'
+            }}
+            onClick={e => {
+              if (!isClickable) return;
+              e.stopPropagation();
+              let symbol = ticker;
+              if (typeof symbol === 'string' && symbol.includes(':')) {
+                symbol = symbol.split(':')[0];
+              }
+              if (onStockClick) onStockClick(symbol);
+            }}
+            tabIndex={isClickable ? 0 : -1}
+            onKeyDown={e => {
+              if (!isClickable) return;
+              if ((e.key === 'Enter' || e.key === ' ')) {
+                e.preventDefault();
+                let symbol = ticker;
+                if (typeof symbol === 'string' && symbol.includes(':')) {
+                  symbol = symbol.split(':')[0];
+                }
+                if (onStockClick) onStockClick(symbol);
+              }
+            }}
+            role={isClickable ? 'button' : undefined}
+            aria-label={isClickable ? `View ${ticker} in Stock view` : undefined}
+          >
+            {ticker}
+          </span>
+        );
+      }
     },
     {
       headerName: 'Trade Type',
@@ -268,7 +312,7 @@ export default function HomeView({ onPoliticianClick }) {
         return parsePrice(a) - parsePrice(b);
       }
     },
-  ], [onPoliticianClick]);
+  ], [onPoliticianClick, onStockClick]);
 
 
   // NEW DESIGN
