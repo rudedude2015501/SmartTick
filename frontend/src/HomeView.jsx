@@ -321,7 +321,7 @@ export default function HomeView({ onPoliticianClick, onStockClick }) {
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 6, p: 4, alignItems: 'center' }}>
 
       {/* ─── Top Section: Recent Trades ─── */}
-      <Box sx={{ width: '66%', textAlign: 'center' }}>
+      <Box sx={{ width: '90%', textAlign: 'center' }}>
         <Typography
           variant="h4"
           component="h2"
