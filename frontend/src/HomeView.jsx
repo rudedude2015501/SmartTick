@@ -187,6 +187,7 @@ export default function HomeView({ onPoliticianClick, onStockClick }) {
                 backgroundColor: 'white',
               }}
               src={img}
+              alt={name}
             >
               <PersonIcon sx={{ fontSize: 24, color: '#888' }} />
             </Avatar>
