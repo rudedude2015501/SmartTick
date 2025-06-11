@@ -118,7 +118,9 @@ const TradeChart = ({ data }) => {
         <XAxis dataKey="name" stroke={theme.palette.text.secondary} /> 
         <YAxis
           stroke={theme.palette.text.secondary}
-          tickFormatter={(value) => value.toLocaleString()}
+          tickFormatter={value =>
+            new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 1 }).format(value)
+          }
         />
         <Tooltip
           contentStyle={{

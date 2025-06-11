@@ -243,6 +243,15 @@ function App() {
     setOptions([]);
   };
 
+  // Handler for clicking a stock in HomeView
+  const handleStockClick = (symbol) => {
+    setViewMode(VIEW_STOCK);
+    setSearchTerm(symbol);
+    setSearchedTerm(symbol);
+    setOpen(false);
+    setOptions([]);
+  };
+
   // Render
   return (
     <ThemeProvider theme={theme}>
@@ -351,7 +360,7 @@ function App() {
         {viewMode === VIEW_HOME ? (
           // full-width wrapper instead of Container
           <Box sx={{ px: 2 }}>
-            <HomeView onPoliticianClick={handlePoliticianClick} />
+            <HomeView onPoliticianClick={handlePoliticianClick} onStockClick={handleStockClick} />
           </Box>
         ) : (
           <Container maxWidth="md">
